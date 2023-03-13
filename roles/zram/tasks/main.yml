@@ -18,6 +18,14 @@
     backrefs: true
     state: present
 
+- name: comment out swap lvs
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    regexp: '(^/dev/mapper.*swap.*)'  # starts with dev/mapper and has swap in line
+    line: '# \1'
+    backrefs: true
+    state: present
+
 - name: check for swap file
   ansible.builtin.stat:
     path: /var/swap
@@ -41,7 +49,7 @@
 
 - name: enable swapfile
   ansible.builtin.command:
-    cmd: swapon /var/swap
+    cmd: swapon -p -4 /var/swap
   when: not swapfile_check.stat.exists
 
 - name: add swapfile to fstab
