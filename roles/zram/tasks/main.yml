@@ -10,18 +10,10 @@
     path: /etc/systemd/system/zram.service
   register: zram_systemd_check
 
-- name: comment out swap mounts
-  ansible.builtin.lineinfile:
-    path: /etc/fstab
-    regexp: '(^\/.*swap.*)' # starts with '/' and has swap in line
-    line: '# \1'
-    backrefs: true
-    state: present
-
 - name: comment out swap UUIDs
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    regexp: '(^UUID.*swap.*)' # starts with UUID and has swap in line
+    regexp: '(^UUID.*swap.*)'  # starts with UUID and has swap in line
     line: '# \1'
     backrefs: true
     state: present
@@ -34,6 +26,12 @@
 - name: create file for swap
   ansible.builtin.command:
     cmd: fallocate -l 512M /var/swap
+  when: not swapfile_check.stat.exists
+
+- name: set permissions on swapfile
+  ansible.builtin.file:
+    path: /var/swap
+    mode: '0600'
   when: not swapfile_check.stat.exists
 
 - name: config file as swapfile
@@ -49,9 +47,9 @@
 - name: add swapfile to fstab
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    regexp: ^(?=.*UUID)(?=.*swap).*$
+    regexp: ^(?=.*UUID)(?=.*swap).*$  # search any UUID + any swap, select line
     line: "/var/swap   none  swap  defaults 0 0"
-  when: swapfile_check.stat.exists
+  when: not swapfile_check.stat.exists
 
 - name: install modules-load.d file
   ansible.builtin.copy:

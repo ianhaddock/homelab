@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "west" do |west|
-    west.vm.box = "bento/centos-stream-8"
+    west.vm.box = "generic/rocky8"
     west.vm.define "west" # update default vm definition name
     west.vm.hostname = "west"
     west.vm.network "private_network", # private for ansible
