@@ -1,0 +1,9 @@
+---
+nginx_user: nginx
+nginx_uid: 995
+nginx_group: nginx
+nginx_gid: 995
+comment: "nginx account"
+
+nginx_conf: "/etc/nginx/conf.d"
+nginx_path: "/usr/share/nginx/html"

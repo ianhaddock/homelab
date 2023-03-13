@@ -1,0 +1,9 @@
+# requirements file
+# e.x: ansible-galaxy install -r roles/requirements.yml
+# https://galaxy.ansible.com/docs/using/installing.html
+---
+collections:
+  - name: ansible.posix
+  - name: community.crypto
+  - name: community.general
+  - name: containers.podman

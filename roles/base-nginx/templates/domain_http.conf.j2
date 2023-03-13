@@ -1,0 +1,24 @@
+server {
+  listen 80;
+  listen [::]:80;
+  server_name {{ app_name }}.{{ site_fqdn }};
+  client_max_body_size 256m;
+
+
+  error_page 404 /404/404-error.html;
+  location /404/ {
+        root {{ nginx_path }}/error_pages;
+  }
+
+  error_page 500 502 503 504 /50x/50x-error.html;
+  location /50x/ {
+        root {{ nginx_path }}/error_pages;
+  }
+
+  location / {
+    root {{ nginx_path }}/{{ app_name }}.{{ site_fqdn }};
+
+    index index.html;
+  }
+
+}

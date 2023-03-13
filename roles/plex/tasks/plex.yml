@@ -1,0 +1,222 @@
+# configure plex
+---
+- name: create directories for plex
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_name }}/config"
+    - "{{ containers_path }}/{{ app_name }}/transcode"
+    - "{{ media_path }}/audiobooks"
+    - "{{ media_path }}/music"
+    - "{{ media_path }}/movies"
+    - "{{ media_path }}/tvshows"
+    - "{{ media_path }}/racing"
+    - "{{ media_path }}/yoga"
+    - "{{ media_path }}/youtube"
+    - "{{ media_path }}/lemans"
+
+- name: check for old Library folder
+  ansible.builtin.stat:
+    path: "{{ containers_path }}/{{ app_name }}/Library"
+  register: old_library_path
+
+- name: migrate old Library folders
+  ansible.builtin.command:
+    cmd: 'rsync -avP "{{ containers_path }}/{{ app_name }}/Library" "{{ containers_path }}/{{ app_name }}/config/"'
+  when: old_library_path.stat.exists
+
+- name: remove old Library folder
+  ansible.builtin.file:
+    path: "{{ containers_path }}/{{ app_name }}/Library"
+    state: absent
+  when: old_library_path.stat.exists
+
+- name: pull latest plex image
+  become_user: "{{ app_user }}"
+  containers.podman.podman_image:
+    name: docker.io/plexinc/pms-docker:plexpass
+  register: image_pull
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ image_pull }}"
+  when: verbose
+
+- name: start plex container:plexpass
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: docker.io/plexinc/pms-docker:plexpass
+    ports:
+      - "{{ app_port }}:32400/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_name }}/config:/config"
+      - "{{ containers_path }}/{{ app_name }}/transcode:/transcode"
+      - "{{ media_path }}:/mnt/media:ro"
+    device:
+      - '/dev/dri:/dev/dri'
+    group_add:
+      - 'keep-groups'
+    env:
+      PLEX_CLAIM: "{{ plex_claim }}"
+      PLEX_UID: "{{ app_uid }}"
+      PLEX_GID: "{{ app_gid }}"
+      TZ: "{{ timezone }}"
+    state: present
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+  when: image_pull.changed
+  register: container_state
+
+- name: debug plex podman
+  ansible.builtin.debug:
+    msg: "{{ container_state }}"
+  when: verbose
+
+- name: prune old images
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: 'podman image prune -f -a'
+  register: prune_debug
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ prune_debug }}"
+  when: verbose
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+      #  when: container_state.changed
+  when: container_state.changed
+  register: app_systemctl_debug
+
+- name: debug plex podman
+  ansible.builtin.debug:
+    msg: "{{ app_systemctl_debug }}"
+  when: verbose
+
+- name: wait for first start to settle
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ app_port }}/web"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 720  # 720 * 5 = 1 hour
+  delay: 5
+
+- name: get subuid for plex preferences
+  ansible.builtin.stat:
+    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+           Plex Media Server"
+  register: app_subuid
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ app_subuid }}"
+  when: verbose
+
+- name: check for plugins
+  ansible.builtin.stat:
+    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+           Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle"
+  register: youtube_dl_agent
+
+- name: check for scanners
+  ansible.builtin.stat:
+    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+           Plex Media Server/Scanners/Series/Absolute Series Scanner.py"
+  register: series_scanner
+
+- name: unarchive youtube-dl plugin
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://github.com/JordyAlkema/Youtube-DL-Agent.bundle/\
+          archive/master.zip"
+    dest: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+           Plex Media Server/Plug-ins/"
+    owner: "{{ app_subuid.stat.uid }}"
+    group: "{{ app_subuid.stat.gid }}"
+      #mode: '0755'
+  when: not youtube_dl_agent.stat.exists
+
+- name: remove old youtube-dl plugin if present
+  ansible.builtin.file:
+    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+           Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle"
+    state: absent
+  when: not youtube_dl_agent.stat.exists
+
+- name: rename youtube-dl plugin folder
+  ansible.builtin.copy:
+    src: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+          Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle-master"
+    dest: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+           Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle"
+    remote_src: true
+  when: not youtube_dl_agent.stat.exists
+
+- name: remove source youtube-dl plugin folder
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+       Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle-master"
+    - "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+       Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle-master.zip"
+  when: not youtube_dl_agent.stat.exists
+
+- name: create folders for absolute series scanner
+  ansible.builtin.file:
+    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+           Plex Media Server/Scanners/Series"
+    state: directory
+    owner: "{{ app_subuid.stat.uid }}"
+    group: "{{ app_subuid.stat.gid }}"
+    mode: '0755'
+
+- name: add plex absolute series scanner
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/ZeroQI/Absolute-Series-Scanner/\
+      master/Scanners/Series/Absolute%20Series%20Scanner.py"
+    dest: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
+           Plex Media Server/Scanners/Series/Absolute Series Scanner.py"
+    owner: "{{ app_subuid.stat.uid }}"
+    group: "{{ app_subuid.stat.gid }}"
+    mode: '0544'
+  when: not series_scanner.stat.exists
+
+- name: restart plex
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: restarted
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
+  register: files_systemctl_debug
+
+- name: wait for restart to settle
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ app_port }}/web"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 720  # 720 * 5 = 1 hour
+  delay: 5

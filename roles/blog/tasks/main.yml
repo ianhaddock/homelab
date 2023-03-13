@@ -1,0 +1,23 @@
+# blog install
+
+---
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "blog app account"
+
+- name: install container-blog
+  ansible.builtin.import_tasks: blog.yml
+
+- name: set forward proxy and ports
+  ansible.builtin.include_role:
+    name: base-nginx
+    tasks_from: forward_proxy.yml
+    public: true
+  when: containers

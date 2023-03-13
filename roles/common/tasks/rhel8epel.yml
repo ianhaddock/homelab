@@ -1,0 +1,26 @@
+# RHEL & CentOS 8 EPEL setup
+
+---
+- name: check if EPEL is installed
+  ansible.builtin.stat:
+    path: /etc/yum.repos.d/epel.repo
+  register: epel_repo
+
+- name: install codeready builder for Red Hat, but not Centos EPEL
+  ansible.builtin.command:
+    cmd: >
+      subscription-manager repos --enable
+      "codeready-builder-for-rhel-8-{{ ansible_architecture }}-rpms"
+  when: not epel_repo.stat.exists and ansible_distribution == 'RedHat'
+
+- name: install rpm key for EPEL
+  ansible.builtin.rpm_key:
+    key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+    state: present
+  when: not epel_repo.stat.exists
+
+- name: install EPEL RPM
+  ansible.builtin.package:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    state: present
+  when: not epel_repo.stat.exists

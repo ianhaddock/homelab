@@ -1,0 +1,1 @@
+KERNEL=="zram0", ATTR{disksize}="{{ (ansible_memory_mb.real.total * zram_ratio) | int | abs }}M",TAG+="systemd"

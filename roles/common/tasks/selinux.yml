@@ -1,0 +1,20 @@
+# configure selinux for RedHat family machines
+---
+- name: set selinux to permissive
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX=enforcing'
+    line: 'SELINUX=permissive'
+    state: present
+    backrefs: true
+  register: selinux_status
+  when: ansible_os_family == 'RedHat'
+
+- name: debug selinux
+  ansible.builtin.debug:
+    msg: selinux status '{{ selinux_status }}'
+  when: selinux_status.changed and ansible_os_family == 'RedHat'
+
+- name: restart system if status changed
+  ansible.builtin.reboot:
+  when: selinux_status.changed and ansible_os_family == 'RedHat'

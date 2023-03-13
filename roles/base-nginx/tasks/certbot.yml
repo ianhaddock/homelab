@@ -1,0 +1,42 @@
+# certbot certs
+---
+- name: ask certbot what domains have been registered
+  become: true
+  ansible.builtin.command:
+    cmd: "certbot certificates"
+  register: certbot_check
+
+- name: output of certboti check
+  ansible.builtin.debug:
+    msg: "certbot certificates: {{ certbot_check }}"
+  when: verbose
+
+- name: check if cerbot certificate directory exists
+  ansible.builtin.stat:
+    path: '/etc/letsencrypt/live/{{ site_fqdn }}'
+  register: certbot_dir
+
+- name: stop nginx for certs if running
+  ansible.builtin.service:
+    name: nginx
+    state: stopped
+  when: not certbot_dir.stat.exists
+
+- name: request letsencrypt certificates if they do not exist
+  ansible.builtin.command:
+    cmd: >-
+      certbot certonly
+      -v
+      --dry-run
+      --standalone
+      --non-interactive
+      --expand
+      --agree-tos -m {{ certbot_email }}
+      -d {{ certbot_domains }}
+  when: not certbot_dir.stat.exists
+  register: certbot_certonly_output
+
+- name: output of certbot
+  ansible.builtin.debug:
+    msg: "certbot output {{ certbot_certonly_output }}"
+  when: verbose

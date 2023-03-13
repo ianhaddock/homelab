@@ -1,0 +1,92 @@
+# zRAM kernel module
+#
+# from: https://scatterpated.net/?p=69
+# "zRAM is a kernel module which creates swapspace in compressed RAM. The speed
+# benefits of having swapspace in RAM far outweigh the minor cost of compression
+# in CPU cycles.
+---
+- name: check if systemd zram.service file exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/zram.service
+  register: zram_systemd_check
+
+- name: comment out swap mounts
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    regexp: '(^\/.*swap.*)' # starts with '/' and has swap in line
+    line: '# \1'
+    backrefs: true
+    state: present
+
+- name: comment out swap UUIDs
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    regexp: '(^UUID.*swap.*)' # starts with UUID and has swap in line
+    line: '# \1'
+    backrefs: true
+    state: present
+
+- name: check for swap file
+  ansible.builtin.stat:
+    path: /var/swap
+  register: swapfile_check
+
+- name: create file for swap
+  ansible.builtin.command:
+    cmd: fallocate -l 512M /var/swap
+  when: not swapfile_check.stat.exists
+
+- name: config file as swapfile
+  ansible.builtin.command:
+    cmd: mkswap /var/swap
+  when: not swapfile_check.stat.exists
+
+- name: enable swapfile
+  ansible.builtin.command:
+    cmd: swapon /var/swap
+  when: not swapfile_check.stat.exists
+
+- name: add swapfile to fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    regexp: ^(?=.*UUID)(?=.*swap).*$
+    line: "/var/swap   none  swap  defaults 0 0"
+  when: swapfile_check.stat.exists
+
+- name: install modules-load.d file
+  ansible.builtin.copy:
+    src: modules-load.d/zram.conf
+    dest: /etc/modules-load.d/zram.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: install modprobeb.d file
+  ansible.builtin.copy:
+    src: modprobe.d/zram.conf
+    dest: /etc/modprobe.d/zram.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: install rules.d template
+  ansible.builtin.template:
+    src: templates/rules.d/99-zram.rules.j2
+    dest: /etc/udev/rules.d/99-zram.rules
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: install systemd file
+  ansible.builtin.copy:
+    src: systemd/zram.service
+    dest: /etc/systemd/system/zram.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: enable zram on next restart
+  ansible.builtin.service:
+    name: zram
+    enabled: true
+  notify: restart system

@@ -1,0 +1,36 @@
+# base webserver
+---
+- name: install nginx
+  ansible.builtin.package:
+    name: nginx
+    state: present
+
+- name: create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "/etc/nginx/sites-available"
+
+- name: open web ports
+  ansible.builtin.firewalld:
+    port: "{{ item }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  with_items:
+    - 80/tcp
+    - 443/tcp
+
+- name: setup certs
+  ansible.builtin.import_tasks: certbot.yml
+  when: cert_enabled
+
+- name: enable nginx
+  ansible.builtin.service:
+    name: nginx
+    enabled: true
+    state: restarted

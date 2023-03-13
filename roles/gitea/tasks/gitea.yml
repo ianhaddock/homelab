@@ -1,0 +1,78 @@
+# gitea install
+---
+- name: create gitea directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_user }}/data"
+
+- name: pull latest gitea image
+  become_user: "{{ app_user }}"
+  containers.podman.podman_image:
+    name: docker.io/gitea/gitea:latest
+    force: true
+  register: image_pull
+
+- name: debug pull
+  ansible.builtin.debug:
+    msg: "{{ image_pull }}"
+  when: verbose
+
+- name: add timezone file
+  ansible.builtin.copy:
+    src: timezone
+    dest: "{{ containers_path }}/{{ app_user }}/timezone"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0644"
+
+- name: create gitea container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: docker.io/gitea/gitea:latest
+    ports:
+      - "{{ app_port }}:3000/tcp"
+      - "{{ app_ssh_port }}:22/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_user }}/data:/data"
+      - "{{ containers_path }}/{{ app_user }}/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    env:
+      TZ: "America/Los_Angeles"
+      USER_UID: "{{ app_uid }}"
+      USER_GID: "{{ app_gid }}"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  when: image_pull.changed
+  register: container_state
+
+- name: prune old images
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: 'podman image prune -f -a'
+  register: prune_debug
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ prune_debug }}"
+  when: verbose
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
+  register: files_systemctl_debug

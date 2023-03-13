@@ -1,0 +1,9 @@
+# pihole vars
+---
+app_user: pihole
+app_uid: 1203
+app_group: pihole
+app_gid: 1203
+
+app_name: pihole
+app_port: 8080

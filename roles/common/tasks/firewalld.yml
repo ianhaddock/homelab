@@ -1,0 +1,30 @@
+# firewalld ssh
+---
+- name: check for eth0 file
+  stat:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+  register: eth0
+
+- name: set eth0 start on boot
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    regexp: '^ONBOOT='
+    line: 'ONBOOT=yes'
+  when: eth0.stat.exists
+
+- name: install firewalld
+  ansible.builtin.package:
+    name: firewalld
+    state: present
+
+- name: enable Firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    enabled: true
+    state: started
+
+- name: open 22/tcp
+  ansible.builtin.firewalld:
+    port: 22/tcp
+    permanent: true
+    state: enabled

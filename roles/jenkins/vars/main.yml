@@ -1,0 +1,10 @@
+# jenkins
+---
+# jenkins vars
+app_user: jenkins
+app_uid: 1209
+app_group: jenkins
+app_gid: 1209
+
+app_name: jenkins
+app_port: 8084

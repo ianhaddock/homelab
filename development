@@ -1,0 +1,14 @@
+# Vagrant development hosts
+---
+  all:
+    hosts:
+      192.168.40.41:  # vagrantVM
+      192.168.40.42:  # vagrantVM
+
+    children:
+      west:
+        hosts:
+          192.168.40.42:
+      blog:
+        hosts:
+          192.168.40.41:

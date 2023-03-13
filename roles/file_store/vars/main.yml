@@ -1,0 +1,11 @@
+# file_store
+---
+app_user: files
+app_uid: 1207
+app_group: files
+app_gid: 1207
+
+app_name: files
+app_port: 9999
+
+nginx_path: "/usr/share/nginx/html"

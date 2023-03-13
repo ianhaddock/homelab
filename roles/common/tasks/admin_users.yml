@@ -1,0 +1,59 @@
+# admin user, group with passwordless sudo
+---
+- name: Add admin group
+  ansible.builtin.group:
+    name: "{{ admin_user }}"
+    gid: "{{ admin_gid }}"
+    state: present
+
+- name: Add admin user
+  ansible.builtin.user:
+    name: "{{ admin_user }}"
+    comment: admin user
+    uid: "{{ admin_uid }}"
+    group: "{{ admin_group }}"
+    groups: wheel
+    generate_ssh_key: true
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: Allow wheel passwordless sudo
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL, !/bin/su'
+    validate: visudo -cf %s
+  when: ansible_os_family == 'RedHat'
+
+- name: Add admin user
+  ansible.builtin.user:
+    name: "{{ admin_user }}"
+    comment: admin user
+    uid: "{{ admin_uid }}"
+    group: "{{ admin_group }}"
+    groups: sudo
+    generate_ssh_key: true
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Allow sudo passwordless sudo
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL, !/bin/su'
+    validate: visudo -cf %s
+  when: ansible_os_family == 'Debian'
+
+- name: install authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ admin_user }}"
+    state: present
+    key: "{{ item }}"
+  with_file:
+    - "public_keys/{{ public_key }}"

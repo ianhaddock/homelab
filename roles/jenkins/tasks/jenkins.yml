@@ -1,0 +1,102 @@
+# jenkins install
+---
+- name: create jenkins directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_name }}/data"
+    - "{{ containers_path }}/{{ app_name }}/certs"
+
+# Jenkins hard codes UID/GID of its container account to 1000.
+# the problem here is Vagrant uses 1000 for its account. I'd
+# rather not change Vagrant to test with Jenkins. The below
+# is a quick hack to map the data volume to the Jenkins
+# account UID/GID inside the container so it can write files.
+
+- name: -hacky- map data directory to container user id
+  ansible.builtin.file:
+    path: "{{ containers_path }}/{{ app_name }}/data"
+    owner: "625287"   # dev "690824"
+    group: "625287"   # dev "690824"
+    mode: u=rwX,g=rX,o=r
+    state: directory
+
+- name: copy dockerfile
+  ansible.builtin.template:
+    src: dockerfile.j2
+    dest: "{{ containers_path }}/{{ app_name }}/Dockerfile"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: run dockerfile
+  become_user: "{{ app_user }}"
+  containers.podman.podman_image:
+    force: true
+    name: my_jenkins:latest
+    path: "{{ containers_path }}/{{ app_name }}"
+    build:
+      format: docker
+      extra_args: "--build-arg uid={{ app_uid }}, --build-arg gid={{ app_gid }}"
+  register: dockerfile_build
+
+- name: debug dockerfile build
+  ansible.builtin.debug:
+    msg: "{{ dockerfile_build }}"
+  when: verbose
+
+- name: create jenkins container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: localhost/my_jenkins:latest
+      #    userns: keep-id:uid={{ app_uid }},gid={{ app_gid }}
+      #    cpus: 2
+      #    memory: 4g
+    ports:
+      - "{{ app_port }}:8080/tcp"
+      - "50000:50000/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_name }}/data:/var/jenkins_home"
+      - "{{ containers_path }}/{{ app_name }}/certs:/certs/client:ro"
+    env:
+      DOCKER_HOST: "tcp://docker:2376"
+      DOCKER_CERT_PATH: "/certs/client"
+      DOCKER_TLS_VERIFY: 1
+      TZ: "America/Los_Angeles"
+      USER_UID: "{{ app_uid }}"
+      USER_GID: "{{ app_gid }}"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  when: dockerfile_build.changed
+  register: container_state
+
+- name: prune old images
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: 'podman image prune -f -a'
+  register: prune_debug
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ prune_debug }}"
+  when: verbose
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
+  register: files_systemctl_debug

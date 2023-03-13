@@ -1,0 +1,104 @@
+# file_store install
+---
+- name: create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_name }}/html"
+    - "{{ containers_path }}/{{ app_name }}/conf.d"
+
+- name: copy files to be served
+  ansible.builtin.copy:
+    src: "files/source/"
+    dest: "{{ containers_path }}/{{ app_name }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: copy index template
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ containers_path }}/{{ app_name }}/html/index.html"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: copy http config template
+  ansible.builtin.template:
+    src: domain_http.conf.j2
+    dest: "{{ containers_path }}/{{ app_name }}/conf.d/domain.conf"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: copy dockerfile template
+  ansible.builtin.template:
+    src: dockerfile.j2
+    dest: "{{ containers_path }}/{{ app_name }}/Dockerfile"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: build image from dockerfile
+  become_user: "{{ app_user }}"
+  containers.podman.podman_image:
+    name: file_store:v0.1
+    path: "{{ containers_path }}/{{ app_name }}"
+    build:
+      cache: false
+      format: docker
+    force: true
+  register: dockerfile_build
+
+- name: debug dockerfile build
+  ansible.builtin.debug:
+    msg: "{{ dockerfile_build }}"
+  when: verbose
+
+- name: create container from local image
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    name: files
+    hostname: files
+    image: localhost/file_store:v0.1
+    ports:
+      - "{{ app_port }}:80/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_name }}/html:\
+         /usr/share/nginx/html:ro"
+      - "{{ containers_path }}/{{ app_name }}/conf.d:\
+         /etc/nginx/conf.d:ro"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  when: dockerfile_build.changed
+  register: container_state
+
+- name: prune old images
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: 'podman image prune -f -a'
+  when: container_state.changed
+  register: prune_debug
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ prune_debug }}"
+  when: verbose
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    no_block: true
+    name: "container-{{ app_user }}"
+    enabled: true
+    state: restarted
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed

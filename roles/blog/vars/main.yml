@@ -1,0 +1,9 @@
+# blog site
+---
+app_user: blog
+app_uid: 1205
+app_group: blog
+app_gid: 1205
+
+app_name: blog
+app_port: 8888

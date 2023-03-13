@@ -1,0 +1,52 @@
+# set forward proxy
+---
+
+- name: open firewall port when not proxying
+  ansible.builtin.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items:
+    - "{{ app_port }}/tcp"
+  when: not cert_enabled
+
+- name: set nginx http forward proxy
+  ansible.builtin.template:
+    src: proxy_http.conf.j2
+    dest: "/etc/nginx/conf.d/{{ site_fqdn }}.conf"
+    owner: root
+    group: root
+    mode: '0640'
+  when: not cert_enabled and app_name in domain_app
+  notify: reload nginx
+
+- name: set nginx https forward proxy
+  ansible.builtin.template:
+    src: proxy_https.conf.j2
+    dest: "/etc/nginx/conf.d/{{ site_fqdn }}.conf"
+    owner: root
+    group: root
+    mode: '0640'
+  when: cert_enabled and app_name in domain_app
+  notify: reload nginx
+
+- name: set nginx subdomain http forward proxy
+  ansible.builtin.template:
+    src: subdomain_proxy_http.conf.j2
+    dest: "/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf"
+    owner: root
+    group: root
+    mode: '0640'
+  when: not cert_enabled
+  notify: reload nginx
+
+- name: set nginx subdomain https forward proxy
+  ansible.builtin.template:
+    src: subdomain_proxy_https.conf.j2
+    dest: "/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf"
+    owner: root
+    group: root
+    mode: '0640'
+  when: cert_enabled
+  notify: reload nginx

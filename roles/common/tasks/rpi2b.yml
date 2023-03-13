@@ -1,0 +1,11 @@
+# raspberryPi2B setup tweaks
+---
+- name: install udev rule for old style NIC name
+  ansible.builtin.template:
+    src: 10-network-device.rules.j2
+    dest: /etc/udev/rules.d/10-network-device.rules
+    owner: root
+    group: root
+    mode: '0640'
+  when: ansible_hostname == 'raspberrypi'
+  notify: reload network

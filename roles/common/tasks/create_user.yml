@@ -1,0 +1,40 @@
+# standard user creation
+---
+- name: create group
+  ansible.builtin.group:
+    name: "{{ group }}"
+    gid: "{{ gid }}"
+
+- name: create user
+  ansible.builtin.user:
+    name: "{{ user }}"
+    group: "{{ group }}"
+    uid: "{{ uid }}"
+    comment: "{{ comment }}"
+
+- name: check if linger is enabled
+  ansible.builtin.stat:
+    path: "/var/lib/systemd/linger/{{ user }}"
+  register: linger_status
+  when: containers
+
+- name: enable linger
+  ansible.builtin.command:
+    cmd: "loginctl enable-linger {{ user }}"
+  when: containers and not linger_status.stat.exists
+
+- name: add XDG_RUNTIME_DIR to .bashrc as a workaround to systemd-nspawn
+  ansible.builtin.lineinfile:
+    path: "/home/{{ user }}/.bashrc"
+    line: 'export XDG_RUNTIME_DIR=/run/user/$UID'
+    regexp: '^export XDG_RUNTIME_DIR'
+
+    # - name: install systemd-container package for machinectl
+    #  so this is the new way to switch users with a clean login environment
+    #  has to do with changes to systemd and its vm & container handling
+    #  but its not simple to remember:
+    #  https://unix.stackexchange.com/questions/346841/\
+    #  why-does-sudo-i-not-set-xdg-runtime-dir-for-the-target-user
+    #  e.g. # machinectl shell --uid=$(id -u user)
+    #  so for now I'm leaving the cheap fix of exporting the XDG_RUNTIME_DIR
+    #  in .bashrc on login

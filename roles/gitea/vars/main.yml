@@ -1,0 +1,10 @@
+# gitea
+---
+app_user: gitea
+app_uid: 1208
+app_group: gitea
+app_gid: 1208
+
+app_name: git
+app_port: 8082
+app_ssh_port: 2222

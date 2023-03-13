@@ -1,0 +1,52 @@
+# configure sshd
+# >>> /etc/update-motd.d/10-uname
+---
+- name: disable root login via ssh
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin yes'
+    line: 'PermitRootLogin no'
+  register: sshd_reload
+
+- name: disable password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication yes'
+    line: 'PasswordAuthentication no'
+  register: sshd_reload
+
+- name: install banner file
+  ansible.builtin.template:
+    src: banner.j2
+    dest: /etc/banner.txt
+    owner: root
+    group: root
+    mode: '0640'
+
+- name: debug
+  ansible.builtin.debug:
+    msg: messge {{ sshd_reload }}
+  when: verbose
+
+- name: create motd file with hostname
+  ansible.builtin.command:
+    cmd: /bin/echo "$(hostname)" > /etc/motd
+
+- name: enable banner file
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#Banner none'
+    line: 'Banner /etc/banner.txt'
+  register: sshd_reload
+
+- name: reload sshd if changed - RedHat
+  ansible.builtin.service:
+    name: sshd
+    state: reloaded
+  when: sshd_reload.changed and ansible_os_family == 'RedHat'
+
+- name: reload ssh if changed - Debian
+  ansible.builtin.service:
+    name: ssh
+    state: reloaded
+  when: sshd_reload.changed and ansible_os_family == 'Debian'

@@ -1,0 +1,24 @@
+# file_store
+---
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "files app account"
+
+- name: install container-file_store
+  ansible.builtin.import_tasks: file_store.yml
+
+- name: set forward proxy and ports
+  ansible.builtin.include_role:
+    name: base-nginx
+    tasks_from: forward_proxy.yml
+    public: true
+
+- name: make files available
+  meta: flush_handlers

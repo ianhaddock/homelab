@@ -1,0 +1,9 @@
+# Vagrant Provision Play
+---
+- name: Vagrant provision play
+  hosts: blog:west
+  become: true
+  gather_facts: true
+
+  roles:
+  - common

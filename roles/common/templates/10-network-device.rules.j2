@@ -1,0 +1,3 @@
+# update ethernet name
+
+SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ ansible_eth0.macaddress }}", NAME="eth0"

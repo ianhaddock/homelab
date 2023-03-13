@@ -1,0 +1,93 @@
+# blog install
+
+---
+- name: create container volume directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_name }}/app"
+    - "{{ containers_path }}/{{ app_name }}/instance"
+
+- name: get app from git
+  become_user: "{{ app_user }}"
+  ansible.builtin.git:
+    repo: "{{ app_git_repo }}"
+    dest: "{{ containers_path }}/{{ app_name }}/app"
+    force: true
+
+- name: copy blog custom media files if available
+  ansible.builtin.unarchive:
+    src: "{{ file_server }}/custom.zip"
+    dest: "{{ containers_path }}/{{ app_name }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: u=rwX,g=rX,o=rX
+    remote_src: true
+  ignore_errors: true
+
+- name: run dockerfile
+  become_user: "{{ app_user }}"
+  containers.podman.podman_image:
+    force: true
+    name: blog:v0.1
+    path: "{{ containers_path }}/{{ app_name }}/app"
+    build:
+      format: docker
+      cache: false
+  register: dockerfile_build_debug
+
+- name: debug dockerfile build
+  ansible.builtin.debug:
+    msg: "{{ dockerfile_build_debug }}"
+  when: verbose
+
+- name: pull blog container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    force_restart: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: localhost/blog:v0.1
+    ports:
+      - "{{ app_port }}:5000/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_name }}/custom:\
+         /blog/app/static/custom:ro"
+      - "{{ containers_path }}/{{ app_name }}/instance:\
+         /blog/instance"
+
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  when: dockerfile_build_debug.changed
+  register: container_state
+
+- name: prune old images
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: 'podman image prune -f -a'
+  when: container_state.changed
+  register: prune_debug
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ prune_debug }}"
+  when: verbose
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    no_block: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
+  register: files_systemctl_debug

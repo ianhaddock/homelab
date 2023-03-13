@@ -1,0 +1,66 @@
+# Master Playbook
+---
+### all hosts ###
+
+- hosts: all
+  gather_facts: true
+  become: true
+
+  roles:
+    - common
+    - sshd
+    - zram
+
+  handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
+    - name: reload network
+      ansible.builtin.systemd:
+        name: network
+        state: reloaded
+
+
+### blog server ###
+
+- hosts: blog
+  become: true
+
+  roles:
+    - base-nginx
+    - file_store
+    - gitea
+    - blog
+
+  handlers:
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+
+
+### west server ###
+
+- hosts: west
+  become: true
+
+  roles:
+    - base-nginx
+    - file_store
+    - gitea
+    - blog
+    - jenkins
+    - pihole
+    - plex
+    - transmission
+
+  handlers:
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+
+    - name: restart smb
+      ansible.builtin.systemd:
+        name: smb
+        state: restarted

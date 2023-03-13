@@ -1,0 +1,34 @@
+# site wide default variables
+---
+verbose: true
+hostname: "example"
+timezone: "America/Los_Angeles"
+public_key: ansible.pub
+
+zram_ratio: 0.8
+cert_enabled: false
+certbot_email: "name@example.com"
+
+domain_app: 'blog'
+
+siteFQDN: example.com
+site_fqdn: "{{ siteFQDN }}"
+
+certbot_domains: "{{ site_fqdn }},\
+                  files.{{ site_fqdn }},\
+                  git.{{ site_fqdn }},\
+                  blog.{{ site_fqdn }},\
+                  www.{{ site_fqdn }}"
+
+app_git_repo: "https://git.example.com/name/{{ app_name }}.git"
+file_server: "https://files.example.com"
+
+containers: true
+containers_path: '/mnt/containers'
+
+user_transmission: "example"
+pass_transmission: "example"
+
+pass_pihole: "example"
+
+plex_claim: 'claim-0000000000000000000'

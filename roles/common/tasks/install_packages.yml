@@ -1,0 +1,53 @@
+# packages
+---
+- name: update packages to latest
+  ansible.builtin.package:
+    name: '*'
+    state: latest  # noqa package-latest
+
+- name: install epel-release
+  ansible.builtin.package:  # noqa package-latest
+    name: epel-release
+    state: latest
+  when: ansible_os_family == 'RedHat'
+
+- name: install utility packages
+  ansible.builtin.package:
+    name:
+      - git
+      - screen  # not on centstream8 without EPEL
+      - lm_sensors
+      - sysstat
+      - zip
+      - unzip
+      - smartmontools
+      - rsync
+      - figlet
+    state: latest  # noqa package-latest
+
+- name: install container tools
+  ansible.builtin.package:
+    name:
+      - podman
+    state: latest  # noqa package-latest
+  when: containers
+
+- name: set rootless storage path
+  ansible.builtin.lineinfile:
+    path: /etc/containers/storage.conf
+    regexp: '^# rootless_storage_path'
+    line: 'rootless_storage_path =
+      "{{ containers_path }}/$USER/storage"'
+  when: containers
+
+    # - name: set cgroupsv2
+    #   become: true
+    #   ansible.builtin.command:
+    #     cmd: grubby --update-kernel=/boot/vmlinuz-$(uname -r) --args='systemd.unified_cgroup_hierarchy=1'
+    #   when: containers
+
+- name: install letsencrypt certbot
+  ansible.builtin.package:
+    name: certbot
+    state: latest  # noqa package-latest
+  when: cert_enabled
