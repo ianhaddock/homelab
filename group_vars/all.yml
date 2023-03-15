@@ -5,6 +5,11 @@ hostname: "example"
 timezone: "America/Los_Angeles"
 public_key: ansible.pub
 
+admin_user: ansible
+admin_uid: 1100
+admin_group: ansible
+admin_gid: 1100
+
 zram_ratio: 0.8
 cert_enabled: false
 certbot_email: "name@example.com"
