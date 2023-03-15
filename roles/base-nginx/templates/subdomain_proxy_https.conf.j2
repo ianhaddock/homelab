@@ -4,6 +4,7 @@ server {
   server_name {{ app_name }}.{{ site_fqdn }};
   client_max_body_size 256m;
 
+  # custom 50x error page only as 404 is handled by the app proxied
   error_page 500 502 503 504 /50x/50x-error.html;
   location /50x {
         root {{ nginx_path }}/error_pages;
@@ -20,7 +21,7 @@ server {
     proxy_set_header Connection "upgrade";
   }
 
-  location /robots.txt {
+  location = /robots.txt {
     alias {{ nginx_path }}/robots.txt;
   }
 

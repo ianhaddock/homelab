@@ -15,6 +15,10 @@ server {
         root {{ nginx_path }}/error_pages;
   }
 
+  location = /robots.txt {
+    alias {{ nginx_path }}/robots.txt;
+  }
+
   location / {
     root {{ nginx_path }}/{{ app_name }}.{{ site_fqdn }};
 

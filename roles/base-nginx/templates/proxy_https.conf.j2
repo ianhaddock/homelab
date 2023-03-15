@@ -9,6 +9,10 @@ server {
         root {{ nginx_path }}/error_pages;
   }
 
+  location = /robots.txt {
+    alias {{ nginx_path }}/robots.txt;
+  }
+
   location / {
     proxy_pass http://localhost:{{ app_port }};
     proxy_set_header Host $host;

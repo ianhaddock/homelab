@@ -31,6 +31,10 @@ server {
     location = /index.html {
         allow all;
     }
+    # allow robots.txt
+    location = /robots.txt {
+        allow all;
+    }
     # allow specific file types
     location ~ "\.(zip|html|png)$" {
         allow all;

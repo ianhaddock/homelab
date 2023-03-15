@@ -1,6 +1,8 @@
 # zRAM kernel module
 #
-# from: https://scatterpated.net/?p=69
+# https://scatterpated.net/?p=69
+# https://wiki.archlinux.org/title/Zram
+#
 # "zRAM is a kernel module which creates swapspace in compressed RAM. The speed
 # benefits of having swapspace in RAM far outweigh the minor cost of compression
 # in CPU cycles.
@@ -13,7 +15,8 @@
 - name: comment out swap UUIDs
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    regexp: '(^UUID.*swap.*)'  # starts with UUID and has swap in line
+    regexp: '(^UUID.*swap.*)'
+    # starts with UUID and has swap in line
     line: '# \1'
     backrefs: true
     state: present
@@ -21,7 +24,8 @@
 - name: comment out swap lvs
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    regexp: '(^/dev/mapper.*swap.*)'  # starts with dev/mapper and has swap in line
+    regexp: '(^/dev/mapper.*swap.*)'
+    # line starts with dev/mapper and has swap in line
     line: '# \1'
     backrefs: true
     state: present
@@ -55,7 +59,8 @@
 - name: add swapfile to fstab
   ansible.builtin.lineinfile:
     path: /etc/fstab
-    regexp: ^(?=.*UUID)(?=.*swap).*$  # search any UUID + any swap, select line
+    regexp: ^(?=.*UUID)(?=.*swap).*$
+    # search any UUID + any swap, select line
     line: "/var/swap     none    swap    sw,pri=1   0 0"
   when: not swapfile_check.stat.exists
 

@@ -14,6 +14,14 @@
     state: directory
   with_items:
     - "/etc/nginx/sites-available"
+      
+- name: add robots.txt
+  ansible.builtin.copy:
+    src: robots.txt
+    dest: "{{ nginx_path }}/robots.txt"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    mode: u=rwX,g=rX,o=rX
 
 - name: open web ports
   ansible.builtin.firewalld:
