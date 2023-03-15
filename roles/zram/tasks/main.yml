@@ -49,14 +49,14 @@
 
 - name: enable swapfile
   ansible.builtin.command:
-    cmd: swapon -p -4 /var/swap
+    cmd: swapon -p 1 /var/swap
   when: not swapfile_check.stat.exists
 
 - name: add swapfile to fstab
   ansible.builtin.lineinfile:
     path: /etc/fstab
     regexp: ^(?=.*UUID)(?=.*swap).*$  # search any UUID + any swap, select line
-    line: "/var/swap   none  swap  defaults 0 0"
+    line: "/var/swap     none    swap    sw,pri=1   0 0"
   when: not swapfile_check.stat.exists
 
 - name: install modules-load.d file

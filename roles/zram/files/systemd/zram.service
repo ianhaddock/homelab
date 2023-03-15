@@ -6,11 +6,8 @@ After=multi-user.target
 Type=oneshot
 RemainAfterExit=true
 ExecStartPre=/sbin/mkswap /dev/zram0
-ExecStart=/sbin/swapon /dev/zram0
+ExecStart=/sbin/swapon -p 2 /dev/zram0
 ExecStop=/sbin/swapoff /dev/zram0
-
-[Swap]
-Priority=100
 
 [Install]
 WantedBy=multi-user.target
