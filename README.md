@@ -34,16 +34,16 @@ $ git pull http://git.ianhaddock.com/ian/ansible.git
 # install requirements
 $ ansible-galaxy install -r roles/requirements.yml
 
-# update vagrant file to conform to your IP space
+# update Vagrantfile to conform to your virtualization product and IP space
 $ vi Vagrantfile
 
 # generate ansible account ssh-key
 $ ssh-keygen -f ~/.ssh/ansible
 
-# provision test VMs
+# provision development VMs
 $ vagrant up --provision
 
-# run the playbook 
+# run playbook 
 $ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development site.yml
  
 ```

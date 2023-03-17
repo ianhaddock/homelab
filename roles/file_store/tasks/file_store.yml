@@ -70,9 +70,9 @@
       - "{{ app_port }}:80/tcp"
     volumes:
       - "{{ containers_path }}/{{ app_name }}/html:\
-         /usr/share/nginx/html:ro"
+         /usr/share/nginx/html:ro,Z"
       - "{{ containers_path }}/{{ app_name }}/conf.d:\
-         /etc/nginx/conf.d:ro"
+         /etc/nginx/conf.d:ro,Z"
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
   when: dockerfile_build.changed
@@ -97,7 +97,7 @@
     no_block: true
     name: "container-{{ app_user }}"
     enabled: true
-    state: restarted
+    state: started
     scope: user
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"

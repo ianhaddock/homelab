@@ -57,9 +57,9 @@
       - "{{ app_port }}:5000/tcp"
     volumes:
       - "{{ containers_path }}/{{ app_name }}/custom:\
-         /blog/app/static/custom:ro"
+         /blog/app/static/custom:ro,Z"
       - "{{ containers_path }}/{{ app_name }}/instance:\
-         /blog/instance"
+         /blog/instance:Z"
 
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
