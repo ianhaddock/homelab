@@ -37,8 +37,12 @@ $ ansible-galaxy install -r roles/requirements.yml
 # update vagrant file to conform to your IP space
 $ vi Vagrantfile
 
-# generate ansible account ssh-key
+# generate ansible admin account ssh-key
 $ ssh-keygen -f ~/.ssh/ansible
+
+# add admin public key to common role files
+$ mkdir -p roles/common/files/public_key
+$ cp ~/.ssh/ansible.pub roles/common/files/public_keys/
 
 # provision test VMs
 $ vagrant up --provision
@@ -48,5 +52,4 @@ $ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development site.y
  
 ```
 
-[1]: https://ianhaddock.com
 [2]: https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux
