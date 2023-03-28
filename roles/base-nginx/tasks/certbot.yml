@@ -6,7 +6,7 @@
     cmd: "certbot certificates"
   register: certbot_check
 
-- name: output of certboti check
+- name: output of certbot check
   ansible.builtin.debug:
     msg: "certbot certificates: {{ certbot_check }}"
   when: verbose
@@ -22,17 +22,17 @@
     state: stopped
   when: not certbot_dir.stat.exists
 
-- name: request letsencrypt certificates if they do not exist
+- name: request letsencrypt certificates when they do not exist
   ansible.builtin.command:
-    cmd: >-
+    cmd: >
       certbot certonly
       -v
-      --dry-run
       --standalone
       --non-interactive
       --expand
       --agree-tos -m {{ certbot_email }}
       -d {{ certbot_domains }}
+
   when: not certbot_dir.stat.exists
   register: certbot_certonly_output
 
