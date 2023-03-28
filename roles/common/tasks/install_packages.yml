@@ -16,7 +16,7 @@
     name:
       - git
       - screen  # not on centstream8 without EPEL
-      - lm_sensors
+        #      - lm_sensors -- rpi2b does not have
       - sysstat
       - zip
       - unzip

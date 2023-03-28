@@ -31,12 +31,40 @@
     - file_store
     - gitea
     - blog
+    - pihole
 
   handlers:
     - name: reload nginx
       ansible.builtin.systemd:
         name: nginx
         state: reloaded
+
+
+### rpi2b server ###
+
+- hosts: rpi2b
+  become: true
+
+  roles:
+    - base-nginx
+    #    - file_store
+    #     - gitea
+    #    - blog
+    #     - jenkins
+    #    - pihole
+    #    - plex
+    #    - transmission
+
+  handlers:
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+
+    - name: restart smb
+      ansible.builtin.systemd:
+        name: smb
+        state: restarted
 
 
 ### west server ###
@@ -65,20 +93,21 @@
         name: smb
         state: restarted
 
+
 ### development server ###
 
-- hosts: dev
+- hosts: devbox
   become: true
 
   roles:
-    - base-nginx
-    - file_store
-    - gitea
-    - blog
-    - jenkins
+    #    - base-nginx
+    #    - file_store
+    #    - gitea
+    #    - blog
+    #    - jenkins
     - pihole
-    - plex
-    - transmission
+    #    - plex
+    #    - transmission
 
   handlers:
     - name: reload nginx
