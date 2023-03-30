@@ -5,10 +5,8 @@ app_uid: 1202
 app_group: plex
 app_gid: 1202
 
-pms_plugin_dir: "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server"
-pms_scanner_dir: "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server"
-
+plex_server_dir: "config/Library/Application Support/Plex Media Server"
 media_path: /mnt/media
 
-app_port: 32400
+app_port: 32500
 app_name: plex

@@ -19,22 +19,6 @@
     - "{{ media_path }}/youtube"
     - "{{ media_path }}/lemans"
 
-- name: check for old Library folder
-  ansible.builtin.stat:
-    path: "{{ containers_path }}/{{ app_name }}/Library"
-  register: old_library_path
-
-- name: migrate old Library folders
-  ansible.builtin.command:
-    cmd: 'rsync -avP "{{ containers_path }}/{{ app_name }}/Library" "{{ containers_path }}/{{ app_name }}/config/"'
-  when: old_library_path.stat.exists
-
-- name: remove old Library folder
-  ansible.builtin.file:
-    path: "{{ containers_path }}/{{ app_name }}/Library"
-    state: absent
-  when: old_library_path.stat.exists
-
 - name: pull latest plex image
   become_user: "{{ app_user }}"
   containers.podman.podman_image:
@@ -46,18 +30,19 @@
     msg: "{{ image_pull }}"
   when: verbose
 
+  # image does not support keep-id, s6's abc user perms error s6-setuidgid
 - name: start plex container:plexpass
   become_user: "{{ app_user }}"
   containers.podman.podman_container:
     recreate: true
     name: "{{ app_name }}"
-    hostname: "{{ hostname }}"
+    hostname: "PLEX"
     image: docker.io/plexinc/pms-docker:plexpass
     ports:
       - "{{ app_port }}:32400/tcp"
     volumes:
-      - "{{ containers_path }}/{{ app_name }}/config:/config"
-      - "{{ containers_path }}/{{ app_name }}/transcode:/transcode"
+      - "{{ containers_path }}/{{ app_name }}/config:/config:Z"
+      - "{{ containers_path }}/{{ app_name }}/transcode:/transcode:Z"
       - "{{ media_path }}:/mnt/media:ro"
     device:
       - '/dev/dri:/dev/dri'
@@ -99,7 +84,6 @@
     scope: user
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
-      #  when: container_state.changed
   when: container_state.changed
   register: app_systemctl_debug
 
@@ -117,10 +101,10 @@
   retries: 720  # 720 * 5 = 1 hour
   delay: 5
 
+  # as image does not support keep-id this finds the app uid+gid  
 - name: get subuid for plex preferences
   ansible.builtin.stat:
-    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-           Plex Media Server"
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}"
   register: app_subuid
 
 - name: debug
@@ -130,14 +114,14 @@
 
 - name: check for plugins
   ansible.builtin.stat:
-    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-           Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle"
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Plug-ins/Youtube-DL-Agent.bundle"
   register: youtube_dl_agent
 
 - name: check for scanners
   ansible.builtin.stat:
-    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-           Plex Media Server/Scanners/Series/Absolute Series Scanner.py"
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Scanners/Series/Absolute Series Scanner.py"
   register: series_scanner
 
 - name: unarchive youtube-dl plugin
@@ -145,44 +129,45 @@
     remote_src: true
     src: "https://github.com/JordyAlkema/Youtube-DL-Agent.bundle/\
           archive/master.zip"
-    dest: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-           Plex Media Server/Plug-ins/"
+    dest: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Plug-ins"
     owner: "{{ app_subuid.stat.uid }}"
     group: "{{ app_subuid.stat.gid }}"
-      #mode: '0755'
   when: not youtube_dl_agent.stat.exists
 
 - name: remove old youtube-dl plugin if present
   ansible.builtin.file:
-    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-           Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle"
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Plug-ins/Youtube-DL-Agent.bundle"
     state: absent
   when: not youtube_dl_agent.stat.exists
 
 - name: rename youtube-dl plugin folder
   ansible.builtin.copy:
-    src: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-          Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle-master"
-    dest: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-           Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle"
+    src: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+          Plug-ins/Youtube-DL-Agent.bundle-master/"  # keep the trailing slash
+    dest: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+          Plug-ins/Youtube-DL-Agent.bundle"
+    owner: "{{ app_subuid.stat.uid }}"
+    group: "{{ app_subuid.stat.gid }}"
     remote_src: true
   when: not youtube_dl_agent.stat.exists
 
-- name: remove source youtube-dl plugin folder
+- name: remove source youtube-dl plugin folders
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   with_items:
-    - "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-       Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle-master"
-    - "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-       Plex Media Server/Plug-ins/Youtube-DL-Agent.bundle-master.zip"
+    - "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+       Plug-ins/Youtube-DL-Agent.bundle-master/"
+    - "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+       Plug-ins/Youtube-DL-Agent.bundle-master.zip"
   when: not youtube_dl_agent.stat.exists
 
 - name: create folders for absolute series scanner
   ansible.builtin.file:
-    path: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-           Plex Media Server/Scanners/Series"
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Scanners/Series"
     state: directory
     owner: "{{ app_subuid.stat.uid }}"
     group: "{{ app_subuid.stat.gid }}"
@@ -191,9 +176,9 @@
 - name: add plex absolute series scanner
   ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/ZeroQI/Absolute-Series-Scanner/\
-      master/Scanners/Series/Absolute%20Series%20Scanner.py"
-    dest: "{{ containers_path }}/{{ app_name }}/config/Library/Application Support/\
-           Plex Media Server/Scanners/Series/Absolute Series Scanner.py"
+          master/Scanners/Series/Absolute%20Series%20Scanner.py"
+    dest: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Scanners/Series/Absolute Series Scanner.py"
     owner: "{{ app_subuid.stat.uid }}"
     group: "{{ app_subuid.stat.gid }}"
     mode: '0544'

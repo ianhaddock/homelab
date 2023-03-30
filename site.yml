@@ -46,14 +46,8 @@
   become: true
 
   roles:
-    - base-nginx
-    #    - file_store
-    #     - gitea
-    #    - blog
-    #     - jenkins
-    #    - pihole
-    #    - plex
-    #    - transmission
+    - common  # placeholder until system disk is rebuilt
+    #     - pihole
 
   handlers:
     - name: reload nginx
@@ -74,10 +68,10 @@
 
   roles:
     - base-nginx
-    #    - file_store
-    #     - gitea
-    #    - blog
-    #     - jenkins
+    - file_store
+    - gitea
+    - blog
+    - jenkins
     - pihole
     - plex
     - transmission
@@ -105,8 +99,8 @@
     #    - gitea
     #    - blog
     #    - jenkins
-    - pihole
-    #    - plex
+    #    - pihole
+    - plex
     #    - transmission
 
   handlers:
