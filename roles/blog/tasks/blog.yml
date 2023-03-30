@@ -19,7 +19,7 @@
     dest: "{{ containers_path }}/{{ app_name }}/app"
     force: true
 
-- name: copy blog custom media files if available
+- name: unarchive custom files if available
   ansible.builtin.unarchive:
     src: "{{ file_server }}/custom.zip"
     dest: "{{ containers_path }}/{{ app_name }}"

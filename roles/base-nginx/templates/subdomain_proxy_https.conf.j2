@@ -4,6 +4,12 @@ server {
   server_name {{ app_name }}.{{ site_fqdn }};
   client_max_body_size 256m;
 
+{% if limit_app %}
+  # limit access by source IP
+  allow {{ limit_source_ip }};
+  deny all;
+{% endif %}
+
   # custom 50x error page only as 404 is handled by the app proxied
   error_page 500 502 503 504 /50x/50x-error.html;
   location /50x {

@@ -9,11 +9,12 @@
     state: directory
   with_items:
     - "{{ containers_path }}/{{ app_user }}/data"
+    - "{{ containers_path }}/{{ app_user }}/config"
 
 - name: pull latest gitea image
   become_user: "{{ app_user }}"
   containers.podman.podman_image:
-    name: docker.io/gitea/gitea:latest
+    name: docker.io/gitea/gitea:latest-rootless
     force: true
   register: image_pull
 
@@ -36,18 +37,18 @@
     recreate: true
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
-    image: docker.io/gitea/gitea:latest
+    image: docker.io/gitea/gitea:latest-rootless
     ports:
       - "{{ app_port }}:3000/tcp"
-      - "{{ app_ssh_port }}:22/tcp"
+      - "{{ app_ssh_port }}:2222/tcp"
     volumes:
-      - "{{ containers_path }}/{{ app_user }}/data:/data"
+      - "{{ containers_path }}/{{ app_user }}/data:/var/lib/gitea"
+      - "{{ containers_path }}/{{ app_user }}/config:/etc/gitea"
       - "{{ containers_path }}/{{ app_user }}/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
+    userns: keep-id:uid=1000,gid=1000
     env:
       TZ: "America/Los_Angeles"
-      USER_UID: "{{ app_uid }}"
-      USER_GID: "{{ app_gid }}"
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
   when: image_pull.changed

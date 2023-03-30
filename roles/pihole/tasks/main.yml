@@ -1,5 +1,4 @@
 # pihole install
-
 ---
 - name: create isolation user and group. Enable linger
   ansible.builtin.include_role:

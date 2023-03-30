@@ -7,3 +7,6 @@ app_gid: 1203
 
 app_name: pihole
 app_port: 8080
+
+# limit access even when using https proxy  
+limit_app: true

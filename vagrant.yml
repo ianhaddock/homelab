@@ -1,7 +1,7 @@
 # Vagrant Provision Play
 ---
 - name: Vagrant provision play
-  hosts: blog:west
+  hosts: blog:west:devbox
   become: true
   gather_facts: true
 

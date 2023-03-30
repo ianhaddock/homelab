@@ -4,16 +4,15 @@ server {
   server_name {{ app_name }}.{{ site_fqdn }};
   client_max_body_size 256m;
 
+  # limit access by source IP
+  allow {{ limit_source_ip }};
+  deny all;
+
   # custom 50x error only as 404 handled by app.
   error_page 500 502 503 504 /50x/50x-error.html;
   location /50x {
         root {{ nginx_path }}/error_pages;
   }
-
-  # allow local networks only
-  allow 192.168.1.0/24;
-  allow 192.168.40.0/24;
-  deny all;
 
   location = /robots.txt {
     alias {{ nginx_path }}/robots.txt;

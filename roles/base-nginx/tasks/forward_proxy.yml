@@ -1,7 +1,7 @@
 # set forward proxy
 ---
 
-- name: open firewall port when not proxying
+- name: open firewall port when not using SSL
   ansible.builtin.firewalld:
     port: "{{ item }}"
     permanent: true

@@ -5,6 +5,11 @@ hostname: "example"
 timezone: "America/Los_Angeles"
 public_key: ansible.pub
 
+admin_user: ansible
+admin_uid: 1100
+admin_group: ansible
+admin_gid: 1100
+
 zram_ratio: 0.8
 cert_enabled: false
 certbot_email: "name@example.com"
@@ -22,6 +27,10 @@ certbot_domains: "{{ site_fqdn }},\
 
 app_git_repo: "https://git.example.com/name/{{ app_name }}.git"
 file_server: "https://files.example.com"
+
+  # always limit access to http apps from a local IP range with
+  # the option to limit specific apps when running https
+limit_source_ip: '192.168.1.0/24'
 
 containers: true
 containers_path: '/mnt/containers'
