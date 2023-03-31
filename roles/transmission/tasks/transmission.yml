@@ -1,4 +1,4 @@
-# transmission container
+# transmission rootful container
 ---
 - name: create directories
   ansible.builtin.file:
@@ -32,7 +32,7 @@
   when: verbose
 
 - name: pull transmission container:latest
-  become_user: "{{ app_user }}"
+  #  become_user: "{{ app_user }}"
   containers.podman.podman_container:
     recreate: true
     name: "{{ app_name }}"
@@ -40,12 +40,12 @@
     image: lscr.io/linuxserver/transmission:latest
     ports:
       - "{{ app_port }}:9091/tcp"
-      - "{{ app_data_port }}:51413/udp"
-      - "{{ app_data_port }}:51413/tcp"
+      - "{{ app_data_port }}:51412/udp"
+      - "{{ app_data_port }}:51412/tcp"
     volumes:
-      - "{{ containers_path }}/{{ app_user }}/conf:/config"
-      - "{{ app_media }}:/downloads"
-      - "{{ app_media }}/watch_folder:/watch"
+      - "{{ containers_path }}/{{ app_user }}/conf:/config:Z"
+      - "{{ app_media }}:/downloads:z"
+      - "{{ app_media }}/watch_folder:/watch:z"
     env:
       TZ: "{{ timezone }}"
       PUID: "{{ app_uid }}"
@@ -53,7 +53,8 @@
       USER: "{{ user_transmission }}"
       PASS: "{{ pass_transmission }}"
       PEERPORT: "{{ app_data_port }}"
-    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    generate_systemd: {"path": "/etc/systemd/system"}
+    #  {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
   when: image_pull.changed
   register: container_state
@@ -70,15 +71,15 @@
   when: verbose
 
 - name: enable and start
-  become_user: "{{ app_user }}"
+  #  become_user: "{{ app_user }}"
   ansible.builtin.systemd:
     daemon-reload: true
     no_block: true
     name: "container-{{ app_name }}"
     enabled: true
     state: started
-    scope: user
-  environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+      #  scope: user
+      #  environment:
+      #    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
   when: container_state.changed
   register: files_systemctl_debug

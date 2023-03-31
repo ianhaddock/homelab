@@ -1,8 +1,8 @@
 # transmission
 ---
-app_user: trans
+app_user: tr
 app_uid: 1204
-app_group: trans
+app_group: tr
 app_gid: 1204
 
 app_name: tr

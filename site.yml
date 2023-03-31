@@ -100,8 +100,8 @@
     #    - blog
     #    - jenkins
     #    - pihole
-    - plex
-    #    - transmission
+    #    - plex
+    - transmission
 
   handlers:
     - name: reload nginx
