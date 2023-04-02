@@ -11,12 +11,12 @@
     state: latest
   when: ansible_os_family == 'RedHat'
 
-- name: install utility packages
+  # workaround temp
+- name: install utility packages rpi2b
   ansible.builtin.package:
     name:
       - git
       - screen  # not on centstream8 without EPEL
-        #      - lm_sensors -- rpi2b does not have
       - sysstat
       - zip
       - unzip
@@ -24,6 +24,22 @@
       - rsync
       - figlet
     state: latest  # noqa package-latest
+  when: hostname == 'raspberrypi'
+
+- name: install utility packages
+  ansible.builtin.package:
+    name:
+      - git
+      - screen  # not on centstream8 without EPEL
+      - lm_sensors    # rpi2b does not have
+      - sysstat
+      - zip
+      - unzip
+      - smartmontools
+      - rsync
+      - figlet
+    state: latest  # noqa package-latest
+  when: not hostname == 'raspberrypi'
 
 - name: install container tools
   ansible.builtin.package:
@@ -38,7 +54,7 @@
     regexp: '^# rootless_storage_path'
     line: 'rootless_storage_path =
       "{{ containers_path }}/$USER/storage"'
-  when: containers
+  when: containers and not hostname == 'raspberrypi'
 
     # - name: set cgroupsv2
     #   become: true
