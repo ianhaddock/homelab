@@ -91,6 +91,7 @@
   become: true
 
   roles:
+<<<<<<< Updated upstream
     - base-nginx
     - file_store
     - gitea
@@ -100,6 +101,17 @@
     - pihole
     - plex
     - transmission
+=======
+    #    - base-nginx
+    #    - file_store
+    #    - gitea
+    #    - blog
+    - jenkins
+    - jenkins-agent
+    #    - pihole
+    #    - plex
+    #    - transmission
+>>>>>>> Stashed changes
 
   handlers:
     - name: reload nginx
