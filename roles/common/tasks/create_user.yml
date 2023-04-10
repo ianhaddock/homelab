@@ -11,6 +11,8 @@
     group: "{{ group }}"
     uid: "{{ uid }}"
     comment: "{{ comment }}"
+    generate_ssh_key: true
+    ssh_key_file: ".ssh/{{ user }}"
 
 - name: check if linger is enabled
   ansible.builtin.stat:

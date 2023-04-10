@@ -1,4 +1,4 @@
-# jenkins controller install
+# jenkins agent install
 ---
 - name: create isolation user and group. Enable linger
   ansible.builtin.include_role:
@@ -11,8 +11,8 @@
     gid: "{{ app_gid }}"
     comment: "jenkins app account"
 
-- name: install jenkins container
-  ansible.builtin.import_tasks: jenkins.yml
+- name: install jenkins agent
+  ansible.builtin.import_tasks: agent.yml
 
 - name: set forward proxy and http port
   ansible.builtin.include_role:

@@ -1,7 +1,7 @@
 # Master Playbook
 ---
-### all hosts ###
 
+### all hosts ###
 - hosts: all
   gather_facts: true
   become: true
@@ -22,7 +22,6 @@
 
 
 ### blog server ###
-
 - hosts: blog
   become: true
 
@@ -41,13 +40,14 @@
 
 
 ### rpi2b server ###
-
 - hosts: rpi2b
   become: true
 
   roles:
-    - common  # placeholder until system disk is rebuilt
+    - common  # placeholder until rebuilt
     #     - pihole
+    #     - blog
+    #     - gitea
 
   handlers:
     - name: reload nginx
@@ -62,7 +62,6 @@
 
 
 ### west server ###
-
 - hosts: west
   become: true
 
@@ -71,7 +70,6 @@
     - file_store
     - gitea
     - blog
-    - jenkins
     - pihole
     - plex
     - transmission
@@ -89,18 +87,18 @@
 
 
 ### development server ###
-
 - hosts: devbox
   become: true
 
   roles:
-    #    - base-nginx
-    #    - file_store
-    #    - gitea
-    #    - blog
-    #    - jenkins
-    #    - pihole
-    #    - plex
+    - base-nginx
+    - file_store
+    - gitea
+    - blog
+    - jenkins
+    - jenkins-agent
+    - pihole
+    - plex
     - transmission
 
   handlers:

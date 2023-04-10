@@ -1,0 +1,9 @@
+# jenkins agent
+---
+app_user: j_agent
+app_uid: 1001
+app_group: j_agent
+app_gid: 1001
+
+app_name: j-agent
+app_port: 2201

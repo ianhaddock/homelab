@@ -1,0 +1,39 @@
+# jenkins agent install
+---
+- name: create agent container
+  containers.podman.podman_container:
+    ip: 10.88.0.64
+    recreate: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: docker.io/jenkins/ssh-agent:latest
+    ports:
+      - "{{ app_port }}:22/tcp"
+    cap_add:
+      SYS_CHROOT  # allow ssh in container
+    env:
+      JENKINS_AGENT_SSH_PUBKEY: "{{ jenkins_pub_key }}"
+      TZ: "America/Los_Angeles"
+    generate_systemd: {"path": "/etc/systemd/system"}
+    state: present
+  register: container_state
+
+- name: prune old images
+  ansible.builtin.command:
+    cmd: 'podman image prune -f -a'
+  register: prune_debug
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ prune_debug }}"
+  when: verbose
+
+- name: enable and start
+  ansible.builtin.systemd:
+    no_block: true
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+  when: container_state.changed
+  register: files_systemctl_debug

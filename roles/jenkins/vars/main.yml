@@ -1,10 +1,11 @@
 # jenkins
 ---
-# jenkins vars
 app_user: jenkins
-app_uid: 1209
+app_uid: 1000
+  # uid is hardcoded in jenkins
 app_group: jenkins
-app_gid: 1209
+app_gid: 1000
+  # gid is hardcoded in jenkins
 
 app_name: jenkins
 app_port: 8084
