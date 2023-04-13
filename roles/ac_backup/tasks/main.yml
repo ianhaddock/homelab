@@ -1,0 +1,62 @@
+# acsm backup
+---
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "{{ app_comment }}"
+
+- name: copy key
+  ansible.builtin.shell:
+    cmd: "cat /home/{{ app_user }}/.ssh/{{ app_user }}.pub"
+  register: ssh_key
+
+- name: debug keys
+  ansible.builtin.debug:
+    msg: "{{ ssh_key.stdout }}"
+  when: verbose
+
+    # - name: copy key to target
+    #   ansible.builtin.authorized_key:
+    #     user: "{{ ac_user }}"
+    #     key: "{{ ssh_key.stdout }}"
+    #   delegate_to: "{{ item }}"
+    #   with_items:
+    #     - "{{ groups['east'] }}"
+
+- name: create log file
+  ansible.builtin.file:
+    state: touch
+    path: "{{ app_log }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0644'
+
+- name: create local storage directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ ac_backup_destination }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+
+- name: install script
+  ansible.builtin.template:
+    src: templates/acsm_backup.sh.j2
+    dest: "{{ app_script }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0740'
+
+- name: add cron job
+  become_user: "{{ app_user }}"
+  ansible.builtin.cron:
+    name: daily ac server backup
+    minute: "45"
+    hour: "6"
+    job: "{{ app_script }} >> {{ app_log }} 2>&1"

@@ -68,11 +68,11 @@
   roles:
     - base-nginx
     - file_store
-    - gitea
-    - blog
-    - pihole
-    - plex
-    - transmission
+      #     - gitea
+      #     - blog
+      #     - pihole
+      #     - plex
+      #     - transmission
 
   handlers:
     - name: reload nginx
@@ -91,27 +91,16 @@
   become: true
 
   roles:
-<<<<<<< Updated upstream
-    - base-nginx
-    - file_store
-    - gitea
-    - blog
-    - jenkins
-    - jenkins-agent
-    - pihole
-    - plex
-    - transmission
-=======
-    #    - base-nginx
-    #    - file_store
-    #    - gitea
-    #    - blog
-    - jenkins
-    - jenkins-agent
-    #    - pihole
-    #    - plex
-    #    - transmission
->>>>>>> Stashed changes
+    #     - base-nginx
+    #     - file_store
+    #     - gitea
+    #     - blog
+    #     - jenkins
+    #     - jenkins-agent
+    #     - pihole
+    #     - plex
+    #     - transmission
+    - ac_backup
 
   handlers:
     - name: reload nginx
