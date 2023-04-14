@@ -1,28 +1,34 @@
----
-gitea: none
-include_toc: true
----
 # Ansible automation
-This is an infra. build for a small VPS and home server. 
+Personal infrastructure build. 
 
-Initially created while migrating my home lab to lower power alternatives. OSs are CentOS Stream 8 and Red Hat 8.7 Oopta (via the [developer subscription][2] program). All apps are running in rootless Podman containers within sudo-less, passwordless user accounts.  Vagrant is used as the development environment.
+Most Apps are in rootless Podman containers inside sudo-less, password-less user accounts.
 
 ## Uses
-* RedHat 8.7 & CentOS Stream 8
-* Podman rootless containerization
-* Vagrant VM test environment 
+* RedHat 8 via the [developer subscription][2]
+* CentOS Stream 8
+* Podman containers
+* Vagrant dev environment 
 
-## Targets
-### Small VPS
-* my blog app
-* simple file server
-* Gitea
 
-### Home Server
-* Pihole
-* Plex
-* Transmission
-* Jenkins
+## Roles
+
+Utilities:
+* common: add base packages, users, configs
+* sshd: update ssh configs
+* zram: add ram compression before disk swap
+* base-nginx: reverse proxy & ssl certificates
+* file_store: simple https file server
+* ac_backup: rsync over ssh
+
+Apps: 
+* blog: Flask app for [my blog][1]
+* gitea: git repo
+* pihole: DNS with ad-guard
+* plex: personal media streaming service
+* transmission: bittorrent client
+* jenkins: automation server
+* jenkins-agent: automation agent
+
 
 ## Setup:
 Requires a configured Ansible and Vagrant environment.
@@ -34,9 +40,14 @@ $ git pull http://git.ianhaddock.com/ian/ansible.git
 # install requirements
 $ ansible-galaxy install -r roles/requirements.yml
 
-# update Vagrantfile to conform to your virtualization product and IP space
-$ vi Vagrantfile
+# update Vagrantfile to conform to your VM product and IP space
 
+# clone group_vars/all.yml file to create host_vars files
+$ mkdir host_vars
+$ cp group_vars/all.yml host_vars/[ip.address].yml
+
+# edit host_vars files to match Vagrantfile
+ 
 # generate ansible admin account ssh-key
 $ ssh-keygen -f ~/.ssh/ansible
 
@@ -52,4 +63,5 @@ $ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development site.y
  
 ```
 
+[1]: https://ianhaddock.com
 [2]: https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux
