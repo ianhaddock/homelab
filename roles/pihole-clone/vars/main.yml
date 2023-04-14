@@ -1,0 +1,13 @@
+# pihole-clone vars
+---
+clone_user: pihole1
+clone_uid: 1201
+clone_group: pihole1
+clone_gid: 1201
+clone_comment: "{{ clone_name }} account"
+
+clone_name: pihole1
+clone_port: 8001
+
+# limit access even when using https proxy
+limit_app: true

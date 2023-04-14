@@ -9,7 +9,7 @@
     uid: "{{ app_uid }}"
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
-    comment: "pihole app account"
+    comment: "{{ app_comment }}"
 
 - name: install pihole container
   ansible.builtin.import_tasks: pihole.yml

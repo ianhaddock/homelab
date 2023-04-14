@@ -1,24 +1,39 @@
 #!/bin/bash
-###
-# prune zip files older than 30 days (+29) from {{ site_fqdn }}
-# backup acsm zip files from {{ ac_fqdn }} to {{ site_fqdn }}
-# prune zip files older than 7 (+6) days from {{ ac_fqdn }}
-# Added by Ansible {{ ansible_date_time.date }} {{ansible_date_time.time}}
-###
+
+
+# # # # # #
+#
+#   Actions:
+#   check available space on {{ site_fqdn }}
+#   sleep random >10 seconds
+#   prune zip files older than 30 days (+29) from {{ site_fqdn }}
+#   backup acsm zip files from {{ ac_fqdn }} to {{ site_fqdn }}
+#   prune zip files older than 7 (+6) days from {{ ac_fqdn }}
+#  
+#   v20230413.1350
+#   Added by Ansible {{ ansible_date_time.date }} {{ansible_date_time.time}}
+#
+# # # # # #
+
+
 echo "$(date +%Y%m%d:%H%M%S): Starting."
 
-# check if storage is available
+
+### check if storage is available
 used_space="$(df -k | grep media | awk '{print $5}' | sed 's/%//g')"
 if [ $used_space -gt 79 ]; then
     echo "$(date +%Y%m%d:%H%M%S): Exiting. Not enough space available, over $used_space% full";
     exit 1;
 fi
 
+
+### sleep jitter
 n=$((RANDOM % 10))  # sleep random seconds < 10
 echo "Sleeping $n seconds."
 sleep $n
 
-# prune local files
+
+### prune local files
 echo "$(date +%Y%m%d:%H%M%S): remove local .zips older than 30 (+29) days old."
 
 find {{ ac_backup_destination }} -name *.zip -ctime +29 -exec rm -rvf '{}' \;
@@ -28,7 +43,8 @@ if [ $? != 0 ]; then
     exit 1;
 fi
 
-# copy remote
+
+### copy remote files
 echo "$(date +%Y%m%d:%H%M%S): Pull backups from {{ ac_fqdn }}";
 
 rsync -a  --log-file={{ app_log }} \
@@ -41,7 +57,8 @@ if [ $? != 0 ]; then
     exit 1;
 fi
 
-# prune remote
+
+### prune remote files
 echo "$(date +%Y%m%d:%H%M%S): remove .zips older than 7 (+6) days old on {{ ac_fqdn }}"
 
 ssh -i /home/{{ app_user }}/.ssh/{{ app_user }} \
@@ -53,6 +70,7 @@ if [ $? != 0 ]; then
     exit 1;
 fi
 
-# exit
+
+### exit
 echo "$(date +%Y%m%d:%H%M%S): Exiting"
-exit
+exit 0;

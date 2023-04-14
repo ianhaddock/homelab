@@ -30,7 +30,7 @@
     - file_store
     - gitea
     - blog
-    - pihole
+    - pihole-main
 
   handlers:
     - name: reload nginx
@@ -44,10 +44,14 @@
   become: true
 
   roles:
-    - common  # placeholder until rebuilt
+    - common  # until rebuilt
     #     - pihole
-    #     - blog
+    #     - base-nginx
+    #     - file_store
     #     - gitea
+    #     - blog
+    #     - plex
+    #     - transmission
 
   handlers:
     - name: reload nginx
@@ -66,13 +70,14 @@
   become: true
 
   roles:
-    - base-nginx
-    - file_store
-      #     - gitea
-      #     - blog
-      #     - pihole
-      #     - plex
-      #     - transmission
+    - common  # until rebuild
+    #     - base-nginx
+    #     - file_store
+    #     - gitea
+    #     - blog
+    #     - pihole
+    #     - plex
+    #     - transmission
 
   handlers:
     - name: reload nginx
@@ -91,16 +96,16 @@
   become: true
 
   roles:
-    #     - base-nginx
+    - base-nginx
     #     - file_store
     #     - gitea
     #     - blog
     #     - jenkins
     #     - jenkins-agent
-    #     - pihole
+    - pihole-clone
     #     - plex
     #     - transmission
-    - ac_backup
+    #     - ac_backup
 
   handlers:
     - name: reload nginx

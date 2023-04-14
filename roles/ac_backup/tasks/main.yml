@@ -21,6 +21,7 @@
     msg: "{{ ssh_key.stdout }}"
   when: verbose
 
+    ## requires update to ACSM admin user ##
     # - name: copy key to target
     #   ansible.builtin.authorized_key:
     #     user: "{{ ac_user }}"
