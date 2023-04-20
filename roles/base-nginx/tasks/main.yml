@@ -5,22 +5,33 @@
     name: nginx
     state: present
 
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "{{ app_comment }}"
+
 - name: create directories
   ansible.builtin.file:
     path: "{{ item }}"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
     mode: '0755'
     state: directory
   with_items:
     - "/etc/nginx/sites-available"
-      
+
 - name: add robots.txt
   ansible.builtin.copy:
     src: robots.txt
     dest: "{{ nginx_path }}/robots.txt"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
     mode: u=rwX,g=rX,o=rX
 
 - name: open web ports
@@ -41,4 +52,4 @@
   ansible.builtin.service:
     name: nginx
     enabled: true
-    state: restarted
+    state: started

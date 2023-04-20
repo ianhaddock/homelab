@@ -8,98 +8,73 @@
     mode: '0755'
     state: directory
   with_items:
-    - "{{ containers_path }}/{{ app_name }}/etc-dnsmasq.d"
-    - "{{ containers_path }}/{{ app_name }}/etc-pihole"
-    - "{{ containers_path }}/{{ app_name }}/var_log"
-    - "{{ containers_path }}/{{ app_name }}/var_log/lighttpd"
+    - "{{ containers_path }}/{{ app_name }}"
 
-- name: set firewall ports
-  ansible.builtin.firewalld:
-    rich_rule: "{{ item }}"
-    immediate: true
-    permanent: true
-    state: enabled
-  with_items:
-    - 'rule family=ipv4 forward-port port=53 protocol=tcp to-port=5353'
-    - 'rule family=ipv4 forward-port port=53 protocol=udp to-port=5353'
-    - 'rule family=ipv4 forward-port port=67 protocol=tcp to-port=6767'
-  when: not limit_app
+- name: pull git repo
+  ansible.builtin.git:
+    repo: https://github.com/pi-hole/pi-hole.git
+    depth: 1
+    dest: "{{ containers_path }}/{{ app_name }}/pi-hole"
+    version: master
 
-- name: set firewall ports
-  ansible.builtin.firewalld:
-    rich_rule: "{{ item }}"
-    immediate: true
-    permanent: true
-    state: enabled
-  with_items:
-    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
-      port=53 protocol=tcp to-port=5353'
-    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
-      port=53 protocol=udp to-port=5353'
-    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
-      port=67 protocol=tcp to-port=6767'
-  when: limit_app
+- name: create dest directory
+  ansible.builtin.file:
+    path: /etc/pihole
+    owner: root
+    group: root
 
-- name: pull latest pihole image
-  become_user: "{{ app_user }}"
-  containers.podman.podman_image:
-    name: docker.io/pihole/pihole:latest
-  register: image_pull
+- name: add setupVars.conf
+  ansible.builtin.template:
+    src: setupVars.conf.j2
+    dest: /etc/pihole/setupVars.conf
+    owner: root
+    group: root
+    mode: '0640'
 
-- name: debug pull
+- name: run unattended setup script
+  become: true
+  ansible.builtin.shell:
+    cmd: >
+      '{{ containers_path }}/{{ app_name }}/pi-hole/automated install/basic-install.sh' --unattended >>
+      {{ containers_path }}/{{ app_name }}/pi-hole/install.log
+  ignore_errors: true
+  register: install_script
+
+- name: debug output
   ansible.builtin.debug:
-    msg: "{{ image_pull }}"
+    msg: "{{ install_script }}"
   when: verbose
 
-- name: create pihole container
-  become_user: "{{ app_user }}"
-  containers.podman.podman_container:
-    recreate: true
-    name: "{{ app_name }}"
-    hostname: "{{ hostname }}"
-    image: docker.io/pihole/pihole:latest
-    ports:
-      - "5353:53/tcp"
-      - "5353:53/udp"
-      - "6767:67/udp"
-      - "{{ app_port }}:80/tcp"
-    volumes:
-      - "{{ containers_path }}/{{ app_name }}/etc-dnsmasq.d:/etc/dnsmasq.d"
-      - "{{ containers_path }}/{{ app_name }}/etc-pihole:/etc/pihole"
-      - "{{ containers_path }}/{{ app_name }}/var_log:/var/log"
-
-    env:
-      TZ: "{{ timezone }}"
-      WEBPASSWORD: "{{ pass_pihole }}"
-      PIHOLE_UID: "{{ app_uid }}"
-      PIHOLE_GID: "{{ app_gid }}"
-      WEB_UID: "{{ app_uid }}"
-      WEB_GID: "{{ app_gid }}"
-    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
-    state: present
-  when: image_pull.changed
-  register: container_state
-
-- name: prune old images
-  become_user: "{{ app_user }}"
+- name: set web password
+  become: true
   ansible.builtin.command:
-    cmd: 'podman image prune -f -a'
-  register: prune_debug
+    cmd: 'pihole -a -p {{ pass_pihole }}'
 
-- name: debug
-  ansible.builtin.debug:
-    msg: "{{ prune_debug }}"
-  when: verbose
+- name: allow apple image handling in emails
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/pihole/pihole-FTL.conf
+    regexp: '^BLOCK_ICLOUD_PR=true$'
+    line: 'BLOCK_ICLOUD_PR=false'
 
-- name: enable and start
-  become_user: "{{ app_user }}"
+- name: change web port to {{ app_port }}
+  ansible.builtin.lineinfile:
+    path: /etc/lighttpd/lighttpd.conf
+    regexp: '^server.port                 = 80$'
+    line: 'server.port                 = 8080'
+
+- name: reload lighttpd
   ansible.builtin.systemd:
-    daemon-reload: true
-    name: "container-{{ app_name }}"
-    enabled: true
-    state: started
-    scope: user
-  environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
-  when: container_state.changed
-  register: files_systemctl_debug
+    name: lighttpd
+    state: restarted
+
+- name: open firewall ports
+  ansible.builtin.firewalld:
+    port: "{{ item }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  with_items:
+    - 53/tcp
+    - 53/udp
+    - 67/tcp

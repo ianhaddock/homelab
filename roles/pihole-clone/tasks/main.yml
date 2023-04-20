@@ -14,12 +14,24 @@
 - name: install pihole container
   ansible.builtin.include_role:
     name: pihole-main
+    tasks_from: podman_pihole.yml
+  vars:
+    app_user: "{{ clone_user }}"
+    app_group: "{{ clone_group }}"
+    app_name: "{{ clone_name }}"
+    app_port: "{{ clone_port }}"
+  when: containers and not ansible_facts.machine == "armv7l"
+
+- name: install pihole on rpi2b (armv7l)
+  ansible.builtin.include_role:
+    name: pihole-man
     tasks_from: pihole.yml
   vars:
     app_user: "{{ clone_user }}"
     app_group: "{{ clone_group }}"
     app_name: "{{ clone_name }}"
-    app_port: "{{ clone_port }}"  
+    app_port: "{{ clone_port }}"
+  when: ansible_facts.machine == "armv7l"
 
 - name: set forward proxy and ports
   ansible.builtin.include_role:

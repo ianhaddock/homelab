@@ -32,7 +32,6 @@
   when: verbose
 
 - name: pull transmission container:latest
-  #  become_user: "{{ app_user }}"
   containers.podman.podman_container:
     recreate: true
     name: "{{ app_name }}"
@@ -54,7 +53,6 @@
       PASS: "{{ pass_transmission }}"
       PEERPORT: "{{ app_data_port }}"
     generate_systemd: {"path": "/etc/systemd/system"}
-    #  {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
   when: image_pull.changed
   register: container_state
@@ -78,8 +76,5 @@
     name: "container-{{ app_name }}"
     enabled: true
     state: started
-      #  scope: user
-      #  environment:
-      #    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
   when: container_state.changed
   register: files_systemctl_debug

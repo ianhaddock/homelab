@@ -4,10 +4,10 @@ app_user: pihole
 app_uid: 1203
 app_group: pihole
 app_gid: 1203
-app_comment: "{{ app_name }} account"  
+app_comment: "{{ app_name }} account"
 
 app_name: pihole
 app_port: 8080
 
-# limit access even when using https proxy  
-limit_app: true
+# limit access even when using https proxy
+limit_app: false

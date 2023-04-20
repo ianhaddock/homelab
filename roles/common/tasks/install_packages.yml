@@ -11,12 +11,11 @@
     state: latest
   when: ansible_os_family == 'RedHat'
 
-  # workaround temp
-- name: install utility packages rpi2b
+- name: install utility packages
   ansible.builtin.package:
     name:
       - git
-      - screen  # not on centstream8 without EPEL
+      - screen  # needs EPEL on centstream8
       - sysstat
       - zip
       - unzip
@@ -24,20 +23,18 @@
       - rsync
       - figlet
     state: latest  # noqa package-latest
-  when: hostname == 'raspberrypi'
 
-- name: install utility packages
+- name: install utility packages rpi2b
   ansible.builtin.package:
     name:
-      - git
-      - screen  # not on centstream8 without EPEL
-      - lm_sensors    # rpi2b does not have
-      - sysstat
-      - zip
-      - unzip
-      - smartmontools
-      - rsync
-      - figlet
+      - acl  # for ansible become_user on rpi2b
+    state: latest  # noqa package-latest
+  when: hostname == 'raspberrypi'
+
+- name: install utility packages x86
+  ansible.builtin.package:
+    name:
+      - lm_sensors  # rpi2b does not have
     state: latest  # noqa package-latest
   when: not hostname == 'raspberrypi'
 

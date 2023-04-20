@@ -1,0 +1,105 @@
+# pihole install
+---
+- name: create pihole directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_name }}/etc-dnsmasq.d"
+    - "{{ containers_path }}/{{ app_name }}/etc-pihole"
+    - "{{ containers_path }}/{{ app_name }}/var_log"
+    - "{{ containers_path }}/{{ app_name }}/var_log/lighttpd"
+
+- name: set firewall ports
+  ansible.builtin.firewalld:
+    rich_rule: "{{ item }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  with_items:
+    - 'rule family=ipv4 forward-port port=53 protocol=tcp to-port=5353'
+    - 'rule family=ipv4 forward-port port=53 protocol=udp to-port=5353'
+    - 'rule family=ipv4 forward-port port=67 protocol=tcp to-port=6767'
+  when: not limit_app
+
+- name: set firewall ports
+  ansible.builtin.firewalld:
+    rich_rule: "{{ item }}"
+    immediate: true
+    permanent: true
+    state: enabled
+  with_items:
+    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
+      port=53 protocol=tcp to-port=5353'
+    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
+      port=53 protocol=udp to-port=5353'
+    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
+      port=67 protocol=tcp to-port=6767'
+  when: limit_app
+
+- name: pull latest pihole image
+  become_user: "{{ app_user }}"
+  containers.podman.podman_image:
+    name: docker.io/pihole/pihole:latest
+  register: image_pull
+
+- name: debug pull
+  ansible.builtin.debug:
+    msg: "{{ image_pull }}"
+  when: verbose
+
+- name: create pihole container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: docker.io/pihole/pihole:latest
+    ports:
+      - "5353:53/tcp"
+      - "5353:53/udp"
+      - "6767:67/udp"
+      - "{{ app_port }}:80/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_name }}/etc-dnsmasq.d:/etc/dnsmasq.d"
+      - "{{ containers_path }}/{{ app_name }}/etc-pihole:/etc/pihole"
+      - "{{ containers_path }}/{{ app_name }}/var_log:/var/log"
+
+    env:
+      TZ: "{{ timezone }}"
+      WEBPASSWORD: "{{ pass_pihole }}"
+      PIHOLE_UID: "{{ app_uid }}"
+      PIHOLE_GID: "{{ app_gid }}"
+      WEB_UID: "{{ app_uid }}"
+      WEB_GID: "{{ app_gid }}"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  when: image_pull.changed
+  register: container_state
+
+- name: prune old images
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: 'podman image prune -f -a'
+  register: prune_debug
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ prune_debug }}"
+  when: verbose
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
+  register: files_systemctl_debug

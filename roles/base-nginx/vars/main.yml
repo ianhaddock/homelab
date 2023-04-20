@@ -1,9 +1,9 @@
 ---
-nginx_user: nginx
-nginx_uid: 995
-nginx_group: nginx
-nginx_gid: 995
-comment: "nginx account"
+app_user: nginx
+app_uid: 995
+app_group: nginx
+app_gid: 995
+app_comment: "nginx account"
 
 nginx_conf: "/etc/nginx/conf.d"
 nginx_path: "/usr/share/nginx/html"

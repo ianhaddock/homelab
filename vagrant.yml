@@ -1,9 +1,18 @@
 # Vagrant Provision Play
 ---
 - name: Vagrant provision play
-  hosts: all #blog:west:devbox
+  hosts: all  # blog:west:devbox
   become: true
   gather_facts: true
 
   roles:
   - common
+
+  handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
+    - name: reload network
+      ansible.builtin.systemd:
+        name: network
+        state: reloaded

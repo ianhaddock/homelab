@@ -12,7 +12,17 @@
     comment: "{{ app_comment }}"
 
 - name: install pihole container
+  ansible.builtin.import_tasks: podman_pihole.yml
+  when: containers and not ansible_facts.machine == "armv7l"
+
+- name: check if pihole is installed on rpi2b
+  ansible.builtin.stat:
+    path: /etc/pihole
+  register: pihole_path
+
+- name: install pihole on rpi2b (armv7l)
   ansible.builtin.import_tasks: pihole.yml
+  when: ansible_facts.machine == "armv7l" and not pihole_path.stat.exists
 
 - name: set forward proxy and ports
   ansible.builtin.include_role:
