@@ -21,7 +21,7 @@
         state: reloaded
 
 
-### blog server ###
+### blog vps ###
 - hosts: blog
   become: true
 
@@ -39,18 +39,14 @@
         state: reloaded
 
 
-### Raspberry Pi 2B Server ###
+### Raspberry Pi 2B ###
 - hosts: rpi2b
   become: true
 
   roles:
-    #    - base-nginx
-    #    - blog
+    - base-nginx
     - pihole-main
-      #    - file_store
-      ##   - gitea
-      ##    - plex
-      #    - transmission
+    - transmission
 
   handlers:
     - name: reload nginx
@@ -64,47 +60,21 @@
         state: restarted
 
 
-### west server ###
-- hosts: west
-  become: true
-
-  roles:
-    - common  # until rebuild
-    #     - base-nginx
-    #     - file_store
-    #     - gitea
-    #     - blog
-    #     - pihole
-    #     - plex
-    #     - transmission
-
-  handlers:
-    - name: reload nginx
-      ansible.builtin.systemd:
-        name: nginx
-        state: reloaded
-
-    - name: restart smb
-      ansible.builtin.systemd:
-        name: smb
-        state: restarted
-
-
-### development server ###
+### development box ###
 - hosts: devbox
   become: true
 
   roles:
     - base-nginx
-    #     - file_store
-    #     - gitea
-    #     - blog
-    #     - jenkins
-    #     - jenkins-agent
+    - file_store
+    - gitea
+    - blog
+    - jenkins
+    - jenkins-agent
     - pihole-clone
-    #     - plex
-    #     - transmission
-    #     - ac_backup
+    - plex
+    - transmission
+    - ac_backup
 
   handlers:
     - name: reload nginx
