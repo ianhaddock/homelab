@@ -24,3 +24,6 @@
 
 - name: tweak RPi2B nic name
   ansible.builtin.import_tasks: rpi2b.yml
+
+- name: set sysctl options
+  ansible.builtin.import_tasks: sysctl.yml  
