@@ -1,0 +1,17 @@
+# /etc/sysctl.d/network.conf
+
+###
+# https://documentation.suse.com/sles/15-SP2/html/SLES-all/cha-sec-sysctl.html
+# 
+###
+
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+
+net.ipv4.tcp_max_syn_backlog = 4096
+
+net.ipv4.conf.default.secure_redirects = 0
+net.ipv4.conf.all.secure_redirects = 0
+
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.all.send_redirects = 0

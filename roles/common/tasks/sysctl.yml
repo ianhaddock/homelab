@@ -1,0 +1,12 @@
+# sysctl.yml
+---
+- name: add sysctl conf files
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: /etc/sysctl.d/local.conf
+    owner: root
+    group: root
+    mode: '0640'
+  with_items:
+    - local.conf.j2
+    - network.conf.j2

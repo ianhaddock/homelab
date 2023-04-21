@@ -1,0 +1,5 @@
+# main.yml
+---
+
+vm_swappiness: 10
+vfs_cache_pressure: 50
