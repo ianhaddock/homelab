@@ -27,7 +27,8 @@
 - name: install utility packages rpi2b
   ansible.builtin.package:
     name:
-      - acl  # for ansible become_user on rpi2b
+      - acl  # ansible become_user
+      - hdparm  # hd util
     state: latest  # noqa package-latest
   when: hostname == 'raspberrypi'
 

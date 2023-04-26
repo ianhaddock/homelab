@@ -46,6 +46,7 @@
   roles:
     - base-nginx
     - pihole-main
+    - plex
     - transmission
 
   handlers:

@@ -22,8 +22,9 @@
 - name: set selinux
   ansible.builtin.import_tasks: selinux.yml
 
-- name: tweak RPi2B nic name
+- name: tweak rpi2b
   ansible.builtin.import_tasks: rpi2b.yml
+  when: ansible_hostname == 'raspberrypi'
 
 - name: set sysctl options
-  ansible.builtin.import_tasks: sysctl.yml  
+  ansible.builtin.import_tasks: sysctl.yml
