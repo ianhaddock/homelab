@@ -30,14 +30,14 @@
       - acl  # ansible become_user
       - hdparm  # hd util
     state: latest  # noqa package-latest
-  when: hostname == 'raspberrypi'
+  when: ansible_facts.machine == "armv7l"
 
 - name: install utility packages x86
   ansible.builtin.package:
     name:
       - lm_sensors  # rpi2b does not have
     state: latest  # noqa package-latest
-  when: not hostname == 'raspberrypi'
+  when: not ansible_facts.machine == "armv7l"
 
 - name: install container tools
   ansible.builtin.package:

@@ -13,16 +13,11 @@
 
 - name: install plex container
   ansible.builtin.import_tasks: plex.yml
-  when: containers and not hostname == 'raspberrypi'
-
-- name: check if plex is already installed
-  ansible.builtin.stat:
-    path: "/mnt/containers/plex/config/Library/Application Support/Plex Media Server"
-  register: plex_path
+  when: containers and not ansible_facts.machine == "armv7l"
 
 - name: install plex on rpi2b
   ansible.builtin.import_tasks: rpi2b_plex.yml
-  when: hostname == 'raspberrypi' and not plex_path.stat.exists
+  when: ansible_facts.machine == "armv7l"
 
 - name: set forward proxy and ports
   ansible.builtin.include_role:

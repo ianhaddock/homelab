@@ -1,14 +1,24 @@
 # transmission rootful container
 ---
+- name: add sysctl 00-transmission.conf
+  ansible.builtin.template:
+    src: 00-transmission.conf.j2
+    dest: /etc/sysctl.d/00-transmission.conf
+    owner: root
+    group: root
+    mode: '0640'
+
 - name: create directories
   ansible.builtin.file:
     path: "{{ item }}"
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
-    mode: '0755'
+    mode: '0775'
     state: directory
   with_items:
     - "{{ containers_path }}/{{ app_user }}/conf"
+    - "{{ app_media }}/complete"
+    - "{{ app_media }}/incomplete"
     - "{{ app_media }}/watch_folder"
 
 - name: install transmission.json file

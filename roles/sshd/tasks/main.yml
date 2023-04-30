@@ -23,14 +23,23 @@
     group: root
     mode: '0640'
 
+- name: install motd file
+  ansible.builtin.template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: '0640'
+
 - name: debug
   ansible.builtin.debug:
     msg: messge {{ sshd_reload }}
   when: verbose
 
 - name: create motd file with hostname
+  become: true
   ansible.builtin.command:
-    cmd: /bin/echo "$(hostname)" > /etc/motd
+    cmd: /usr/bin/figlet "{{ hostname }}" >> /etc/motd
 
 - name: enable banner file
   ansible.builtin.lineinfile:

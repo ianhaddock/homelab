@@ -1,0 +1,14 @@
+[Unit]
+Description = Torrent Daemon
+Wants = network-online.target
+
+[Service]
+ExecStart = /usr/local/bin/transmission-daemon -f --log-level=debug --logfile=/var/log/transmission-daemon.log --config-dir /mnt/containers/tr/conf
+User = tr
+Group = tr
+Restart = no 
+Nice = 10
+CPUSchedulingPolicy = idle
+
+[Install]
+WantedBy = multi-user.target
