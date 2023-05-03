@@ -15,13 +15,22 @@
   ansible.builtin.import_tasks: plex.yml
   when: containers and not ansible_facts.machine == "armv7l"
 
-- name: install plex on rpi2b
-  ansible.builtin.import_tasks: rpi2b_plex.yml
-  when: ansible_facts.machine == "armv7l"
-
-- name: set forward proxy and ports
+- name: set plex container forward proxy and ports
   ansible.builtin.include_role:
     name: base-nginx
     tasks_from: forward_proxy.yml
     public: true
-  when: containers
+  when: containers and not ansible_facts.machine == "armv7l"
+
+- name: install plex on rpi2b
+  ansible.builtin.import_tasks: rpi2b_plex.yml
+  when: ansible_facts.machine == "armv7l"
+
+- name: set rpi2b forward proxy and ports
+  ansible.builtin.include_role:
+    name: base-nginx
+    tasks_from: forward_proxy.yml
+  vars:
+    app_port: 32400
+    app_name: plex
+  when: ansible_facts.machine == "armv7l"

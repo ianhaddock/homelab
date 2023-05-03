@@ -13,6 +13,12 @@
     path: "/usr/local/bin/transmission-daemon"
   register: transmission_daemon
 
+- name: stop transmission-daemon to update settings files
+  ansible.builtin.systemd:
+    name: transmission-daemon
+    state: stopped
+  when: transmission_daemon.stat.exists
+
 - name: install dependencies
   ansible.builtin.package:
     name:
@@ -86,4 +92,4 @@
     no_block: true
     name: "transmission-daemon.service"
     enabled: true
-    state: restarted
+    state: started

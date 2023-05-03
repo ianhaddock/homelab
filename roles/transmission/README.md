@@ -1,3 +1,4 @@
-Adds a rootful container in most cases
-Adds sysctl values
-Installs directly if 32bit rpi2b target
+# Transmission 
+Creates a rootful container
+Adds recommended sysctl values
+Installs directly if target is Raspberry Pi 2b (armv7l arch)

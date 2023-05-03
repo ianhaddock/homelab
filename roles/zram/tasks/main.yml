@@ -1,9 +1,12 @@
-# zRAM kernel module
+# zram/tasks/main.yml
 #
+# Edit swap file settings and install zram
+#
+# zRAM kernel module
 # https://scatterpated.net/?p=69
 # https://wiki.archlinux.org/title/Zram
 #
-# "zRAM is a kernel module which creates swapspace in compressed RAM. The speed
+# zRAM is a kernel module which creates swapspace in compressed RAM. The speed
 # benefits of having swapspace in RAM far outweigh the minor cost of compression
 # in CPU cycles.
 ---
@@ -29,6 +32,13 @@
     line: '# \1'
     backrefs: true
     state: present
+
+- name: update rpi2b dphys-swapfile file size
+  ansible.builtin.lineinfile:
+    path: /etc/dphys-swapfile
+    regexp: '^CONF_SWAPSIZE=100$'
+    line: 'CONF_SWAPSIZE=512'
+  when: ansible_facts.machine == "armv7l"
 
 - name: check for swap file
   ansible.builtin.stat:
