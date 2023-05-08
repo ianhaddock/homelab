@@ -1,5 +1,4 @@
 # blog install
-
 ---
 - name: create container volume directories
   ansible.builtin.file:

@@ -1,0 +1,103 @@
+# plex/tasks/plugins.yml
+# plex container does not support plugins natively, this is a workaround
+---
+- name: get subuid for plex preferences
+  ansible.builtin.stat:
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}"
+  register: app_subuid
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ app_subuid }}"
+  when: verbose
+
+- name: check for plugins
+  ansible.builtin.stat:
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Plug-ins/Youtube-DL-Agent.bundle"
+  register: youtube_dl_agent
+
+- name: check for scanners
+  ansible.builtin.stat:
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Scanners/Series/Absolute Series Scanner.py"
+  register: series_scanner
+
+- name: unarchive youtube-dl plugin
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://github.com/JordyAlkema/Youtube-DL-Agent.bundle/\
+          archive/master.zip"
+    dest: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Plug-ins"
+    owner: "{{ app_subuid.stat.uid }}"
+    group: "{{ app_subuid.stat.gid }}"
+  when: not youtube_dl_agent.stat.exists
+
+- name: remove old youtube-dl plugin if present
+  ansible.builtin.file:
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Plug-ins/Youtube-DL-Agent.bundle"
+    state: absent
+  when: not youtube_dl_agent.stat.exists
+
+- name: rename youtube-dl plugin folder
+  ansible.builtin.copy:
+    src: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+          Plug-ins/Youtube-DL-Agent.bundle-master/"  # keep the trailing slash
+    dest: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+          Plug-ins/Youtube-DL-Agent.bundle"
+    owner: "{{ app_subuid.stat.uid }}"
+    group: "{{ app_subuid.stat.gid }}"
+    remote_src: true
+  when: not youtube_dl_agent.stat.exists
+
+- name: remove source youtube-dl plugin folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+       Plug-ins/Youtube-DL-Agent.bundle-master/"
+    - "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+       Plug-ins/Youtube-DL-Agent.bundle-master.zip"
+  when: not youtube_dl_agent.stat.exists
+
+- name: create folders for absolute series scanner
+  ansible.builtin.file:
+    path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Scanners/Series"
+    state: directory
+    owner: "{{ app_subuid.stat.uid }}"
+    group: "{{ app_subuid.stat.gid }}"
+    mode: '0755'
+
+- name: add plex absolute series scanner
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/ZeroQI/Absolute-Series-Scanner/\
+          master/Scanners/Series/Absolute%20Series%20Scanner.py"
+    dest: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}/\
+           Scanners/Series/Absolute Series Scanner.py"
+    owner: "{{ app_subuid.stat.uid }}"
+    group: "{{ app_subuid.stat.gid }}"
+    mode: '0544'
+  when: not series_scanner.stat.exists
+
+- name: restart container
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: restarted
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: containers and not ( series_scanner.stat.exists or youtube_dl_agent.stat.exists )
+
+- name: restart plexmediaserver
+  ansible.builtin.systemd:
+    name: plexmediaserver
+    enabled: true
+    state: restarted
+  when: ansible_facts.machine == "armv7l" and not ( series_scanner.stat.exists or youtube_dl_agent.stat.exists )

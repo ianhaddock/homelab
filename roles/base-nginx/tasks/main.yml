@@ -5,16 +5,17 @@
     name: nginx
     state: present
 
-- name: create isolation user and group. Enable linger
-  ansible.builtin.include_role:
-    name: common
-    tasks_from: create_user.yml
-  vars:
-    user: "{{ app_user }}"
-    uid: "{{ app_uid }}"
-    group: "{{ app_group }}"
-    gid: "{{ app_gid }}"
-    comment: "{{ app_comment }}"
+      ### different systems have different nginx uid gid ###
+      # - name: create isolation user and group. Enable linger
+      #   ansible.builtin.include_role:
+      #     name: common
+      #     tasks_from: create_user.yml
+      #   vars:
+      #     user: "{{ app_user }}"
+      #     uid: "{{ app_uid }}"
+      #     group: "{{ app_group }}"
+      #     gid: "{{ app_gid }}"
+      #     comment: "{{ app_comment }}"
 
 - name: create directories
   ansible.builtin.file:
