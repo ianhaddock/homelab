@@ -15,3 +15,9 @@
     owner: root
     group: root
     mode: '0640'
+  register: sysctl_settings
+
+- name: reload sysctl if new values set
+  ansible.builtin.command:
+    cmd: sysctl --load "{{ sysctlSettingsPath }}/{{ sysctlSettings }}"
+  when: sysctl_settings.changed
