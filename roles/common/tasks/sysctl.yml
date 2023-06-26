@@ -19,5 +19,5 @@
 
 - name: reload sysctl if new values set
   ansible.builtin.command:
-    cmd: sysctl --load "{{ sysctlSettingsPath }}/{{ sysctlSettings }}"
+    cmd: sysctl --load "/etc/sysctl.d/00-network.conf"
   when: sysctl_settings.changed
