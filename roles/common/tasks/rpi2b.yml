@@ -17,11 +17,11 @@
     group: root
     mode: '0755'
   loop:
-    - { path: /mnt, dir: hdd }
-    - { path: /mnt, dir: ssd }
-    - { path: /mnt/ssd, dir: transmission }
-    - { path: /mnt/ssd, dir: containers }
-    - { path: /mnt/hdd, dir: media }
+    - {path: /mnt, dir: hdd}
+    - {path: /mnt, dir: ssd}
+    - {path: /mnt/ssd, dir: transmission}
+    - {path: /mnt/ssd, dir: containers}
+    - {path: /mnt/hdd, dir: media}
 
 - name: create links in /mnt
   ansible.builtin.file:
@@ -31,7 +31,14 @@
     group: root
     state: link
   loop:
-    - { src: /mnt/hdd/media, dest: /mnt/media }
-    - { src: /mnt/ssd/transmission, dest: /mnt/transmission }
-    - { src: /mnt/ssd/containers, dest: /mnt/containers }
+    - {src: /mnt/hdd/media, dest: /mnt/media}
+    - {src: /mnt/ssd/transmission, dest: /mnt/transmission}
+    - {src: /mnt/ssd/containers, dest: /mnt/containers}
 
+- name: add bash_aslises file
+  ansible.builtin.template:
+    src: rpi2b_bash_aliases
+    dest: /home/ian/.bash_aliases
+    owner: ian
+    group: ian
+    mode: '0640'

@@ -21,7 +21,7 @@
 
 - name: unarchive custom files if available
   ansible.builtin.unarchive:
-    src: "{{ file_server }}/custom.zip"
+    src: "{{ file_server }}/blog.zip"
     dest: "{{ containers_path }}/{{ app_name }}"
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
