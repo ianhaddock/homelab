@@ -70,12 +70,13 @@
     - file_store
     - gitea
     - blog
-    - jenkins
-    - jenkins-agent
+      #    - jenkins
+      #    - jenkins-agent
     - pihole-clone
     - plex
     - transmission
     - ac_backup
+    - steamcmd
 
   handlers:
     - name: reload nginx

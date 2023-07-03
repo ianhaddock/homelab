@@ -1,0 +1,4 @@
+# bash aliases file
+# v.{{ ansible_date_time.date }}
+
+alias wakewin='wakeonlan {{ windows_mac }}' 

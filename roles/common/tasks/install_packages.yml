@@ -29,6 +29,7 @@
     name:
       - acl  # ansible become_user
       - hdparm  # hd util
+      - wakeonlan  
     state: latest  # noqa package-latest
   when: ansible_facts.machine == "armv7l"
 
