@@ -1,0 +1,127 @@
+#!/bin/bash -e
+
+# # # #
+#
+# Sync youtube playlists to plex
+#
+# v20200421 first pass
+# v20201006 update paths, add checks
+# v20201023 add --no-progress flag
+# v20201128 add flags for json metadata
+# v20220825 exclude av1 video codec
+# v20230705 move to yt-dlp
+# v20230710 prefer avc (h264) codec
+# v20230712 add opts
+#
+# Installed by Ansible on "{{ ansible_date_time.date }}"
+#
+# # # #
+
+function usage() {
+  echo "";
+  echo "Batch download Plex compatible YouTube videos to a target directory.";
+  echo "Expects .yt-playlists and .yt-downloads files in directory.";
+  echo "";
+  echo " -h: This help message";
+  echo " -v: Run in verbose mode";
+  echo " -q: Run in quiet mode";
+  echo " -a: Download playlist as audio only";
+  echo "";
+  echo "Usage: ./yt-dlp-batch [opts] /path/to/files";
+  echo "";
+}
+
+# set last argument passed to script as directory
+for LAST; do true; done
+
+DIRECTORY=$LAST
+PLAYLIST=.yt-playlists
+ARCHIVE=.yt-downloaded
+PIDFILE=/tmp/yt-dlp-batch.PID
+DATEAFTER=20220101
+SLEEP=66
+SLEEP_MAX=234
+RATE_LIMIT="0.6M"
+
+quiet_or_verbose=""
+video_format="-f bestvideo[ext=mp4][vcodec^=avc]+bestaudio[ext=m4a]"
+
+while getopts ":vqa" opt; do
+  case "${opt}" in
+    v)
+      quiet_or_verbose="--verbose";
+      ;;
+    q)
+      quiet_or_verbose="--quiet";
+      ;;
+    a)
+      video_format="-f bestaudio[ext=m4a]";  
+      ;;
+    *)
+      usage;
+      exit 0;
+      ;;
+  esac
+done;
+
+
+# sanity checks
+if [ ! -d "$DIRECTORY" ]; then
+  usage; 
+  echo "ERROR: Directory not found. Exiting.";
+  exit 1;
+elif [ ! -f "$DIRECTORY/$PLAYLIST" ]; then
+  usage;
+  echo "ERROR: Playlist file not found. Exiting.";
+  exit 1;
+elif [ -f $PIDFILE ]; then
+  echo "WARNING: yt-dlp-batch is already running. Exiting.";
+  exit 0;
+fi
+
+# temp file cleanup
+trap 'rm -f $PIDFILE' EXIT
+
+echo $$ > $PIDFILE 
+
+echo "### Starting: $(date)";
+echo "Target: $DIRECTORY";
+echo " ";
+
+# Download a youtube-DL compatible h264 (avc) video file, subtitles, metadata
+/usr/local/sbin/yt-dlp \
+    $quiet_or_verbose \
+    --abort-on-error \
+    --abort-on-unavailable-fragments \
+    --limit-rate $RATE_LIMIT \
+    --max-sleep-interval $SLEEP_MAX \
+    --sleep-interval $SLEEP \
+    --restrict-filenames \
+    --add-metadata \
+    --write-description \
+    --write-info-json \
+    --write-thumbnail \
+    --no-progress \
+    --dateafter $DATEAFTER \
+    --download-archive $DIRECTORY/$ARCHIVE \
+    --output $DIRECTORY/"%(playlist)s/%(playlist_index)s - %(title)s [%(id)s].%(ext)s" \
+    $video_format \
+    --merge-output-format mp4 \
+    --embed-subs \
+    --write-subs \
+    --sub-format vtt \
+    --sub-langs en*,-live_chat \
+    --convert-subs srt \
+    --compat-options no-youtube-unavailable-videos \
+    --batch-file="$DIRECTORY/$PLAYLIST"
+
+echo " ";
+echo "### Finishing: "$(date)";
+echo " ";
+echo "Time Taken:";
+time;
+echo "";
+
+rm -f "$PIDFILE"
+
+exit 0;

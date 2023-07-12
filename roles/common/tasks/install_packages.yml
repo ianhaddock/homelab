@@ -28,8 +28,9 @@
   ansible.builtin.package:
     name:
       - acl  # ansible become_user
-      - hdparm  # hd util
-      - wakeonlan  
+      - hdparm
+      - wakeonlan
+      - ffmpeg
     state: latest  # noqa package-latest
   when: ansible_facts.machine == "armv7l"
 
