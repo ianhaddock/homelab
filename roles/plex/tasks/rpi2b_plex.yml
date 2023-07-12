@@ -11,13 +11,17 @@
     - "{{ containers_path }}/{{ app_name }}/config/Library/Application Support"
     - "{{ containers_path }}/{{ app_name }}/transcode"
     - "{{ media_path }}/audiobooks"
-    - "{{ media_path }}/music"
+    - "{{ media_path }}/f1"
+    - "{{ media_path }}/lemans"
     - "{{ media_path }}/movies"
+    - "{{ media_path }}/music"
+    - "{{ media_path }}/staging"
+    - "{{ media_path }}/tallyho"
     - "{{ media_path }}/tvshows"
-    - "{{ media_path }}/racing"
+    - "{{ media_path }}/wec"
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
-    - "{{ media_path }}/lemans"
+    - "{{ media_path }}/yt_tunes"
 
 - name: check if plex is already installed
   ansible.builtin.stat:
@@ -56,3 +60,63 @@
     group: root
     state: link
   when: not plex_path.stat.exists
+
+- name: install yt-dlp latest
+  ansible.builtin.get_url:
+    url: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
+    dest: /usr/local/sbin/yt-dlp
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0740'
+
+- name: install youtube-dl scripts
+  ansible.builtin.template:
+    src: yt-dlp-batch.sh.j2
+    dest: /usr/local/sbin/yt-dlp-batch.sh
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0740'
+
+- name: create log file
+  ansible.builtin.file:
+    state: touch
+    path: /var/log/yt-dlp-batch.log
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0644'
+
+- name: add cron job
+  become_user: "{{ app_user }}"
+  ansible.builtin.cron:
+    name: yt-dlp yoga to Plex
+    minute: "15"
+    hour: "6"
+    weekday: "2,4"
+    job: "/usr/local/sbin/yt-dlp-batch.sh /mnt/media/yoga >> /var/log/yt-dlp-batch.log 2>&1"
+
+- name: add cron job
+  become_user: "{{ app_user }}"
+  ansible.builtin.cron:
+    name: yt-dlp youtube to Plex
+    minute: "15"
+    hour: "6"
+    weekday: "3,5"
+    job: "/usr/local/sbin/yt-dlp-batch.sh /mnt/media/youtube >> /var/log/yt-dlp-batch.log 2>&1"
+
+- name: add cron job
+  become_user: "{{ app_user }}"
+  ansible.builtin.cron:
+    name: yt-dlp TallyHo to Plex
+    minute: "45"
+    hour: "7"
+    weekday: "6,7"
+    job: "/usr/local/sbin/yt-dlp-batch.sh /mnt/media/tallyho >> /var/log/yt-dlp-batch.log 2>&1"
+
+- name: add cron job
+  become_user: "{{ app_user }}"
+  ansible.builtin.cron:
+    name: yt-dlp YouTunes to Plex
+    minute: "25"
+    hour: "6"
+    weekday: "1"
+    job: "/usr/local/sbin/yt-dlp-batch.sh -a /mnt/media/yt_tunes >> /var/log/yt-dlp-batch.log 2>&1"

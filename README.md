@@ -1,11 +1,11 @@
 # Ansible automation
-Personal infrastructure build. 
+Personal infrastructure build.
 
-Most Apps are in rootless Podman containers inside sudo-less, password-less user accounts.
 
 ## Uses
 * RedHat 8 via the [developer subscription][2]
 * CentOS Stream 8
+* Raspberry Pi OS
 * Podman containers
 * Vagrant dev environment 
 
@@ -28,6 +28,7 @@ Apps:
 * transmission: bittorrent client
 * jenkins: automation server
 * jenkins-agent: automation agent
+* steamcmd: Steam CLI
 
 
 ## Setup:

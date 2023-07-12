@@ -40,5 +40,5 @@
     src: rpi2b_bash_aliases
     dest: "/home/{{ user_account }}/.bash_aliases"
     owner: "{{ user_account }}"
-    group: "{{ user_group }}" 
+    group: "{{ user_group }}"
     mode: '0640'
