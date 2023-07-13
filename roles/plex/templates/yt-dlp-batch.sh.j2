@@ -85,8 +85,7 @@ trap 'rm -f $PIDFILE' EXIT
 echo $$ > $PIDFILE 
 
 echo "### Starting: $(date)";
-echo "Target: $DIRECTORY";
-echo " ";
+echo "[info] Target: $DIRECTORY";
 
 # Download a youtube-DL compatible h264 (avc) video file, subtitles, metadata
 /usr/local/sbin/yt-dlp \
@@ -115,13 +114,12 @@ echo " ";
     --compat-options no-youtube-unavailable-videos \
     --batch-file="$DIRECTORY/$PLAYLIST"
 
-echo " ";
 echo "### Finishing: "$(date)";
 echo " ";
 echo "Time Taken:";
 time;
 echo "";
 
-rm -f "$PIDFILE"
+rm -f "$PIDFILE";
 
 exit 0;
