@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 
 # # # # # #
@@ -21,7 +21,7 @@ echo "$(date +%Y%m%d:%H%M%S): Starting."
 
 ### check if storage is available
 used_space="$(df -k | grep media | awk '{print $5}' | sed 's/%//g')"
-if [ $used_space -gt 79 ]; then
+if [ $used_space > 79 ]; then
     echo "$(date +%Y%m%d:%H%M%S): Exiting. Not enough space available, over $used_space% full";
     exit 1;
 fi
