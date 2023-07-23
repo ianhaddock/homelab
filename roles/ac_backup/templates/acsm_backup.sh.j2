@@ -1,53 +1,57 @@
 #!/bin/bash -e
 
-
-# # # # # #
-#
-#   Actions:
-#   check available space on {{ site_fqdn }}
-#   sleep random >10 seconds
-#   prune zip files older than 30 days (+29) from {{ site_fqdn }}
-#   backup acsm zip files from {{ ac_fqdn }} to {{ site_fqdn }}
-#   prune zip files older than 7 (+6) days from {{ ac_fqdn }}
+# # #
 #  
-#   v20230413.1350
-#   Added by Ansible {{ ansible_date_time.date }} {{ansible_date_time.time}}
+#   v20230413:
+#   v20230716: add usage function, update storage check 
+#   v20230725: remove rsync --log-file param, shorten retention to 20 days
+##
+#   Added by Ansible {{ ansible_date_time.date }}
 #
-# # # # # #
+# # #
 
+function usage() {
+  echo "";
+  echo "This is a simple backup script for the ACSM Game Server. It:";
+  echo " * checks available space on {{ site_fqdn }}";
+  echo " * sleeps random >10 seconds";
+  echo " * prunes zip files older than 30 days (+29) from {{ site_fqdn }}";
+  echo " * backups acsm zip files from {{ ac_fqdn }} to {{ site_fqdn }}";
+  echo " * prunes zip files older than 7 (+6) days from {{ ac_fqdn }}";
+  echo "";#  
+}
 
-echo "$(date +%Y%m%d:%H%M%S): Starting."
+space_limit=96
 
-
-### check if storage is available
-used_space="$(df -k | grep media | awk '{print $5}' | sed 's/%//g')"
-if [ $used_space > 79 ]; then
-    echo "$(date +%Y%m%d:%H%M%S): Exiting. Not enough space available, over $used_space% full";
+# sanity checks
+drive_full="$(df -k {{ ac_backup_destination }} | tail -n1 | awk '{print $5}' | sed 's/%//g')"
+if [ $drive_full -gt $space_limit ]; then
+    usage;
+    echo "ERROR: Not enough space available, over $drive_full% full. Exiting.";
     exit 1;
+elif [ $# -gt 0 ]; then
+  usage;
+  echo "ERROR: This script does not take parameters. Exiting.";
+  exit 1;
 fi
+  
+# sleep jitter
+n=$((RANDOM % 10));
+echo "Sleeping $n seconds.";
+sleep $n;
 
-
-### sleep jitter
-n=$((RANDOM % 10))  # sleep random seconds < 10
-echo "Sleeping $n seconds."
-sleep $n
-
-
-### prune local files
-echo "$(date +%Y%m%d:%H%M%S): remove local .zips older than 30 (+29) days old."
-
-find {{ ac_backup_destination }} -name *.zip -ctime +29 -exec rm -rvf '{}' \;
-
+# prune local files
+echo "Removing local .zips older than 20 (+19) days old."
+find {{ ac_backup_destination }} -name *.zip -ctime +19 -exec rm -rvf '{}' \;
 if [ $? != 0 ]; then
     echo "$(date +%Y%m%d:%H%M%S): local prune failed. Exiting"
     exit 1;
 fi
 
+# copy remote files
+echo "Pulling backups from {{ ac_fqdn }}";
 
-### copy remote files
-echo "$(date +%Y%m%d:%H%M%S): Pull backups from {{ ac_fqdn }}";
-
-rsync -a  --log-file={{ app_log }} \
+rsync -a \
     -e 'ssh -i /home/{{ app_user }}/.ssh/{{ app_user }}' \
     {{ ac_user }}@{{ ac_fqdn }}:{{ ac_backup_source }}/ \
     {{ ac_backup_destination }}
@@ -57,9 +61,8 @@ if [ $? != 0 ]; then
     exit 1;
 fi
 
-
-### prune remote files
-echo "$(date +%Y%m%d:%H%M%S): remove .zips older than 7 (+6) days old on {{ ac_fqdn }}"
+# prune remote files
+echo "Removing .zip files older than 7 (+6) days old on {{ ac_fqdn }}"
 
 ssh -i /home/{{ app_user }}/.ssh/{{ app_user }} \
     {{ ac_user }}@{{ ac_fqdn }} "find {{ ac_backup_source }} \
@@ -70,7 +73,9 @@ if [ $? != 0 ]; then
     exit 1;
 fi
 
+# exit
+echo "Done. Time taken: $SECONDS seconds.";
+times;
+echo "";
 
-### exit
-echo "$(date +%Y%m%d:%H%M%S): Exiting"
 exit 0;

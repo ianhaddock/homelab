@@ -48,6 +48,7 @@
     - pihole-main
     - plex
     - transmission
+    - ac_backup
 
   handlers:
     - name: reload nginx
@@ -72,10 +73,10 @@
     - blog
       #    - jenkins
       #    - jenkins-agent
+      #    - ac_backup
     - pihole-clone
     - plex
     - transmission
-    - ac_backup
     - steamcmd
 
   handlers:
