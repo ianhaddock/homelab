@@ -6,7 +6,9 @@ server {
 
 {% if limit_app %}
   # limit access by source IP
-  allow {{ limit_source_ip }};
+  {% for limit_ip in limit_source_ips %}
+  allow {{ limit_ip }};
+  {% endfor %}
   deny all;
 {% endif %}
 

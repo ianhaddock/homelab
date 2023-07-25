@@ -12,6 +12,7 @@
 # v20230705 move to yt-dlp
 # v20230710 prefer avc (h264) codec
 # v20230712 add opts
+# v20230717 add SECONDS on end
 #
 # Installed by Ansible on "{{ ansible_date_time.date }}"
 #
@@ -38,7 +39,7 @@ DIRECTORY=$LAST
 PLAYLIST=.yt-playlists
 ARCHIVE=.yt-downloaded
 PIDFILE=/tmp/yt-dlp-batch.PID
-DATEAFTER=20220101
+DATEAFTER=20190101
 SLEEP=66
 SLEEP_MAX=234
 RATE_LIMIT="0.6M"
@@ -85,8 +86,7 @@ trap 'rm -f $PIDFILE' EXIT
 echo $$ > $PIDFILE 
 
 echo "### Starting: $(date)";
-echo "Target: $DIRECTORY";
-echo " ";
+echo "[info] Target: $DIRECTORY";
 
 # Download a youtube-DL compatible h264 (avc) video file, subtitles, metadata
 /usr/local/sbin/yt-dlp \
@@ -115,13 +115,10 @@ echo " ";
     --compat-options no-youtube-unavailable-videos \
     --batch-file="$DIRECTORY/$PLAYLIST"
 
-echo " ";
-echo "### Finishing: "$(date)";
-echo " ";
-echo "Time Taken:";
-time;
+echo "### Finishing: $(date)";
 echo "";
-
-rm -f "$PIDFILE"
-
+echo "Time Taken: $SECONDS seconds.";
+times;
+echo "";
+rm -f "$PIDFILE";
 exit 0;

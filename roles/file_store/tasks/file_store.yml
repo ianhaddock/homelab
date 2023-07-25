@@ -54,6 +54,19 @@
     force: true
   register: dockerfile_build
 
+- name: stop old container when dockerfile changes
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    no_block: false
+    name: "container-{{ app_user }}"
+    enabled: true
+    state: stopped
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: dockerfile_build.changed
+
 - name: debug dockerfile build
   ansible.builtin.debug:
     msg: "{{ dockerfile_build }}"
