@@ -27,16 +27,16 @@
     path: "{{ containers_path }}/{{ app_name }}/{{ plex_server_dir }}"
   register: plex_path
 
-- name: downlaod plexmediaserver
+- name: downlaod latest plexmediaserver
   ansible.builtin.get_url:
-    url: "https://downloads.plex.tv/plex-media-server-new/1.32.1.6999-91e1e2e2c/debian/plexmediaserver_1.32.1.6999-91e1e2e2c_armhf.deb"
+    url: "https://plex.tv/downloads/latest/5?channel=16&build=linux-armv7neon&distro=debian&X-Plex-Token=xxxxxxxxxxxxxxxxxxxx"
     dest: "{{ containers_path }}/{{ app_name }}/plexmediaserver.deb"
-  when: not plex_path.stat.exists
+      #  when: not plex_path.stat.exists
 
-- name: install plexmediaserver
+- name: install or update plexmediaserver
   ansible.builtin.apt:
     deb: "{{ containers_path }}/{{ app_name }}/plexmediaserver.deb"
-  when: not plex_path.stat.exists
+      #  when: not plex_path.stat.exists
 
 - name: copy Plex Media Server folder to {{ containers_path }}/plex
   ansible.builtin.copy:

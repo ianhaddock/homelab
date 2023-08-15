@@ -45,6 +45,7 @@
 
   roles:
     - base-nginx
+    - file_store
     - pihole-main
     - plex
     - transmission

@@ -14,6 +14,11 @@
 - name: install container-file_store
   ansible.builtin.import_tasks: file_store.yml
 
+    # - name: install file store direct on rpi2b
+    #
+    #
+
+
 - name: set forward proxy and ports
   ansible.builtin.include_role:
     name: base-nginx
