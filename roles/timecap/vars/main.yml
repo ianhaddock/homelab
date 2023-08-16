@@ -1,0 +1,11 @@
+# timemachine timecapsule vars
+---
+
+app_user: timecap
+app_uid: 1209
+app_group: timecap
+app_gid: 1209
+
+app_name: timecapsule
+
+

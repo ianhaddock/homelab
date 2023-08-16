@@ -1,0 +1,73 @@
+# timemachine timecapsule on rpi2b
+# ref:
+# https://ovechkin.xyz/blog/2021-12-13-using-raspberry-pi-for-time-machine
+# https://stackoverflow.com/questions/44762488/non-interactive-samba-user-creation-via-ansible
+---
+
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "{{ app_name }} account"
+
+- name: install samba and avahi
+  ansible.builtin.apt:
+    name:
+      - samba
+      - avahi-daemon
+    state: latest  # noqa package-latest
+
+# - name: set samba password for timecapsule account
+#   ansible.builtin.command:
+#     psudo cmd: sudo echo pa55w0rd | smbpasswd -s -a app_user
+
+- name: setup directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "/mnt/hdd/{{ app_name }}"
+    - "/mnt/hdd/{{ app_name }}/backups"
+
+- name: update smb.conf file
+  ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: '0644'
+  register: smbconf_state
+
+- name: open ports
+  ansible.builtin.firewalld:
+    port: 445/tcp
+    state: enabled
+
+- name: reload samba
+  ansible.builtin.systemd:
+    name: smbd
+    state: reloaded
+  when: smbconf_state.changed
+
+- name: install avahi service
+  ansible.builtin.template:
+    src: samba.service.j2
+    dest: /etc/avahi/services/samba.service
+    owner: root
+    group: root
+    mode: '0644'
+  register: avahi_state
+
+- name: reload avahi
+  ansible.builtin.systemd:
+    name: avahi-daemon
+    state: restarted
+  when: avahi_state.changed

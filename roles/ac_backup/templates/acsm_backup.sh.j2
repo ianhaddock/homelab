@@ -24,7 +24,7 @@ function usage() {
   echo "";#  
 }
 
-space_limit=96
+space_limit=98
 
 # sanity checks
 drive_full="$(df -k {{ ac_backup_destination }} | tail -n1 | awk '{print $5}' | sed 's/%//g')"
@@ -66,11 +66,11 @@ if [ $? != 0 ]; then
 fi
 
 # prune remote files
-echo "Removing .zip files older than 2 (+3) days old on {{ ac_fqdn }}"
+echo "Removing .zip files older than 2 (+1) days old on {{ ac_fqdn }}"
 
 ssh -i /home/{{ app_user }}/.ssh/{{ app_user }} \
     {{ ac_user }}@{{ ac_fqdn }} "find {{ ac_backup_source }} \
-        -name *.zip -ctime +3 -exec rm -rvf '{}' \;"
+        -name *.zip -ctime +1 -exec rm -rvf '{}' \;"
 
 if [ $? != 0 ]; then
     echo "$(date +%Y%m%d:%H%M%S): prune failed. Exiting"

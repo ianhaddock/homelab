@@ -50,6 +50,7 @@
     - plex
     - transmission
     - ac_backup
+    - timecap
 
   handlers:
     - name: reload nginx
