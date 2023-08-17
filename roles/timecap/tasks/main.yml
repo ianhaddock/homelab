@@ -16,11 +16,20 @@
     comment: "{{ app_name }} account"
 
 - name: install samba and avahi
-  ansible.builtin.apt:
+  ansible.builtin.package:
+    name:
+      - samba
+      - avahi-tools
+    state: latest  # noqa package-latest
+  when: not ansible_facts.machine == "armv7l"
+
+- name: install samba and avahi
+  ansible.builtin.package:
     name:
       - samba
       - avahi-daemon
     state: latest  # noqa package-latest
+  when: ansible_facts.machine == "armv7l"
 
 # - name: set samba password for timecapsule account
 #   ansible.builtin.command:
@@ -55,7 +64,13 @@
   ansible.builtin.systemd:
     name: smbd
     state: reloaded
-  when: smbconf_state.changed
+  when: smbconf_state.changed and ansible_facts.machine == "armv7l"
+
+- name: reload samba
+  ansible.builtin.systemd:
+    name: smb
+    state: reloaded
+  when: smbconf_state.changed and not ansible_facts.machine == "armv7l"
 
 - name: install avahi service
   ansible.builtin.template:

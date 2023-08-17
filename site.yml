@@ -70,16 +70,17 @@
 
   roles:
     - base-nginx
-    - file_store
+      #    - file_store
     - gitea
-    - blog
+      #    - blog
       #    - jenkins
       #    - jenkins-agent
       #    - ac_backup
     - pihole-clone
-    - plex
-    - transmission
-    - steamcmd
+      #    - plex
+      #    - transmission
+      #    - steamcmd
+      #    - timecap
 
   handlers:
     - name: reload nginx
