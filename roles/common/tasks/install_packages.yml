@@ -34,6 +34,11 @@
     state: latest  # noqa package-latest
   when: ansible_facts.machine == "armv7l"
 
+- name: drop package cache when working on the blog site
+  ansible.builtin.command:
+    cmd: dnf clean packages
+  when: hostname == 'blog'
+
 - name: install utility packages x86
   ansible.builtin.package:
     name:
