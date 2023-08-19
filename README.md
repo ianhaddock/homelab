@@ -1,5 +1,5 @@
 # Ansible automation
-Personal infrastructure build.
+Personal infrastructure build. 
 
 
 ## Uses
@@ -19,6 +19,8 @@ Utilities:
 * base-nginx: reverse proxy & ssl certificates
 * file_store: simple https file server
 * ac_backup: rsync over ssh
+* timecap: timecapsule service
+* steamcmd: Steam cli
 
 Apps: 
 * blog: Flask app for [my blog][1]
@@ -28,7 +30,6 @@ Apps:
 * transmission: bittorrent client
 * jenkins: automation server
 * jenkins-agent: automation agent
-* steamcmd: Steam CLI
 
 
 ## Setup:
