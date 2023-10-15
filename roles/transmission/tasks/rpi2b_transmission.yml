@@ -41,6 +41,7 @@
     remote_src: true  
   when: not transmission_daemon.stat.exists
 
+    #  ### https://github.com/transmission/transmission/blob/main/docs/Building-Transmission.md
     #  - name: build transmission 4
     #  cd /mnt/containers/tr/transmission-4.0.3
     #  mkdir build

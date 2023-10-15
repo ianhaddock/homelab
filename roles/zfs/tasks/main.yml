@@ -1,0 +1,30 @@
+# zfs on centos
+
+---
+# https://openzfs.github.io/openzfs-docs/Getting%20Started/RHEL-based%20distro/index.html
+# 2023-10-06: on Centos 9 Stream, use DKMS and not kABI
+- name: add zfs key file
+  ansible.builtin.rpm_key:
+    key: https://raw.githubusercontent.com/zfsonlinux/zfsonlinux.github.com/master/zfs-release/RPM-GPG-KEY-openzfs-key2
+    fingerprint: '7DC7 299D CF7C 7FD9 CD87 701B A599 FD5E 9DB8 4141'
+    state: present
+
+- name: add zfs repo
+  ansible.builtin.dnf:
+    name: https://zfsonlinux.org/epel/zfs-release-2-3.el9.noarch.rpm
+    state: present
+  register: zfs_install_state
+
+- name: install zfs
+  ansible.builtin.dnf:
+    name:
+      - epel-release
+      - kernel-devel
+      - zfs
+    state: present
+
+- name: add zfs module conf and restart if changed
+  ansible.builtin.template:
+    src: zfs.conf.j2
+    dest: /etc/modules-load.d/zfs.conf
+  notify: restart system

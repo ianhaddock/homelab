@@ -1,0 +1,21 @@
+# Update Playbook
+---
+
+### all hosts ###
+- hosts: all
+  gather_facts: true
+  become: true
+
+  roles:
+    - common
+    - sshd
+    - zram
+
+  handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
+    - name: reload network
+      ansible.builtin.systemd:
+        name: network
+        state: reloaded

@@ -30,7 +30,8 @@
       - acl  # ansible become_user
       - hdparm
       - wakeonlan
-      - ffmpeg
+      - ffmpeg  # plex
+      - tree
     state: latest  # noqa package-latest
   when: ansible_facts.machine == "armv7l"
 

@@ -39,13 +39,13 @@
         state: reloaded
 
 
-### Raspberry Pi 2B ###
+### RPi2B ###
 - hosts: rpi2b
   become: true
 
   roles:
     - base-nginx
-    - file_store
+    - munin
     - pihole-main
     - plex
     - transmission
@@ -64,25 +64,27 @@
         state: restarted
 
 
-### development box ###
+### devbox ###
 - hosts: devbox
   become: true
 
   roles:
     - base-nginx
-      #    - file_store
-    - gitea
-      #    - blog
-      #    - jenkins
-      #    - jenkins-agent
-      #    - ac_backup
-    - pihole-clone
-      #    - plex
-      #    - transmission
       #    - steamcmd
-      #    - timecap
+    - zfs
+    - gitea
+    - munin
+    - jenkins
+    - jenkins-agent
+    - pihole-clone
+    - plex
+    - transmission
+
 
   handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
     - name: reload nginx
       ansible.builtin.systemd:
         name: nginx
