@@ -1,0 +1,217 @@
+# rpi2b munin install
+#
+---
+
+- name: install munin packages for rpi2b
+  ansible.builtin.package:
+    name:
+      - apache2-utils
+      - rrdcached
+      - munin
+      - munin-node
+      - lm-sensors
+      - liblwp-protocol-https-perl
+      - libauthen-ntlm-perl
+    state: latest
+
+- name: add cidr_allow localhost in munin-node.conf
+  ansible.builtin.lineinfile:
+    path: '/etc/munin/munin-node.conf'
+    regexp: '^# cidr_allow 127.0.0.1/32'
+    line: 'cidr_allow 127.0.0.1/32'
+
+- name: set hostname in munin.conf
+  ansible.builtin.lineinfile:
+    path: '/etc/munin/munin.conf'
+    regexp: '^\[localhost.localdomain\]'
+    line: '[{{ hostname }}]'
+
+- name: add munin local.conf template
+  ansible.builtin.template:
+    src: 'munin_local_conf.j2'
+    dest: '/etc/munin/munin-conf.d/local.conf'
+    owner: munin
+    group: munin
+    mode: '0640'
+
+- name: add munin plugins-conf template
+  ansible.builtin.template:
+    src: '10-plugins.j2'
+    dest: '/etc/munin/plugin-conf.d/10-plugins'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: set htpassword file
+  become_user: root
+  ansible.builtin.command:
+    cmd: 'htpasswd -bc /etc/nginx/htpasswd {{ munin_username }} {{ munin_password }}'
+
+- name: add munin-graph script
+  ansible.builtin.template:
+    src: 'munin-graph.j2'
+    dest: '/usr/bin/munin-graph'
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: add munin-cron script
+  ansible.builtin.template:
+    src: 'munin-cron.j2'
+    dest: '/usr/bin/munin-cron'
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: add rrdcached systemd service template
+  ansible.builtin.template:
+    src: 'systemd_rrdcached_service.j2'
+    dest: '/usr/lib/systemd/system/munin-rrdcached.service'
+    owner: root
+    group: root
+    mode: '0644'
+  register: rrdcached_systemd_status
+
+- name: add munin cgi graph socket
+  ansible.builtin.template:
+    src: 'rpi2b-munin-cgi-graph.socket.j2'
+    dest: '/usr/lib/systemd/system/munin-cgi-graph.socket'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: add munin cgi graph service
+  ansible.builtin.template:
+    src: 'rpi2b-munin-cgi-graph.service.j2'
+    dest: '/usr/lib/systemd/system/munin-cgi-graph.service'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: update permissions on munin-cgi-graph log
+  ansible.builtin.file:
+    path: /var/log/munin/munin-cgi-graph.log
+    owner: munin
+    group: adm
+    mode: '0640'
+
+      #- name: update permissions on munin-cgi-html log
+      #  ansible.builtin.file:
+      #    path: /var/log/munin/munin-cgi-html.log
+      #    owner: munin
+      #    group: adm
+      #    mode: '0640'
+
+- name: reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+      #  when: rrdcached_systemd_status.changed
+
+- name: start munin-rrdcached service
+  ansible.builtin.systemd:
+    name: munin-rrdcached
+    enabled: true
+    state: restarted
+      #  when: rrdcached_systemd_status.changed
+
+- name: stop rrdcached service
+  ansible.builtin.systemd:
+    name: rrdcached
+    enabled: false
+    state: stopped
+      #  when: rrdcached_systemd_status.changed
+
+- name: add plugin update script
+  ansible.builtin.template:
+    src: 'plugin_update.sh.j2'
+    dest: '/etc/munin/plugin_update.sh'
+    owner: munin
+    group: munin
+    mode: '0740'
+
+  # should run on change to config
+- name: update enabled plugins
+  ansible.builtin.command:
+    cmd: /etc/munin/plugin_update.sh
+  register: plugin_update_stat
+
+- name: plugin update debug
+  ansible.builtin.debug:
+    msg: "{{ plugin_update_stat }}"
+  when: verbose
+
+- name: enable and start munin-node
+  ansible.builtin.systemd:
+    name: munin-node
+    enabled: true
+    state: restarted
+
+- name: enable and start munin-cgi-graph socket
+  ansible.builtin.systemd:
+    name: munin-cgi-graph.socket
+    enabled: true
+    state: restarted
+
+- name: enable and start munin-cgi-graph service
+  ansible.builtin.systemd:
+    name: munin-cgi-graph.service
+    enabled: true
+    state: restarted
+
+- name: enable and start munin
+  ansible.builtin.systemd:
+    name: munin
+    enabled: true
+    state: restarted
+
+- name: comment out root crontab for munin-cron
+  ansible.builtin.lineinfile:
+    path: '/etc/cron.d/munin'
+    regexp: '^\*/5'
+    line: '#*/5 * * * *     munin if [ -x /usr/bin/munin-cron ]; then /usr/bin/munin-cron; fi'
+
+- name: comment out root crontab for munin-limits
+  ansible.builtin.lineinfile:
+    path: '/etc/cron.d/munin'
+    regexp: '^14 10'
+    line: '#14 10 * * *     munin if [ -x /usr/share/munin/munin-limits ]; then /usr/share/munin/munin-limits --force --contact nagios --contact old-nagios; fi'
+
+- name: add cron job for munin-cron
+  become_user: "{{ app_user }}"
+  ansible.builtin.cron:
+    name: munin munin-cron job
+    minute: "*/5"
+    job: "if [ -x /usr/bin/munin-cron ]; then /bin/ionice -c 3 /bin/nice -n 19 /usr/bin/munin-cron; fi"
+
+- name: add cron job for munin-graph
+  become_user: "{{ app_user }}"
+  ansible.builtin.cron:
+    name: munin munin-graph job
+    minute: "7"
+    job: "if [ -x /usr/bin/munin-graph ]; then /bin/ionice -c 3 /bin/nice -n 19 /usr/bin/munin-graph; fi"
+
+- name: setup nginx status page for munin
+  ansible.builtin.template:
+    src: 'nginx_status.conf.j2'
+    dest: '/etc/nginx/conf.d/nginx_status.conf'
+    owner: nginx
+    group: nginx
+    mode: '0640'
+
+- name: setup nginx munin subdomain
+  ansible.builtin.template:
+    src: 'nginx_munin_conf.j2'
+    dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
+    owner: nginx
+    group: nginx
+    mode: '0640'
+  when: cert_enabled
+
+- name: setup nginx munin subdomain
+  ansible.builtin.template:
+    src: 'nginx_munin_conf_http.j2'
+    dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
+    owner: nginx
+    group: nginx
+    mode: '0640'
+  when: not cert_enabled

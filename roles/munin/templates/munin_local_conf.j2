@@ -1,0 +1,10 @@
+# installed by ansible {{ ansible_date_time.date }}
+# Example host tree with localhost node. Configure your nodes here.
+
+# rrdcached enabled, can reduce io on polling
+rrdcached_socket /run/munin/rrdcached.sock
+
+# enable localhost monitoring for single setup
+[{{ hostname }}]
+    address 127.0.0.1
+    use_node_name yes

@@ -1,0 +1,8 @@
+# munin vars main.yml
+---
+
+app_name: 'munin'
+app_port: 4948
+
+app_user: 'munin'
+app_group: 'munin'

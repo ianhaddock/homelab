@@ -3,8 +3,9 @@ Personal infrastructure build.
 
 
 ## Uses
+
 * RedHat 8 via the [developer subscription][2]
-* CentOS Stream 8
+* CentOS Stream 9
 * Raspberry Pi OS
 * Podman containers
 * Vagrant dev environment 
@@ -14,18 +15,19 @@ Personal infrastructure build.
 
 Utilities:
 * common: add base packages, users, configs
-* sshd: update ssh configs
-* zram: add ram compression before disk swap
+* sshd: update ssh config
+* zram: ram compression before disk swap
 * base-nginx: reverse proxy & ssl certificates
-* file_store: simple https file server
-* ac_backup: rsync over ssh
 * timecap: timecapsule service
 * steamcmd: Steam cli
+* ac_backup: rsync file backup
+* file_store: simple https file server
 
 Apps: 
 * blog: Flask app for [my blog][1]
 * gitea: git repo
 * pihole: DNS with ad-guard
+* munin: simple resource monitoring
 * plex: personal media streaming service
 * transmission: bittorrent client
 * jenkins: automation server

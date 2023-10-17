@@ -1,0 +1,10 @@
+# munin install main.yml
+---
+
+- name: install munin on centos stream 9
+  ansible.builtin.include_tasks: centos_munin_install.yml
+  when: not ansible_facts.machine == "armv7l"
+
+- name: install munin on rpi2b
+  ansible.builtin.include_tasks: rpi2b_munin_install.yml
+  when: ansible_facts.machine == "armv7l"
