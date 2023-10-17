@@ -1,11 +1,10 @@
-# Ansible automation
-Personal infrastructure build. 
-
+# Ansible
+Personal infrastructure build.
 
 ## Uses
 
 * RedHat 8 via the [developer subscription][2]
-* CentOS Stream 9
+* CentOS Stream 8 & 9
 * Raspberry Pi OS
 * Podman containers
 * Vagrant dev environment 

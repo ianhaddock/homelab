@@ -1,11 +1,12 @@
 # rpi2b munin install
+# cloned from the centos yml and quickly tweaked for rpi2b's older repos.
 #
 ---
 
-- name: install munin packages for rpi2b
+- name: install munin packages
   ansible.builtin.package:
     name:
-      - apache2-utils
+      - apache2-utils  # for htpasswd
       - rrdcached
       - munin
       - munin-node
@@ -47,7 +48,7 @@
   ansible.builtin.command:
     cmd: 'htpasswd -bc /etc/nginx/htpasswd {{ munin_username }} {{ munin_password }}'
 
-- name: add munin-graph script
+- name: add munin-graph script for munin user crontab
   ansible.builtin.template:
     src: 'munin-graph.j2'
     dest: '/usr/bin/munin-graph'
@@ -55,7 +56,7 @@
     group: root
     mode: '0755'
 
-- name: add munin-cron script
+- name: add munin-cron script for munin user crontab
   ansible.builtin.template:
     src: 'munin-cron.j2'
     dest: '/usr/bin/munin-cron'
@@ -71,55 +72,39 @@
     group: root
     mode: '0644'
   register: rrdcached_systemd_status
+  notify: reload systemd daemon
 
-- name: add munin cgi graph socket
+- name: add munin cgi graph socket for dynazoom page
   ansible.builtin.template:
     src: 'rpi2b-munin-cgi-graph.socket.j2'
     dest: '/usr/lib/systemd/system/munin-cgi-graph.socket'
     owner: root
     group: root
     mode: '0644'
+  notify: reload systemd daemon
 
-- name: add munin cgi graph service
+- name: add munin cgi graph service for dynazoom page
   ansible.builtin.template:
     src: 'rpi2b-munin-cgi-graph.service.j2'
     dest: '/usr/lib/systemd/system/munin-cgi-graph.service'
     owner: root
     group: root
     mode: '0644'
+  notify: reload systemd daemon
 
-- name: update permissions on munin-cgi-graph log
-  ansible.builtin.file:
-    path: /var/log/munin/munin-cgi-graph.log
-    owner: munin
-    group: adm
-    mode: '0640'
-
-      #- name: update permissions on munin-cgi-html log
-      #  ansible.builtin.file:
-      #    path: /var/log/munin/munin-cgi-html.log
-      #    owner: munin
-      #    group: adm
-      #    mode: '0640'
-
-- name: reload systemd daemon
-  ansible.builtin.systemd:
-    daemon_reload: true
-      #  when: rrdcached_systemd_status.changed
-
-- name: start munin-rrdcached service
+- name: first start munin-rrdcached service
   ansible.builtin.systemd:
     name: munin-rrdcached
     enabled: true
     state: restarted
-      #  when: rrdcached_systemd_status.changed
+  when: rrdcached_systemd_status.changed
 
 - name: stop rrdcached service
   ansible.builtin.systemd:
     name: rrdcached
     enabled: false
     state: stopped
-      #  when: rrdcached_systemd_status.changed
+  when: rrdcached_systemd_status.changed
 
 - name: add plugin update script
   ansible.builtin.template:
@@ -164,33 +149,38 @@
     enabled: true
     state: restarted
 
-- name: comment out root crontab for munin-cron
+- name: update munin user shell from nologin to bash
+  ansible.builtin.user:
+    name: munin
+    shell: /bin/bash
+
+- name: comment out root crontab for munin-cron as its moved to the munin account
   ansible.builtin.lineinfile:
     path: '/etc/cron.d/munin'
     regexp: '^\*/5'
     line: '#*/5 * * * *     munin if [ -x /usr/bin/munin-cron ]; then /usr/bin/munin-cron; fi'
 
-- name: comment out root crontab for munin-limits
+- name: comment out root crontab for munin-limits as its moved to the munin account
   ansible.builtin.lineinfile:
     path: '/etc/cron.d/munin'
     regexp: '^14 10'
     line: '#14 10 * * *     munin if [ -x /usr/share/munin/munin-limits ]; then /usr/share/munin/munin-limits --force --contact nagios --contact old-nagios; fi'
 
-- name: add cron job for munin-cron
+- name: add cron job for munin-cron which runs every five minutes
   become_user: "{{ app_user }}"
   ansible.builtin.cron:
     name: munin munin-cron job
     minute: "*/5"
     job: "if [ -x /usr/bin/munin-cron ]; then /bin/ionice -c 3 /bin/nice -n 19 /usr/bin/munin-cron; fi"
 
-- name: add cron job for munin-graph
+- name: add cron job for munin-graph which runs hourly at minute 7
   become_user: "{{ app_user }}"
   ansible.builtin.cron:
     name: munin munin-graph job
     minute: "7"
     job: "if [ -x /usr/bin/munin-graph ]; then /bin/ionice -c 3 /bin/nice -n 19 /usr/bin/munin-graph; fi"
 
-- name: setup nginx status page for munin
+- name: setup nginx status page for munin to pull from
   ansible.builtin.template:
     src: 'nginx_status.conf.j2'
     dest: '/etc/nginx/conf.d/nginx_status.conf'
@@ -198,7 +188,7 @@
     group: nginx
     mode: '0640'
 
-- name: setup nginx munin subdomain
+- name: setup https nginx munin subdomain
   ansible.builtin.template:
     src: 'nginx_munin_conf.j2'
     dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
@@ -206,8 +196,9 @@
     group: nginx
     mode: '0640'
   when: cert_enabled
+  notify: reload nginx
 
-- name: setup nginx munin subdomain
+- name: setup http nginx munin subdomain
   ansible.builtin.template:
     src: 'nginx_munin_conf_http.j2'
     dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
@@ -215,3 +206,4 @@
     group: nginx
     mode: '0640'
   when: not cert_enabled
+  notify: reload nginx

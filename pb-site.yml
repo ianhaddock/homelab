@@ -63,6 +63,9 @@
         name: smb
         state: restarted
 
+    - name: reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
 
 ### devbox ###
 - hosts: devbox

@@ -36,6 +36,10 @@ limit_source_ip: '192.168.1.0/24'
 containers: true
 containers_path: '/mnt/containers'
 
+# munin
+munin_username: 'example'
+munin_password: 'example'
+
 user_transmission: "example"
 pass_transmission: "example"
 
