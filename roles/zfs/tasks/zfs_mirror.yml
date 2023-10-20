@@ -1,0 +1,12 @@
+# setup zfs mirror
+
+---
+
+- name: add volumes
+  community.general.zfs:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ zfs_name }}/isos"
+    - "{{ zfs_name }}/transmission"
+    - "{{ zfs_name }}/ac_backup"

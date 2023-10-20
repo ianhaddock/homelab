@@ -1,2 +1,7 @@
-## ZFS Install on Centos
-Adds repo, installs ZFS, adds module file and enables ZFS at startup.
+## ZFS on Centos
+* Add repo
+* install ZFS
+* add module files
+* enable ZFS at startup
+
+* If zfs_mirror is enabled in host_vars, create zvols.

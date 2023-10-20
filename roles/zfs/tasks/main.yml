@@ -23,8 +23,23 @@
       - zfs
     state: present
 
+- name: lock kernel versions to zfs supported ones
+  ansible.builtin.template:
+    src: dnf_protected_zfs.j2
+    dest: /etc/dnf/protected.d/zfs.conf
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: add zfs module conf and restart if changed
   ansible.builtin.template:
     src: zfs.conf.j2
     dest: /etc/modules-load.d/zfs.conf
+    owner: root
+    group: root
+    mode: '0644'
   notify: restart system
+
+- name: setup tank paths if mirror defined
+  ansible.builtin.import_tasks: zfs_mirror.yml
+  when: setup_zfs_mirror_paths|default(false) == true
