@@ -36,9 +36,9 @@
 
 - name: untar transmission 4
   ansible.builtin.unarchive:
-    src:  /mnt/containers/tr/transmission-4.0.3.tar.xz
-    dest:  /mnt/containers/tr/transmission-4.0.3  
-    remote_src: true  
+    src: /mnt/containers/tr/transmission-4.0.3.tar.xz
+    dest: /mnt/containers/tr/transmission-4.0.3
+    remote_src: true
   when: not transmission_daemon.stat.exists
 
     #  ### https://github.com/transmission/transmission/blob/main/docs/Building-Transmission.md
@@ -70,6 +70,13 @@
     group: "{{ app_group }}"
     mode: '0640'
     state: touch
+
+- name: install logrotate file
+  ansible.builtin.template:
+    src: logrotate.j2
+    dest: /etc/logrotate.d/transmission
+    owner: root
+    group: root
 
 - name: install systemd service file
   ansible.builtin.template:
