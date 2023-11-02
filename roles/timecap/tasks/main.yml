@@ -88,12 +88,14 @@
 - name: reload samba
   ansible.builtin.systemd:
     name: smbd
+    enabled: true
     state: reloaded
   when: smbconf_state.changed and ansible_facts.machine == "armv7l"
 
 - name: reload samba
   ansible.builtin.systemd:
     name: smb
+    enabled: true
     state: reloaded
   when: smbconf_state.changed and not ansible_facts.machine == "armv7l"
 
@@ -109,5 +111,6 @@
 - name: reload avahi
   ansible.builtin.systemd:
     name: avahi-daemon
+    enabled: true
     state: restarted
   when: avahi_state.changed
