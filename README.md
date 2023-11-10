@@ -1,26 +1,34 @@
-# Ansible
-Personal infrastructure build.
+# Personal Infrastructure
+Build out for my systems.
+
+<p align="center">
+  <img width="40%" height="auto" src="https://raw.githubusercontent.com/ianhaddock/ansible/main/personal_infrastructure.png">
+  <img width="40%" height="auto" src="http://git.ianhaddock.org/ian/ansible/raw/branch/main/personal_infrastructure.png">
+</p>
 
 ## Uses
 
-* RedHat 8 via the [developer subscription][2]
-* CentOS Stream 8 & 9
-* Raspberry Pi OS
+* Vagrant
+* Terraform
 * Podman containers
-* Vagrant dev environment 
+* RedHat via the [developer subscription][2]
+* CentOS Stream
+* Raspberry Pi OS (Debian 11)
 
 
 ## Roles
 
 Utilities:
-* common: add base packages, users, configs
-* sshd: update ssh config
+* common: base packages, users, configs
+* sshd: ssh config
 * zram: ram compression before disk swap
 * base-nginx: reverse proxy & ssl certificates
 * timecap: timecapsule service
 * steamcmd: Steam cli
 * ac_backup: rsync file backup
 * file_store: simple https file server
+* wakeonwin: bash alias file to wake my PC
+* rpi2b_setup: rpi2b specific tweaks
 
 Apps: 
 * blog: Flask app for [my blog][1]
@@ -34,7 +42,8 @@ Apps:
 
 
 ## Setup:
-Requires a configured Ansible and Vagrant environment.
+
+Requires Ansible and Vagrant on your host.
 
 ```
 # pull the latest
@@ -58,7 +67,7 @@ $ ssh-keygen -f ~/.ssh/ansible
 $ mkdir -p roles/common/files/public_key
 $ cp ~/.ssh/ansible.pub roles/common/files/public_keys/
 
-## provision development VM
+# provision development VM
 $ vagrant up --provision
 
 # run playbook 

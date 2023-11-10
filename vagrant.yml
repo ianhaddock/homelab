@@ -1,7 +1,7 @@
-# Vagrant Provision Play
+# vagrant.yml
 ---
 - name: Vagrant provision play
-  hosts: all  # blog:west:devbox
+  hosts: all
   become: true
   gather_facts: true
 
@@ -14,5 +14,13 @@
 
     - name: reload network
       ansible.builtin.systemd:
+        daemon-reload: true
         name: network
         state: reloaded
+
+    - name: reload network Debian
+      ansible.builtin.systemd:
+        daemon-reload: true
+        name: networking
+        state: restarted
+

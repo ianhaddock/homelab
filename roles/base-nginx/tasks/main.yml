@@ -5,23 +5,11 @@
     name: nginx
     state: present
 
-      ### different systems have different nginx uid gid ###
-      # - name: create isolation user and group. Enable linger
-      #   ansible.builtin.include_role:
-      #     name: common
-      #     tasks_from: create_user.yml
-      #   vars:
-      #     user: "{{ app_user }}"
-      #     uid: "{{ app_uid }}"
-      #     group: "{{ app_group }}"
-      #     gid: "{{ app_gid }}"
-      #     comment: "{{ app_comment }}"
-
-- name: create directories
+- name: create sites-available directory
   ansible.builtin.file:
     path: "{{ item }}"
-    owner: "{{ app_user }}"
-    group: "{{ app_group }}"
+    owner: root
+    group: root
     mode: '0755'
     state: directory
   with_items:
@@ -31,9 +19,9 @@
   ansible.builtin.copy:
     src: robots.txt
     dest: "{{ nginx_path }}/robots.txt"
-    owner: "{{ app_user }}"
-    group: "{{ app_group }}"
-    mode: u=rwX,g=rX,o=rX
+    owner: root
+    group: root
+    mode: '0644' 
 
 - name: open web ports
   ansible.builtin.firewalld:

@@ -33,19 +33,12 @@
       - ffmpeg  # plex
       - tree
     state: latest  # noqa package-latest
-  when: ansible_facts.machine == "armv7l"
+  when: ansible_os_family == 'Debian'
 
 - name: drop package cache when working on the blog site
   ansible.builtin.command:
     cmd: dnf clean packages
   when: hostname == 'blog'
-
-- name: install utility packages x86
-  ansible.builtin.package:
-    name:
-      - lm_sensors  # rpi2b does not have
-    state: latest  # noqa package-latest
-  when: not ansible_facts.machine == "armv7l"
 
 - name: install container tools
   ansible.builtin.package:
@@ -60,7 +53,7 @@
     regexp: '^# rootless_storage_path'
     line: 'rootless_storage_path =
       "{{ containers_path }}/$USER/storage"'
-  when: containers and not hostname == 'raspberrypi'
+  when: containers and not ansible_os_family == "Debian"
 
     # - name: set cgroupsv2
     #   become: true

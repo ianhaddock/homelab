@@ -1,26 +1,18 @@
-# Vagrant development hosts
+# development environment
 ---
   all:
     hosts:
-      192.168.40.41:  # vagrantVM
-      192.168.40.42:  # vagrantVM
+      192.168.40.41:
+      192.168.40.42:
       192.168.40.43:
-      192.168.40.44:
-      192.168.40.40:
 
     children:
-      west:
-        hosts:
-          192.168.40.42:
       blog:
         hosts:
           192.168.40.41:
       rpi2b:
         hosts:
-          192.168.40.43:
+          192.168.40.42:
       devbox:
         hosts:
-          192.168.40.44:
-      east:
-        hosts:
-          192.168.40.40:
+          192.168.40.43:

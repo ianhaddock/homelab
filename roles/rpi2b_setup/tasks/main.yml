@@ -1,4 +1,4 @@
-# rpi2b.yml
+# rpi2b main.yml
 ---
 - name: install udev rule for old style NIC name
   ansible.builtin.template:
@@ -7,7 +7,7 @@
     owner: root
     group: root
     mode: '0640'
-  notify: reload network
+  notify: reload network Debian
 
 - name: create folder structure in /mnt
   ansible.builtin.file:
@@ -34,11 +34,3 @@
     - {src: /mnt/hdd/media, dest: /mnt/media}
     - {src: /mnt/ssd/transmission, dest: /mnt/transmission}
     - {src: /mnt/ssd/containers, dest: /mnt/containers}
-
-- name: add bash_aslises file
-  ansible.builtin.template:
-    src: rpi2b_bash_aliases
-    dest: "/home/{{ user_account }}/.bash_aliases"
-    owner: "{{ user_account }}"
-    group: "{{ user_group }}"
-    mode: '0640'

@@ -20,6 +20,12 @@
         name: network
         state: reloaded
 
+    - name: reload network Debian
+      ansible.builtin.systemd:
+        daemon-reload: true
+        name: networking
+        state: restarted
+
 
 ### blog vps ###
 - hosts: blog
@@ -44,7 +50,9 @@
   become: true
 
   roles:
+    - rpi2b_setup
     - base-nginx
+    - wakeonwin
     - munin
     - pihole-main
     - plex
@@ -66,6 +74,13 @@
     - name: reload systemd daemon
       ansible.builtin.systemd:
         daemon_reload: true
+
+    - name: reload network Debian
+      ansible.builtin.systemd:
+        daemon-reload: true
+        name: networking
+        state: restarted
+
 
 ### devbox ###
 - hosts: devbox

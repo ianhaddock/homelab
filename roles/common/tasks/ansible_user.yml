@@ -1,0 +1,60 @@
+# ansible user, group with passwordless sudo
+---
+- name: Add ansbile group
+  ansible.builtin.group:
+    name: "{{ ansible_user }}"
+    gid: "{{ ansible_gid }}"
+    state: present
+
+- name: Add Fedora ansible user
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    comment: admin user
+    uid: "{{ ansible_uid }}"
+    group: "{{ ansible_group }}"
+    groups: wheel
+    generate_ssh_key: true
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: Add Debian ansible user
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    comment: admin user
+    uid: "{{ ansible_uid }}"
+    group: "{{ ansible_group }}"
+    groups: sudo
+    shell: "/bin/bash"
+    generate_ssh_key: true
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Allow wheel passwordless sudo for Fedora
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: visudo -cf %s
+  when: ansible_os_family == 'RedHat'
+
+- name: Allow sudo passwordless sudo for Debian
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    validate: visudo -cf %s
+  when: ansible_os_family == 'Debian'
+
+- name: install authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ ansible_user }}"
+    state: present
+    key: "{{ item }}"
+  with_file:
+    - "public_keys/{{ public_key }}"

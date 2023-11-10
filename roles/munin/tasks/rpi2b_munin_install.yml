@@ -21,6 +21,18 @@
     regexp: '^# cidr_allow 127.0.0.1/32'
     line: 'cidr_allow 127.0.0.1/32'
 
+- name: comment out wildcard bind address in munin-node.conf
+  ansible.builtin.lineinfile:
+    path: '/etc/munin/munin-node.conf'
+    regexp: '^host *'
+    line: '# host *'
+
+- name: add 127.0.0.1 bind address in munin-node.conf
+  ansible.builtin.lineinfile:
+    path: '/etc/munin/munin-node.conf'
+    regexp: '^# host 127.0.0.1$'
+    line: 'host 127.0.0.1'
+
 - name: set hostname in munin.conf
   ansible.builtin.lineinfile:
     path: '/etc/munin/munin.conf'
@@ -184,16 +196,16 @@
   ansible.builtin.template:
     src: 'nginx_status.conf.j2'
     dest: '/etc/nginx/conf.d/nginx_status.conf'
-    owner: nginx
-    group: nginx
+    owner: root
+    group: root
     mode: '0640'
 
 - name: setup https nginx munin subdomain
   ansible.builtin.template:
     src: 'nginx_munin_conf.j2'
     dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
-    owner: nginx
-    group: nginx
+    owner: root
+    group: root
     mode: '0640'
   when: cert_enabled
   notify: reload nginx
@@ -202,8 +214,8 @@
   ansible.builtin.template:
     src: 'nginx_munin_conf_http.j2'
     dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
-    owner: nginx
-    group: nginx
+    owner: root
+    group: root
     mode: '0640'
   when: not cert_enabled
   notify: reload nginx

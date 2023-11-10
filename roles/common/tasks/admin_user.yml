@@ -6,7 +6,7 @@
     gid: "{{ admin_gid }}"
     state: present
 
-- name: Add admin user
+- name: Add Fedora admin user
   ansible.builtin.user:
     name: "{{ admin_user }}"
     comment: admin user
@@ -19,7 +19,21 @@
     state: present
   when: ansible_os_family == 'RedHat'
 
-- name: Allow wheel passwordless sudo
+- name: Add Debian admin user
+  ansible.builtin.user:
+    name: "{{ admin_user }}"
+    comment: admin user
+    uid: "{{ admin_uid }}"
+    group: "{{ admin_group }}"
+    groups: sudo
+    shell: "/bin/bash"
+    generate_ssh_key: true
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Allow wheel passwordless sudo for Fedora
   ansible.builtin.lineinfile:
     dest: /etc/sudoers
     state: present
@@ -28,20 +42,7 @@
     validate: visudo -cf %s
   when: ansible_os_family == 'RedHat'
 
-- name: Add admin user
-  ansible.builtin.user:
-    name: "{{ admin_user }}"
-    comment: admin user
-    uid: "{{ admin_uid }}"
-    group: "{{ admin_group }}"
-    groups: sudo
-    generate_ssh_key: true
-    ssh_key_bits: 2048
-    ssh_key_file: .ssh/id_rsa
-    state: present
-  when: ansible_os_family == 'Debian'
-
-- name: Allow sudo passwordless sudo
+- name: Allow sudo passwordless sudo for Debian
   ansible.builtin.lineinfile:
     dest: /etc/sudoers
     state: present

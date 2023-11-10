@@ -13,18 +13,17 @@
 - name: install utility packages
   ansible.builtin.import_tasks: install_packages.yml
 
-- name: add admin users
-  ansible.builtin.import_tasks: admin_users.yml
+- name: add ansible user
+  ansible.builtin.import_tasks: ansible_user.yml
+
+- name: add admin user
+  ansible.builtin.import_tasks: admin_user.yml
 
 - name: set firewalld
   ansible.builtin.import_tasks: firewalld.yml
 
 - name: set selinux
   ansible.builtin.import_tasks: selinux.yml
-
-- name: tweak rpi2b
-  ansible.builtin.import_tasks: rpi2b.yml
-  when: ansible_hostname == 'raspberrypi'
 
 - name: set sysctl options
   ansible.builtin.import_tasks: sysctl.yml

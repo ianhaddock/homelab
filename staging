@@ -1,0 +1,18 @@
+# staging environment
+---
+  all:
+    hosts:
+      192.168.4.31:
+      192.168.4.32:
+      192.168.4.33:
+
+    children:
+      blog:
+        hosts:
+          192.168.4.31:
+      rpi2b:
+        hosts:
+          192.168.4.32:
+      devbox:
+        hosts:
+          192.168.4.33:
