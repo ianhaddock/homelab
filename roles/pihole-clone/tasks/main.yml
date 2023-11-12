@@ -17,6 +17,7 @@
     tasks_from: podman_pihole.yml
   vars:
     app_user: "{{ clone_user }}"
+    app_uid: "{{ clone_uid }}"
     app_group: "{{ clone_group }}"
     app_name: "{{ clone_name }}"
     app_port: "{{ clone_port }}"
@@ -28,6 +29,7 @@
     tasks_from: pihole.yml
   vars:
     app_user: "{{ clone_user }}"
+    app_uid: "{{ clone_uid }}"
     app_group: "{{ clone_group }}"
     app_name: "{{ clone_name }}"
     app_port: "{{ clone_port }}"

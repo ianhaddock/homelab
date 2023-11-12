@@ -44,6 +44,7 @@
   become_user: "{{ app_user }}"
   containers.podman.podman_image:
     name: docker.io/pihole/pihole:latest
+    force: true
   register: image_pull
 
 - name: debug pull
@@ -58,6 +59,7 @@
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
     image: docker.io/pihole/pihole:latest
+    image_strict: true
     ports:
       - "5353:53/tcp"
       - "5353:53/udp"
@@ -103,3 +105,10 @@
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
   when: container_state.changed
   register: files_systemctl_debug
+  notify: reload nginx
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ files_systemctl_debug }}"
+  when: verbose
+

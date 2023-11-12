@@ -88,7 +88,7 @@
 
   roles:
     - base-nginx
-      #    - steamcmd
+    - steamcmd
     - zfs
     - gitea
     - munin

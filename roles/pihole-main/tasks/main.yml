@@ -18,11 +18,16 @@
 - name: check if pihole is installed on rpi2b
   ansible.builtin.stat:
     path: /etc/pihole
-  register: pihole_path
+  register: pihole_path_check
 
 - name: install pihole on rpi2b (armv7l)
-  ansible.builtin.import_tasks: pihole.yml
-  when: ansible_facts.machine == "armv7l" and not pihole_path.stat.exists
+  ansible.builtin.import_tasks: rpi2b_pihole.yml
+  when: ansible_facts.machine == "armv7l" and not pihole_path_check.stat.exists
+
+- name: update pihole if installed and running on rpi2b
+  ansible.builtin.command:
+    cmd: pihole -up
+  when: ansible_facts.machine == "armv7l" and pihole_path_check.stat.exists
 
 - name: set forward proxy and ports
   ansible.builtin.include_role:

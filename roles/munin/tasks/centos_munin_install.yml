@@ -144,10 +144,21 @@
     group: nginx
     mode: '0640'
 
-- name: setup nginx munin subdomain
+- name: setup nginx https munin subdomain
   ansible.builtin.template:
     src: 'nginx_munin_conf.j2'
     dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
     owner: nginx
     group: nginx
     mode: '0640'
+  when: cert_enabled
+
+- name: setup nginx http munin subdomain
+  ansible.builtin.template:
+    src: 'nginx_munin_conf_http.j2'
+    dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
+    owner: nginx
+    group: nginx
+    mode: '0640'
+  when: not cert_enabled
+
