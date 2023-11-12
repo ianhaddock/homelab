@@ -35,7 +35,7 @@
     - file_store
     - gitea
     - blog
-    - pihole-main
+    - pihole
 
   handlers:
     - name: reload nginx
@@ -53,7 +53,7 @@
     - base-nginx
     - wakeonwin
     - munin
-    - pihole-main
+    - pihole
     - plex
     - transmission
     - ac_backup

@@ -1,4 +1,4 @@
-# pihole1 install
+# pihole-clone main.yml
 ---
 - name: create isolation user and group. Enable linger
   ansible.builtin.include_role:
@@ -23,17 +23,25 @@
     app_port: "{{ clone_port }}"
   when: containers and not ansible_facts.machine == "armv7l"
 
+- name: check if pihole is installed on rpi2b
+  ansible.builtin.stat:
+    path: /etc/pihole
+  register: pihole_path_check
+
 - name: install pihole on rpi2b (armv7l)
-  ansible.builtin.include_role:
-    name: pihole-man
-    tasks_from: pihole.yml
+  ansible.builtin.import_tasks: rpi2b_pihole.yml
   vars:
     app_user: "{{ clone_user }}"
     app_uid: "{{ clone_uid }}"
     app_group: "{{ clone_group }}"
     app_name: "{{ clone_name }}"
     app_port: "{{ clone_port }}"
-  when: ansible_facts.machine == "armv7l"
+  when: ansible_facts.machine == "armv7l" and not pihole_path_check.stat.exists
+
+- name: update pihole if installed and running on rpi2b
+  ansible.builtin.command:
+    cmd: pihole -up
+  when: ansible_facts.machine == "armv7l" and pihole_path_check.stat.exists
 
 - name: set forward proxy and ports
   ansible.builtin.include_role:
