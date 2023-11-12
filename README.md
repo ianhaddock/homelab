@@ -2,8 +2,7 @@
 Build out for my systems.
 
 <p align="center">
-  <img width="40%" height="auto" src="https://raw.githubusercontent.com/ianhaddock/ansible/main/personal_infrastructure.png">
-  <img width="40%" height="auto" src="http://git.ianhaddock.org/ian/ansible/raw/branch/main/personal_infrastructure.png">
+  <img width="40%" height="auto" src="http://git.ianhaddock.com/ian/ansible/raw/branch/main/personal_infrastructure.png">
 </p>
 
 ## Uses
