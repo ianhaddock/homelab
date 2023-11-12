@@ -22,7 +22,6 @@
 
     - name: reload network Debian
       ansible.builtin.systemd:
-        daemon-reload: true
         name: networking
         state: restarted
 
