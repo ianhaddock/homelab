@@ -47,9 +47,9 @@ Vagrant.configure("2") do |config|
       ip: "192.168.40.43"
     devbox.vm.network "public_network", # public network
       use_dhcp_assigned_default_route: true
-    devbox.vm.provider "vmware_desktop" do |vmware4|
-      vmware4.vmx["memsize"] = "2048"
-      vmware4.vmx["numvcpus"] = "2"
+    devbox.vm.provider "vmware_desktop" do |vmware3|
+      vmware3.vmx["memsize"] = "2048"
+      vmware3.vmx["numvcpus"] = "2"
     end
     devbox.vm.post_up_message = "Devbox Xeon box."
   end
