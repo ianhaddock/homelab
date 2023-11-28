@@ -1,3 +1,4 @@
+# main.yml
 # common role, all systems
 ---
 - name: print facts
@@ -5,16 +6,16 @@
     var: ansible_facts
   when: verbose
 
-- name: enable EPEL on Fedora 8 systems
+- name: set hostname
+  ansible.builtin.import_tasks: hostname.yml
+
+- name: enable EPEL on RedHat 8 systems
   ansible.builtin.import_tasks: rhel8epel.yml
   when: ansible_distribution_major_version == "8" and
    (ansible_distribution == "CentOS" or ansible_distribution == 'RedHat')
 
 - name: install utility packages
   ansible.builtin.import_tasks: install_packages.yml
-
-- name: add ansible user
-  ansible.builtin.import_tasks: ansible_user.yml
 
 - name: add admin user
   ansible.builtin.import_tasks: admin_user.yml

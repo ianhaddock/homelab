@@ -1,4 +1,5 @@
-# admin user, group with passwordless sudo
+# admin_user.yml
+# sets admin user, group with passwordless sudo
 ---
 - name: Add admin group
   ansible.builtin.group:
