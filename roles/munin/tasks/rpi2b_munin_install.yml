@@ -202,7 +202,7 @@
 
 - name: setup https nginx munin subdomain
   ansible.builtin.template:
-    src: 'nginx_munin_conf.j2'
+    src: 'rpi_nginx_munin_conf.j2'
     dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
     owner: root
     group: root
@@ -212,7 +212,7 @@
 
 - name: setup http nginx munin subdomain
   ansible.builtin.template:
-    src: 'nginx_munin_conf_http.j2'
+    src: 'rpi_nginx_munin_conf_http.j2'
     dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
     owner: root
     group: root
