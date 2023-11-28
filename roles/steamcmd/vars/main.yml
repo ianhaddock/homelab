@@ -1,9 +1,0 @@
-# steamcmd vars
----
-app_user: steam
-app_uid: 12001
-app_group: steam
-app_gid: 12001
-app_comment: "steamcmd user"
-
-steamcmd_path: '/usr/local/sbin/steamcmd'
