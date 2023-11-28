@@ -11,13 +11,28 @@
     - "{{ containers_path }}/{{ app_name }}/config"
     - "{{ containers_path }}/{{ app_name }}/transcode"
     - "{{ media_path }}/audiobooks"
+    - "{{ media_path }}/f1"
     - "{{ media_path }}/music"
+    - "{{ media_path }}/wec"
+    - "{{ media_path }}/staging"
     - "{{ media_path }}/movies"
     - "{{ media_path }}/tvshows"
     - "{{ media_path }}/racing"
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
+    - "{{ media_path }}/yt_tunes"
     - "{{ media_path }}/lemans"
+    - "{{ media_path }}/transmission"
+
+- name: create links in /mnt
+  ansible.builtin.file:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    owner: root
+    group: root
+    state: link
+  loop:
+    - {src: "{{ media_path }}/transmission", dest: /mnt/transmission}
 
 - name: pull latest plex image
   become_user: "{{ app_user }}"
@@ -36,7 +51,7 @@
   containers.podman.podman_container:
     recreate: true
     name: "{{ app_name }}"
-    hostname: "PLEX"
+    hostname: "plex"
     image: docker.io/plexinc/pms-docker:plexpass
     ports:
       - "{{ app_port }}:32400/tcp"
@@ -44,18 +59,21 @@
       - "{{ containers_path }}/{{ app_name }}/config:/config:Z"
       - "{{ containers_path }}/{{ app_name }}/transcode:/transcode:Z"
       - "{{ media_path }}:/mnt/media:ro"
-    device:
-      - '/dev/dri:/dev/dri'
-    group_add:
-      - 'keep-groups'
+        ### Required for hardware acceleration
+        #    device:
+        #      - '/dev/dri:/dev/dri'
+        #    group_add:
+        #      - 'keep-groups'
+        ###
     env:
+      ADVERTISE_IP: "http://192.168.1.199:32500/"
       PLEX_CLAIM: "{{ plex_claim }}"
       PLEX_UID: "{{ app_uid }}"
       PLEX_GID: "{{ app_gid }}"
       TZ: "{{ timezone }}"
     state: present
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
-  when: image_pull.changed
+      #  when: image_pull.changed
   register: container_state
 
 - name: debug plex podman
