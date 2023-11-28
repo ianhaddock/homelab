@@ -13,7 +13,7 @@
 
 - name: install pihole container
   ansible.builtin.include_role:
-    name: pihole-main
+    name: pihole
     tasks_from: podman_pihole.yml
   vars:
     app_user: "{{ clone_user }}"
@@ -29,7 +29,9 @@
   register: pihole_path_check
 
 - name: install pihole on rpi2b (armv7l)
-  ansible.builtin.import_tasks: rpi2b_pihole.yml
+  ansible.builtin.include_role:
+    name: pihole
+    tasks_from: rpi2b_pihole.yml
   vars:
     app_user: "{{ clone_user }}"
     app_uid: "{{ clone_uid }}"
