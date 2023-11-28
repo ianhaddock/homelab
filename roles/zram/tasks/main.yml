@@ -97,6 +97,7 @@
     owner: root
     group: root
     mode: '0644'
+  notify: restart system
 
 - name: install systemd file
   ansible.builtin.copy:
