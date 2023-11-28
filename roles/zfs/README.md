@@ -1,7 +1,8 @@
 ## ZFS on Centos
-* Add repo
-* install ZFS
-* add module files
-* enable ZFS at startup
 
-* If zfs_mirror is enabled in host_vars, create zvols.
+Installs and adds fileshares if enabled.
+
+### As configured:
+* Add zfs repo
+* Install zfs
+* Enable at startup

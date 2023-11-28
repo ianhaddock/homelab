@@ -1,8 +1,15 @@
-# zfs on centos
-
----
+# main.yml
+#
+# # # # # #
+# On Centos 9 Stream, use DKMS and not kABI. Stream os updates can break kABI installs
+#
+# Docs:
 # https://openzfs.github.io/openzfs-docs/Getting%20Started/RHEL-based%20distro/index.html
-# 2023-10-06: on Centos 9 Stream, use DKMS and not kABI
+# https://docs.ansible.com/ansible/latest/collections/community/general/zfs_module.html
+# https://openzfs.github.io/openzfs-docs/man/master/8/zpool-create.8.html
+# # # # # #
+#
+---
 - name: add zfs key file
   ansible.builtin.rpm_key:
     key: https://raw.githubusercontent.com/zfsonlinux/zfsonlinux.github.com/master/zfs-release/RPM-GPG-KEY-openzfs-key2
@@ -21,6 +28,10 @@
       - epel-release
       - kernel-devel
       - zfs
+      - fio  # disk benchmarking
+      - bonnie++  # disk benchmarking
+      - samba
+      - cifs-utils
     state: present
 
 - name: lock kernel versions to zfs supported ones
@@ -40,6 +51,9 @@
     mode: '0644'
   notify: restart system
 
-- name: setup tank paths if mirror defined
-  ansible.builtin.import_tasks: zfs_mirror.yml
-  when: setup_zfs_mirror_paths|default(false) == true
+- name: flush_handlers
+  meta: flush_handlers
+
+- name: setup zfs filesystems if defined
+  ansible.builtin.import_tasks: zfs_filesystems.yml
+  when: setup_zfs_filesystems|default(false) == true

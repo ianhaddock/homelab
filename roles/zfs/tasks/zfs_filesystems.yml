@@ -1,0 +1,65 @@
+# zfs_filesystems.yml
+#
+# # # # # #
+# setup zfs pool
+# 6 x 1TB Samsung 850 Pro SSDs in raidz2
+#
+# Drives:
+# https://download.semiconductor.samsung.com/resources/data-sheet/Samsung_SSD_850_PRO_Data_Sheet_Rev_3.pdf
+# Firmware: https://semiconductor.samsung.com/us/consumer-storage/support/tools/
+#
+# ashift:
+# set at 13 even with 215b sector size as strongy suggested for pool longevity and disk compatibiliy:
+# $ sudo smartctl -a /dev/sda | grep 'Sector Size'
+# Sector Size:      512 bytes logical/physical
+#
+# Docs:
+# https://calomel.org/zfs_raid_speed_capacity.html
+# https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Workload%20Tuning.html#bit-torrent
+# https://illumos.org/books/zfs-admin/setup-1.html
+# https://wiki.debian.org/ZFS
+# https://arstechnica.com/information-technology/2020/05/zfs-101-understanding-zfs-storage-and-performance
+#
+# Pool Setup:
+# sudo zpool create -o ashift=13 tank raidz2 /dev/disk/by-id/ata-Samsung_SSD_850_PRO_1TB_*
+# sudo zfs create tank/containers
+# sudo zfs set compression=lz4 xattr=sa atime=off tank/containers
+# sudo zfs create tank/media
+# sudo zfs set compression=lz4 xattr=sa atime=pff logbias=throughput recordsize=1M tank/media
+# sudo zfs create tank/storage
+# sudo zfs set compression=lz4 xattr=sa atime=off quota=150G reservation=150G tank/storage
+# # # # # #
+#
+---
+- name: add filesystems to zfs pool
+  community.general.zfs:
+    name: "{{ zfs_tank_name }}/{{ item }}"
+    state: present
+    extra_zfs_properties:
+      compression: lz4
+      atime: off
+      xattr: sa  # store file attributes as inodes
+      dnodesize: auto  # supports xattr=sa
+      casesensitivity: mixed  # recommended for SMB shares
+  with_items:
+    - "containers"
+    - "media"
+    - "storage"
+
+- name: set mountpoint, recordsize, and logbias for media filesystem
+  community.general.zfs:
+    name: "{{ zfs_tank_name }}/media"
+    state: present
+    extra_zfs_properties:
+      mountpoint: '/mnt/media'
+      recordsize: 1M
+      logbias: throughput
+
+- name: set quota, reservation, mountpoint for containers filesystem
+  community.general.zfs:
+    name: "{{ zfs_tank_name }}/containers"
+    state: present
+    extra_zfs_properties:
+      mountpoint: '/mnt/containers'
+      reservation: '150G'
+      quota: '150G'
