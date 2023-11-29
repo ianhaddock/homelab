@@ -1,3 +1,4 @@
+# main.yml
 # install plex
 ---
 - name: create isolation user and group. Enable linger
@@ -40,4 +41,4 @@
 
 - name: install yt-dlp scripts
   ansible.builtin.import_tasks: ytdlp_scripts.yml
-  when: ansible_facts.machine == "armv7l"
+  when: containers and ansible_os_family == "RedHat"
