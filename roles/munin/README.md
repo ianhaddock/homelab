@@ -9,11 +9,4 @@
 * password secured gui
 
 
-
-
-
-
-
-
-
 [1]: https://munin-monitoring.org/
