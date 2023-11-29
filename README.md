@@ -9,7 +9,9 @@ Build out for my systems.
 
 * Vagrant
 * Terraform
-* Podman containers
+* Podman
+* Qemu KVM
+* ZFS
 * RedHat via the [developer subscription][2]
 * CentOS Stream
 * Raspberry Pi OS (Debian 11)
@@ -23,7 +25,6 @@ Utilities:
 * zram: ram compression before disk swap
 * base-nginx: reverse proxy & ssl certificates
 * timecap: timecapsule service
-* steamcmd: Steam cli
 * ac_backup: rsync file backup
 * file_store: simple https file server
 * wakeonwin: bash alias file to wake my PC

@@ -55,8 +55,6 @@
     - munin
     - pihole
     - plex
-    - transmission
-    - ac_backup
     - timecap
 
   handlers:
@@ -81,9 +79,10 @@
   become: true
 
   roles:
-    - base-nginx
-    - steamcmd
     - zfs
+    - kvm-host
+    - base-nginx
+    - ac_backup
     - gitea
     - munin
     - jenkins
@@ -91,7 +90,6 @@
     - pihole-clone
     - plex
     - transmission
-
 
   handlers:
     - name: restart system

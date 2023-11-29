@@ -5,14 +5,9 @@ hostname: "example"
 timezone: "America/Los_Angeles"
 public_key: ansible.pub
 
-ansible_user: ansible
-ansible_uid: 1100
-ansible_group: ansible
-ansible_gid: 1100
-
-admin_user: ian
+admin_user: adminuser
 admin_uid: 1101
-admin_group: ian
+admin_group: adminuser
 admin_gid: 1101
 
 zram_ratio: 0.8
