@@ -11,7 +11,33 @@
     state: latest
   when: ansible_os_family == 'RedHat'
 
-- name: install utility packages
+- name: add rpm fusion free key
+  ansible.builtin.rpm_key:
+    key: "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-free-el-9"
+    fingerprint: "EDC0 0FE7 418C 9DF7 EF49  91A4 7403 EA33 2964 58F3"
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: add rpm fusion nonfree key
+  ansible.builtin.rpm_key:
+    key: "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-nonfree-el-9"
+    fingerprint: "BB24 128A 4BB3 C335 2C0B  75A2 E417 4E6B AAB2 12EA"
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: add rpm fusion free repo
+  ansible.builtin.dnf:
+    name: "https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-{{ ansible_facts.distribution_major_version }}.noarch.rpm"
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: add rpm fusion nonfree repo
+  ansible.builtin.dnf:
+    name: "https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-{{ ansible_facts.distribution_major_version }}.noarch.rpm"
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: install utility packages general
   ansible.builtin.package:
     name:
       - git
@@ -30,7 +56,6 @@
       - acl  # ansible become_user
       - hdparm
       - wakeonlan
-      - ffmpeg  # plex
       - tree
     state: latest  # noqa package-latest
   when: ansible_os_family == 'Debian'

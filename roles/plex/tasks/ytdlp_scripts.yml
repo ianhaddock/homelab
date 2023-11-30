@@ -1,5 +1,11 @@
 # ytdlp_scripts.yml
 ---
+- name: install utility packages
+  ansible.builtin.package:
+    name:
+      - ffmpeg  # requires rpmfusion nonfree repo on Centos Stream 9
+    state: latest  # noqa package-latest
+
 - name: install yt-dlp latest
   ansible.builtin.get_url:
     url: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
