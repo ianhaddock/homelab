@@ -7,3 +7,5 @@ app_gid: 1205
 
 app_name: blog
 app_port: 8888
+
+limit_app: false
