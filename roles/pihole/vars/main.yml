@@ -9,5 +9,4 @@ app_comment: "{{ app_name }} account"
 app_name: pihole
 app_port: 8080
 
-# limit access even when using https proxy
-limit_app: false
+# access limits can be set in host vars

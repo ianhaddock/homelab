@@ -5,19 +5,11 @@ hostname: "example"
 timezone: "America/Los_Angeles"
 public_key: ansible.pub
 
-admin_user: adminuser
-admin_uid: 1101
-admin_group: adminuser
-admin_gid: 1101
-
-zram_ratio: 0.8
 cert_enabled: false
 certbot_email: "name@example.com"
 
+site_fqdn: example.com
 domain_app: 'blog'
-
-siteFQDN: example.com
-site_fqdn: "{{ siteFQDN }}"
 
 certbot_domains: "{{ site_fqdn }},\
                   files.{{ site_fqdn }},\
@@ -28,10 +20,9 @@ certbot_domains: "{{ site_fqdn }},\
 app_git_repo: "https://git.example.com/name/{{ app_name }}.git"
 file_server: "https://files.example.com"
 
-# limit access to http apps from a local IP range with
-# the option to limit specific apps when running https
+# nginx forward proxy
 limit_app: true
-limit_source_ip: '192.168.1.0/24'
+limit_source_ip: ['192.168.1.0/24']
 
 containers: true
 containers_path: '/mnt/containers'
@@ -40,11 +31,16 @@ containers_path: '/mnt/containers'
 munin_username: 'example'
 munin_password: 'example'
 
+# transmission-daemon
 user_transmission: "example"
 pass_transmission: "example"
 
-pass_pihole: "example"
+# pihole dns
+pihole_pass: "example"
+pihole_limit: true
+pihole_ips: ['192.168.1.0/24']
 
+# plex media server
 plex_claim: 'claim-0000000000000000000'
 
 # ac backup

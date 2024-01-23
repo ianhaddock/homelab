@@ -13,7 +13,7 @@
     - "{{ containers_path }}/{{ app_name }}/var_log"
     - "{{ containers_path }}/{{ app_name }}/var_log/lighttpd"
 
-- name: set firewall ports
+- name: open pihole firewall ports to all users
   ansible.builtin.firewalld:
     rich_rule: "{{ item }}"
     immediate: true
@@ -23,22 +23,37 @@
     - 'rule family=ipv4 forward-port port=53 protocol=tcp to-port=5353'
     - 'rule family=ipv4 forward-port port=53 protocol=udp to-port=5353'
     - 'rule family=ipv4 forward-port port=67 protocol=tcp to-port=6767'
-  when: not limit_app
+  when: not pihole_limit
 
-- name: set firewall ports
+- name: limit firewall port 53/tcp to pihole users
   ansible.builtin.firewalld:
-    rich_rule: "{{ item }}"
+    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=53 protocol=tcp to-port=5353'
     immediate: true
     permanent: true
     state: enabled
   with_items:
-    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
-      port=53 protocol=tcp to-port=5353'
-    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
-      port=53 protocol=udp to-port=5353'
-    - 'rule family=ipv4 source address={{ limit_source_ip }} forward-port
-      port=67 protocol=tcp to-port=6767'
-  when: limit_app
+    "{{ pihole_ips }}"
+  when: pihole_limit
+
+- name: limit firewall port 53/udp to pihole users
+  ansible.builtin.firewalld:
+    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=53 protocol=udp to-port=5353'
+    immediate: true
+    permanent: true
+    state: enabled
+  with_items:
+    "{{ pihole_ips }}"
+  when: pihole_limit
+
+- name: limit firewall port 67/tcp to pihole users
+  ansible.builtin.firewalld:
+    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=67 protocol=tcp to-port=6767'
+    immediate: true
+    permanent: true
+    state: enabled
+  with_items:
+    "{{ pihole_ips }}"
+  when: pihole_limit
 
 - name: pull latest pihole image
   become_user: "{{ app_user }}"
@@ -72,7 +87,7 @@
 
     env:
       TZ: "{{ timezone }}"
-      WEBPASSWORD: "{{ pass_pihole }}"
+      WEBPASSWORD: "{{ pihole_pass }}"
       PIHOLE_UID: "{{ app_uid }}"
       PIHOLE_GID: "{{ app_gid }}"
       WEB_UID: "{{ app_uid }}"

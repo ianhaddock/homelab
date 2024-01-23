@@ -31,6 +31,7 @@
   become: true
 
   roles:
+ #  - set localhost entries for *.ianhaddock.com
     - base-nginx
     - file_store
     - gitea

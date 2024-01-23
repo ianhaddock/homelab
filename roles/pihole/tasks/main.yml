@@ -29,9 +29,12 @@
     cmd: pihole -up
   when: ansible_facts.machine == "armv7l" and pihole_path_check.stat.exists
 
-- name: set forward proxy and ports
+- name: set nginx forward proxy and access restriction
   ansible.builtin.include_role:
     name: base-nginx
     tasks_from: forward_proxy.yml
     public: true
+  vars:
+    limit_app: "{{ pihole_limit }}"
+    limit_source_ips: "{{ pihole_ips }}"
   when: containers
