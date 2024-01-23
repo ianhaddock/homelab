@@ -37,7 +37,7 @@ server {
 server {
   listen 80;
   listen [::]:80;
-  server_name _ www.{{ site_fqdn }} {{ site_fqdn }};
+  server_name www.{{ site_fqdn }} {{ site_fqdn }};
   client_max_body_size 256m;
 
   location  / {
