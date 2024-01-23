@@ -1,0 +1,10 @@
+# main.yml
+---
+
+admin_user: ansible
+admin_uid: 1100
+admin_group: ansible
+admin_gid: 1100
+
+vm_swappiness: 10
+vfs_cache_pressure: 50
