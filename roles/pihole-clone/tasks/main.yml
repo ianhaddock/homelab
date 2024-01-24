@@ -15,6 +15,7 @@
   ansible.builtin.include_role:
     name: pihole
     tasks_from: podman_pihole.yml
+    public: true
   vars:
     app_user: "{{ clone_user }}"
     app_uid: "{{ clone_uid }}"
