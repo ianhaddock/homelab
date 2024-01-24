@@ -22,7 +22,7 @@ file_server: "https://files.example.com"
 
 # nginx forward proxy
 limit_app: true
-limit_source_ip: ['192.168.1.0/24']
+limit_source_ips: ['192.168.1.0/24']
 
 containers: true
 containers_path: '/mnt/containers'
