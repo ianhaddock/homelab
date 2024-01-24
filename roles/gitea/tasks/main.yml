@@ -23,6 +23,9 @@
   with_items:
     - "{{ app_ssh_port }}/tcp"
 
+- name: set hosts files entries
+  ansible.builtin.import_tasks: hosts_file.yml
+
 - name: set forward proxy and http port
   ansible.builtin.include_role:
     name: base-nginx

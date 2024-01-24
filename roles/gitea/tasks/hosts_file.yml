@@ -1,0 +1,22 @@
+# hosts_file.yml
+#
+---
+
+- name: check for cloud-config
+  ansible.builtin.stat:
+    path: '/etc/cloud/templates/hosts.redhat.tmpl'
+  register: cloud_config_stat
+
+- name: edit cloud-config hosts
+  ansible.builtin.lineinfile:
+    path: '/etc/cloud/templates/hosts.redhat.tmpl'
+    regexp: '^127\.0\.\0\.1 git'
+    line: "127.0.0.1 git.{{ site_fqdn }}"
+  when: cloud_config_stat.stat.exists
+
+- name: edit /etc/hosts
+  ansible.builtin.lineinfile:
+    path: '/etc/hosts'
+    regexp: '^127\.0\.\0\.1 git'
+    line: "127.0.0.1 git.{{ site_fqdn }}"
+  when: not cloud_config_stat.stat.exists
