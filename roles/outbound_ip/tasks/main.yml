@@ -1,0 +1,27 @@
+# set outbound traffic to use reserved IP instead of the default one
+#
+# https://docs.digitalocean.com/products/networking/reserved-ips/how-to/enable-old/#enable-anchor-ips-immediately
+# https://docs.digitalocean.com/products/networking/reserved-ips/how-to/outbound-traffic/
+# https://www.linuxtechi.com/add-delete-static-route-linux-ip-command/
+# https://www.digitalocean.com/community/questions/send-outbound-traffic-over-floating-ip
+# https://docs.digitalocean.com/products/networking/reserved-ips/how-to/find-anchor-ips/
+# https://docs.digitalocean.com/reference/api/metadata-api/#operation/getReservedIpIpv4Active
+# https://stackoverflow.com/questions/35610586/how-to-get-public-ip-address-in-ubuntu
+#
+# Why:
+# If the VPS is restarted, the firewall and services are set to not open up
+# and start. Instead, running the ansible play will setup thesystem with the
+# latest configuration. This way if something bounces the box unexpectedly,
+# it boots to a simple state with just port 22 open for ssh.
+#
+---
+- name: set outbound traffic ip to reserved IP
+  become: true
+  ansible.builtin.command:
+    cmd: sh -c 'ip route del default ; ip route add default via {{ outbound_route }} dev eth0'
+  register: outbound_ip_status
+
+- name: debug outbound ip status
+  ansible.builtin.debug:
+    msg: "{{ outbound_ip_status }}"
+  when: verbose
