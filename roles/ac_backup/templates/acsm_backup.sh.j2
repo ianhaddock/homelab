@@ -51,6 +51,14 @@ if [ $? != 0 ]; then
     exit 1;
 fi
 
+# prune local files
+echo "Removing local .gz older than 30 (+29) days old."
+find {{ ac_backup_destination }} -name *.gz -ctime +29 -exec rm -rvf '{}' \;
+if [ $? != 0 ]; then
+    echo "$(date +%Y%m%d:%H%M%S): local prune failed. Exiting"
+    exit 1;
+fi
+
 # copy remote files
 echo "Pulling backups from {{ ac_fqdn }}";
 
