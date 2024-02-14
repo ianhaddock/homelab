@@ -16,7 +16,7 @@
     fingerprint: '7DC7 299D CF7C 7FD9 CD87 701B A599 FD5E 9DB8 4141'
     state: present
 
-- name: add zfs repo
+- name: add zfs package
   ansible.builtin.dnf:
     name: https://zfsonlinux.org/epel/zfs-release-2-3.el9.noarch.rpm
     state: present
