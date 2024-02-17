@@ -45,7 +45,7 @@ sleep $n;
 
 # prune local files
 echo "Removing local .zips older than 30 (+29) days old."
-find {{ ac_backup_destination }} -name *.zip -ctime +29 -exec rm -rvf '{}' \;
+find {{ ac_backup_destination }} -name *.zip -atime +29 -exec rm -rvf '{}' \;
 if [ $? != 0 ]; then
     echo "$(date +%Y%m%d:%H%M%S): local prune failed. Exiting"
     exit 1;
@@ -53,7 +53,7 @@ fi
 
 # prune local files
 echo "Removing local .gz older than 30 (+29) days old."
-find {{ ac_backup_destination }} -name *.gz -ctime +29 -exec rm -rvf '{}' \;
+find {{ ac_backup_destination }} -name *.gz -atime +29 -exec rm -rvf '{}' \;
 if [ $? != 0 ]; then
     echo "$(date +%Y%m%d:%H%M%S): local prune failed. Exiting"
     exit 1;
