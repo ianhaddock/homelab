@@ -3,14 +3,14 @@
 
 - name: check for bash_aliases file
   ansible.builtin.stat:
-    path: "/home/{{ admin_user }}/.bash_aliases"
+    path: "/home/{{ wake_user }}/.bash_aliases"
   register: bash_aliases_check
 
 - name: add bash_aliases file
   ansible.builtin.template:
     src: bash_aliases.j2
-    dest: "/home/{{ admin_user }}/.bash_aliases"
-    owner: "{{ admin_user }}"
-    group: "{{ admin_group }}"
+    dest: "/home/{{ wake_user }}/.bash_aliases"
+    owner: "{{ wake_user }}"
+    group: "{{ wake_group }}"
     mode: '0640'
   when: not bash_aliases_check.stat.exists

@@ -1,0 +1,5 @@
+# wakeonwin vars
+---
+
+wake_user: 'ian'
+wake_group: 'ian'
