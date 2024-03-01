@@ -72,7 +72,7 @@
     "tcp-enabled": true,
     "torrent-added-verify-mode": "fast",
     "trash-original-torrent-files": false,
-    "umask": "022",
+    "umask": "002",
     "upload-slots-per-torrent": 8,
     "utp-enabled": true
 }
