@@ -10,7 +10,7 @@
     "anti-brute-force-enabled": false,
     "anti-brute-force-threshold": 100,
     "bind-address-ipv4": "0.0.0.0",
-    "bind-address-ipv6": "::",
+    "bind-address-ipv6": "fe80::",
     "blocklist-enabled": false,
     "blocklist-url": "http://www.example.com/blocklist",
     "cache-size-mb": 4,
