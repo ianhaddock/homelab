@@ -54,6 +54,13 @@
 - name: flush_handlers
   meta: flush_handlers
 
+- name: enable monthly zfs scrubs
+  ansible.builtin.systemd:
+    name: "zfs-scrub-monthly@{{ zfs_tank_name }}.timer"
+    enabled: true
+    state: started
+  when: setup_zfs_filesystems|default(false) == true
+
 - name: setup zfs filesystems if defined
   ansible.builtin.import_tasks: zfs_filesystems.yml
   when: setup_zfs_filesystems|default(false) == true
