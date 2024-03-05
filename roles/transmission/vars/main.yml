@@ -11,4 +11,4 @@ app_data_port: 51412
 app_media: "/mnt/transmission"
 
 blocklist_enabled: 'true'
-blocklist: 'https://github.com/Naunter/BT_BlockLists/releases/download/v.1/bt_blocklists.gz'  
+blocklist: 'https://github.com/Naunter/BT_BlockLists/releases/download/v.1/bt_blocklists.gz'
