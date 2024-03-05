@@ -11,18 +11,16 @@
     - "{{ containers_path }}/{{ app_name }}/config"
     - "{{ containers_path }}/{{ app_name }}/transcode"
     - "{{ media_path }}/audiobooks"
-    - "{{ media_path }}/f1"
-    - "{{ media_path }}/music"
-    - "{{ media_path }}/wec"
-    - "{{ media_path }}/staging"
+    - "{{ media_path }}/lemans"
     - "{{ media_path }}/movies"
+    - "{{ media_path }}/music"
+    - "{{ media_path }}/staging"
     - "{{ media_path }}/tvshows"
-    - "{{ media_path }}/racing"
+    - "{{ media_path }}/wec"
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
     - "{{ media_path }}/yt_tunes"
-    - "{{ media_path }}/lemans"
-    - "{{ media_path }}/transmission"
+
 
 - name: create links in /mnt
   ansible.builtin.file:

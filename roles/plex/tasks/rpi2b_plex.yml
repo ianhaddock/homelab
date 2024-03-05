@@ -11,7 +11,6 @@
     - "{{ containers_path }}/{{ app_name }}/config/Library/Application Support"
     - "{{ containers_path }}/{{ app_name }}/transcode"
     - "{{ media_path }}/audiobooks"
-    - "{{ media_path }}/f1"
     - "{{ media_path }}/lemans"
     - "{{ media_path }}/movies"
     - "{{ media_path }}/music"
