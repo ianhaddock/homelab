@@ -33,10 +33,9 @@
     - {src: /mnt/hdd/containers, dest: /mnt/containers}
 
 
-# disable bright red led
-# ref: https://forums.raspberrypi.com/viewtopic.php?t=338980
-dtparam=pwr_led_trigger=none
-# ref: https://github.com/raspberrypi/firmware/issues/1742
-#dtparam=pwr_led_trigger=default-on
-dtparam=pwr_led_activelow=off
-      
+  #   # disable bright red led
+  #   # ref: https://forums.raspberrypi.com/viewtopic.php?t=338980
+  #   dtparam=pwr_led_trigger=none
+  #   # ref: https://github.com/raspberrypi/firmware/issues/1742
+  #   #dtparam=pwr_led_trigger=default-on
+  #   dtparam=pwr_led_activelow=off
