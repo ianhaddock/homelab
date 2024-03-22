@@ -75,15 +75,17 @@
     mode: '0644'
   register: smbconf_state
 
-- name: open smb port
+- name: open smb 445/tcp port
   ansible.builtin.firewalld:
     port: 445/tcp
     state: enabled
+    permanent: true
 
 - name: open mDNS port
   ansible.builtin.firewalld:
     port: 5353/udp
     state: enabled
+    permanent: true
 
 - name: reload samba
   ansible.builtin.systemd:
