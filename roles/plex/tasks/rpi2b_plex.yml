@@ -11,15 +11,9 @@
     - "{{ containers_path }}/{{ app_name }}/config/Library/Application Support"
     - "{{ containers_path }}/{{ app_name }}/transcode"
     - "{{ media_path }}/audiobooks"
-    - "{{ media_path }}/lemans"
     - "{{ media_path }}/movies"
-    - "{{ media_path }}/music"
     - "{{ media_path }}/staging"
     - "{{ media_path }}/tvshows"
-    - "{{ media_path }}/wec"
-    - "{{ media_path }}/yoga"
-    - "{{ media_path }}/youtube"
-    - "{{ media_path }}/yt_tunes"
 
 - name: check if plex is already installed
   ansible.builtin.stat:
