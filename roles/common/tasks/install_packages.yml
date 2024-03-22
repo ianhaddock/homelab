@@ -55,6 +55,9 @@
     name:
       - acl  # ansible become_user
       - hdparm
+      - hd-idle
+      - lsof
+      - iotop
       - wakeonlan
       - tree
     state: latest  # noqa package-latest
