@@ -52,11 +52,13 @@
   roles:
     - rpi2b_setup
     - base-nginx
+    - hd-idle
     - wakeonwin
     - munin
     - pihole
     - plex
     - timecap
+
 
   handlers:
     - name: reload nginx
@@ -74,6 +76,9 @@
         name: networking
         state: restarted
 
+    - name: reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
 
 ### devbox ###
 - hosts: devbox

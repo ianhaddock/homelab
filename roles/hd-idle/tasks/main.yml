@@ -1,0 +1,27 @@
+# hd-idle main.yml
+---
+- name: install hd-idle and related tools
+  ansible.builtin.package:
+    name:
+      - smartmontools
+      - hdparm
+      - hd-idle
+      - lsof
+      - iotop
+    state: latest  # noqa package-latest
+  when: ansible_os_family == 'Debian'
+
+- name: add hd-idle systemd service
+  ansible.builtin.template:
+    src: 'systemd_hd-idle_service.j2'
+    dest: '/usr/lib/systemd/system/hd-idle.service'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd daemon
+
+- name: enable and start hd-idle service
+  ansible.builtin.systemd:
+    name: hd-idle
+    enabled: true
+    state: started

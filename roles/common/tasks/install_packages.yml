@@ -54,11 +54,8 @@
   ansible.builtin.package:
     name:
       - acl  # ansible become_user
-      - hdparm
-      - hd-idle
       - lsof
       - iotop
-      - wakeonlan
       - tree
     state: latest  # noqa package-latest
   when: ansible_os_family == 'Debian'
