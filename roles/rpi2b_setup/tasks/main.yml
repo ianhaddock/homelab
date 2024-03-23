@@ -18,7 +18,6 @@
     mode: '0755'
   loop:
     - {path: /mnt, dir: hdd}
-    - {path: /mnt/hdd, dir: containers}
     - {path: /mnt/hdd, dir: media}
 
 - name: create links in /mnt
@@ -30,8 +29,6 @@
     state: link
   loop:
     - {src: /mnt/hdd/media, dest: /mnt/media}
-    - {src: /mnt/hdd/containers, dest: /mnt/containers}
-
 
   #   # disable bright red led
   #   # ref: https://forums.raspberrypi.com/viewtopic.php?t=338980
