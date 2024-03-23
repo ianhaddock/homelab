@@ -1,6 +1,13 @@
 # wakeonwin main.yml
 ---
 
+- name: install wakeonlan
+  ansible.builtin.package:
+    name:
+      - wakeonlan
+    state: latest  # noqa package-latest
+  when: ansible_os_family == 'Debian'
+
 - name: check for bash_aliases file
   ansible.builtin.stat:
     path: "/home/{{ wake_user }}/.bash_aliases"
