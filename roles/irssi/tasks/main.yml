@@ -1,0 +1,7 @@
+# irssi main.yml
+---
+- name: install hd-idle and related tools
+  ansible.builtin.package:
+    name:
+      - irssi
+    state: latest  # noqa package-latest

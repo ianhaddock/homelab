@@ -53,6 +53,7 @@
     - rpi2b_setup
     - base-nginx
     - hd-idle
+    - irssi
     - wakeonwin
     - munin
     - pihole
