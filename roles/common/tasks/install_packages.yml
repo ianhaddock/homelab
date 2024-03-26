@@ -37,6 +37,7 @@
     state: present
   when: ansible_os_family == 'RedHat'
 
+ # ref: https://www.brendangregg.com/blog/2024-03-24/linux-crisis-tools.html
 - name: install utility packages general
   ansible.builtin.package:
     name:
@@ -48,6 +49,9 @@
       - smartmontools
       - rsync
       - figlet
+      - lsof
+      - iotop
+      - cpuid
     state: latest  # noqa package-latest
 
 - name: install utility packages rpi2b
