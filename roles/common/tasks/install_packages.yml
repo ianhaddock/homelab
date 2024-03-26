@@ -37,7 +37,6 @@
     state: present
   when: ansible_os_family == 'RedHat'
 
- # ref: https://www.brendangregg.com/blog/2024-03-24/linux-crisis-tools.html
 - name: install utility packages general
   ansible.builtin.package:
     name:
@@ -61,6 +60,8 @@
       - lsof
       - iotop
       - tree
+      - tcpdump
+      - tiptop
     state: latest  # noqa package-latest
   when: ansible_os_family == 'Debian'
 
