@@ -22,6 +22,13 @@
     owner: root
     group: root
     mode: '0640'
+  with_random_choice:
+    - “All we have to decide is what to do with the time that is given us.”
+    - "End of line."
+    - "life is not a problem to be solved; it is a reality to be experienced"
+    - "Come on, you scuzzy data, be in there."
+    - "Never tell me the odds!"
+    - "I never asked for this. They say they saved me, but I'm not sure saved is the right word."
 
 - name: install motd file
   ansible.builtin.template:
@@ -30,13 +37,6 @@
     owner: root
     group: root
     mode: '0640'
-  with_random_choice:
-    - “All we have to decide is what to do with the time that is given us.”
-    - "End of line."
-    - "life is not a problem to be solved; it is a reality to be experienced"
-    - "Come on, you scuzzy data, be in there."
-    - "Never tell me the odds!"
-    - "I never asked for this. They say they saved me, but I'm not sure saved is the right word."
 
 - name: debug
   ansible.builtin.debug:
