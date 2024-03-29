@@ -1,7 +1,5 @@
-# timemachine timecapsule on rpi2b
-# ref:
-# https://ovechkin.xyz/blog/2021-12-13-using-raspberry-pi-for-time-machine
-# https://stackoverflow.com/questions/44762488/non-interactive-samba-user-creation-via-ansible
+# main.yml
+# apple timecapsule on rpi2b
 ---
 
 - name: create isolation user and group. Enable linger
@@ -31,12 +29,6 @@
     state: latest  # noqa package-latest
   when: ansible_facts.machine == "armv7l"
 
-# why change firewall settings?
-# kernel message ipv6 route cache full, nothing listed
-# ref:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1813691
-# https://serverfault.com/questions/902161/linux-host-randomly-stops-answering-ipv6-neighbor-solicitation-requests/907895#907895
-
 - name: tweak filewall for avahi ipv6
   ansible.builtin.lineinfile:
     path: '/etc/firewalld/firewalld.conf'
@@ -52,8 +44,9 @@
   when: firewall_update.changed
 
 # - name: set samba password for timecapsule account
+# become: true
 #   ansible.builtin.command:
-#     psudo cmd: sudo echo hunter2 | smbpasswd -s -a app_user
+#     cmd: sudo echo "{{ timecap_password }}" | smbpasswd -s -a "{{ app_user }}"
 
 - name: setup directories
   ansible.builtin.file:

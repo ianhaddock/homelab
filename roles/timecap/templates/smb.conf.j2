@@ -238,6 +238,8 @@
     comment = Timecapsule
     path = /mnt/hdd/{{ app_name }}/backups
     valid users = {{ app_user }}
+    write list = {{ app_user }}
+    guest ok = no
     read only = no
     vfs objects = catia fruit streams_xattr
     fruit:time machine = yes
@@ -247,5 +249,15 @@
     comment = Media Files
     path = /mnt/hdd/media
     guest ok = yes
-    read only = yes
+    read list = guest
+    write list = plex
+    valid users = plex
+    mangled names = no
+
+[archives]
+    comment = Archives
+    path = /mnt/hdd/archives
+    guest ok = no
+    write list = ian
+    valid users = ian
     mangled names = no
