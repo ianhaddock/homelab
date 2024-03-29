@@ -30,16 +30,23 @@
     owner: root
     group: root
     mode: '0640'
+  with_random_choice:
+    - “All we have to decide is what to do with the time that is given us.”
+    - "End of line."
+    - "life is not a problem to be solved; it is a reality to be experienced"
+    - "Come on, you scuzzy data, be in there."
+    - "Never tell me the odds!"
+    - "I never asked for this. They say they saved me, but I'm not sure saved is the right word."
 
 - name: debug
   ansible.builtin.debug:
     msg: messge {{ sshd_reload }}
   when: verbose
 
-- name: create motd file with hostname
-  become: true
-  ansible.builtin.command:
-    cmd: /usr/bin/figlet "{{ hostname }}" >> /etc/motd
+    # - name: create motd file with hostname
+    #   become: true
+    #   ansible.builtin.command:
+    #     cmd: /usr/bin/figlet "{{ hostname }}" >> /etc/motd
 
 - name: enable banner file
   ansible.builtin.lineinfile:
