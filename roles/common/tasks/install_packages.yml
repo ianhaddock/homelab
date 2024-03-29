@@ -52,6 +52,7 @@
       - iotop
       - cpuid
     state: latest  # noqa package-latest
+  when: ansible_os_family == 'Fedora'
 
 - name: install utility packages rpi2b
   ansible.builtin.package:
