@@ -1,76 +1,88 @@
 # custom error and index pages
-#
 ---
-- name: add custom error pages
-  ansible.builtin.copy:
-    src: "error_pages"
-    dest: "{{ nginx_path }}"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
-    mode: u=rwX,g=rX,o=rX
-  register: build_debug
-
-- name: debug
-  ansible.builtin.debug:
-    msg: "{{ build_debug }}"
-  when: verbose
-
-- name: add nginx domain subfolder
+- name: add custom error page dirs
   ansible.builtin.file:
-    path: "{{ nginx_path }}/{{ app_name }}.{{ site_fqdn }}"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
     mode: u=rwX,g=rX,o=rX
     state: directory
+  with_items:
+    - "{{ nginx_path }}/error_pages"
+    - "{{ nginx_path }}/error_pages/401"
+    - "{{ nginx_path }}/error_pages/404"
+    - "{{ nginx_path }}/error_pages/50x"
 
-- name: add custom index page
+- name: add custom 401 error page
+  ansible.builtin.template:
+    src: 401-error.html.j2
+    dest: "{{ nginx_path }}/error_pages/401/401-error.html"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0640'
+
+- name: add custom 404 error page
+  ansible.builtin.template:
+    src: 404-error.html.j2
+    dest: "{{ nginx_path }}/error_pages/404/404-error.html"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0640'
+
+- name: add custom 50x error page
+  ansible.builtin.template:
+    src: 50x-error.html.j2
+    dest: "{{ nginx_path }}/error_pages/50x/50x-error.html"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0640'
+
+- name: add custom maintenace page
+  ansible.builtin.template:
+    src: maintenance_page.html.j2
+    dest: "{{ nginx_path }}/maintenance_page.html"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0640'
+
+- name: add maintenance page config file
+  ansible.builtin.template:
+    src: default_server.conf.j2
+    dest: "/etc/nginx/conf.d/default_server.conf"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0640'
+
+- name: replace nginx defualt index page
   ansible.builtin.template:
     src: index.html.j2
-    dest: "{{ nginx_path }}/{{ app_name }}.{{ site_fqdn }}/index.html"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
+    dest: "{{ nginx_path }}/index.html"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
     mode: u=rwX,g=rX,o=rX
-  register: build_debug
-
-- name: debug
-  ansible.builtin.debug:
-    msg: "{{ build_debug }}"
-  when: verbose
 
 - name: add robots.txt
   ansible.builtin.copy:
     src: robots.txt
     dest: "{{ nginx_path }}/robots.txt"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
     mode: u=rwX,g=rX,o=rX
 
 - name: add domain http conf
   ansible.builtin.template:
     src: domain_http.conf.j2
-    dest: "{{ nginx_conf }}/{{ app_name }}.{{ site_fqdn }}.conf"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
+    dest: "{{ nginx_conf }}/{{ site_fqdn }}.conf"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
     mode: u=rwX,g=rX,o=rX
-      #   when: not cert_enabled
-  register: build_debug
+  when: not cert_enabled
 
-- name: debug
-  ansible.builtin.debug:
-    msg: "{{ build_debug }}"
-  when: verbose
-
-    # - name: add domain https conf
-    #   ansible.builtin.template:
-    #     src: domain_https.conf.j2
-    #     dest: "{{ nginx_conf }}/{{ app_name }}.{{ site_fqdn }}.conf"
-    #     owner: "{{ nginx_user }}"
-    #     group: "{{ nginx_group }}"
-    #     mode: u=rwX,g=rX,o=rX
-    #   when: cert_enabled
-    #   register: build_debug
-    #
-    # - name: debug
-    #   ansible.builtin.debug:
-    #     msg: "{{ build_debug }}"
-    #   when: verbose
+- name: add domain https conf
+  ansible.builtin.template:
+    src: domain_https.conf.j2
+    dest: "{{ nginx_conf }}/{{ site_fqdn }}.conf"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: u=rwX,g=rX,o=rX
+  when: cert_enabled

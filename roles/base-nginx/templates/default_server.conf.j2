@@ -1,0 +1,66 @@
+#server {
+#  listen 443 ssl;
+#  listen [::]:443 ssl;
+#  server_name default_server;
+#  client_max_body_size 256m;
+#
+#
+#  error_page 401 /401/401-error.html;
+#  location /401 {
+#        root {{ nginx_path }}/error_pages;
+#  }
+#
+#  error_page 404 /404/404-error.html;
+#  location /404 {
+#        root {{ nginx_path }}/error_pages;
+#  }
+#
+#  error_page 500 502 503 504 /50x/50x-error.html;
+#  location /50x {
+#        root {{ nginx_path }}/error_pages;
+#  }
+#
+#  location / {
+#    root {{ nginx_path }};
+#
+#    index maintenance_page.html;
+#  }
+#
+#  ssl_certificate /etc/letsencrypt/live/{{ site_fqdn }}/fullchain.pem;
+#  ssl_certificate_key /etc/letsencrypt/live/{{ site_fqdn }}/privkey.pem;
+##  include /etc/letsencrypt/options-ssl-nginx.conf;
+##  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+#
+#}
+
+
+server {
+  listen 80;
+  listen [::]:80;
+  server_name default_server;
+  client_max_body_size 256m;
+
+
+  error_page 401 /401/401-error.html;
+  location /401 {
+        root {{ nginx_path }}/error_pages;
+  }
+
+  error_page 404 /404/404-error.html;
+  location /404 {
+        root {{ nginx_path }}/error_pages;
+  }
+
+  error_page 500 502 503 504 /50x/50x-error.html;
+  location /50x {
+        root {{ nginx_path }}/error_pages;
+  }
+
+
+  location / {
+    root {{ nginx_path }};
+
+    index maintenance_page.html;
+  }
+
+}
