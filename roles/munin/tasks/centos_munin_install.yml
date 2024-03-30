@@ -146,7 +146,7 @@
 
 - name: setup nginx https munin subdomain
   ansible.builtin.template:
-    src: 'nginx_munin_conf.j2'
+    src: 'nginx_munin_conf_https.j2'
     dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
     owner: nginx
     group: nginx

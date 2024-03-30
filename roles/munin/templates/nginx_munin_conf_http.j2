@@ -8,7 +8,11 @@ server {
   allow 192.168.1.0/24;
   deny all;
 
-  root /var/www/html/munin;
+  root {{ munin_path }};
+
+  auth_basic            "Restricted";
+  # Create the htpasswd file with the htpasswd tool.
+  auth_basic_user_file  /etc/nginx/htpasswd;
 
   index index.html;
 
@@ -28,19 +32,20 @@ server {
   }
 
   #https://guide.munin-monitoring.org/en/latest/example/webserver/nginx-cron.html#example-webserver-nginx-cron
-  location /munin/static/ {
-    alias /var/www/html/munin/static/;
+  location /static/ {
+
+    alias {{ munin_path }}/static/;
     expires modified +1w;
   }
 
-  location /munin/ {
-    auth_basic            "Restricted";
-    # Create the htpasswd file with the htpasswd tool.
-    auth_basic_user_file  /etc/nginx/htpasswd;
-
-    alias /var/www/html/munin/;
-    expires modified +310s;
-  }
+#  location /munin/ {
+#    auth_basic            "Restricted";
+#    # Create the htpasswd file with the htpasswd tool.
+#    auth_basic_user_file  /etc/nginx/htpasswd;
+#
+#    alias {{ munin_path }};
+#    expires modified +310s;
+#  }
 
   location ^~ /munin-cgi/munin-cgi-graph/ {
     # access_log off;
@@ -50,9 +55,9 @@ server {
     include fastcgi_params;
   }
 
-  location = / {
-    rewrite ^/$ munin/ redirect; break;
-  }
+#  location = / {
+#    rewrite ^/$ munin/ redirect; break;
+#  }
 
 #  # only allow static file serving
 #  location ~* \.(jpg|jpeg|gif|png|bmp|ico|pdf|flv|swf|exe|html|htm|txt|css|js) {
@@ -62,16 +67,3 @@ server {
 #  }
 
 }
-
-#server {
-#  listen 443;
-#  listen [::]:443;
-#  server_name {{ app_name }}.{{ site_fqdn }};
-#  client_max_body_size 256m;
-#
-#  # 301 redirect
-#  location  / {
-#     deny all;
-#     return 301 http://{{ app_name }}.{{ site_fqdn }}$request_uri;
-#  }
-#}

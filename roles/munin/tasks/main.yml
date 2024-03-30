@@ -1,6 +1,12 @@
 # munin install main.yml
 ---
 
+- name: set domain pages
+  ansible.builtin.include_role:
+    name: base-nginx
+    tasks_from: domain_pages.yml
+    public: true
+
 - name: install munin on centos stream 9
   ansible.builtin.include_tasks: centos_munin_install.yml
   when: ansible_os_family == "RedHat"
