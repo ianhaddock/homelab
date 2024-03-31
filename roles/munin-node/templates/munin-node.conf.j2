@@ -43,7 +43,7 @@ ignore_file \.pod$
 # may repeat the allow line as many times as you'd like
 
 allow ^127\.0\.0\.1$
-allow ^192\.168\.1\.4$
+allow {{ munin_server_ip_regex }}
 allow ^::1$
 
 # If you have installed the Net::CIDR perl module, you can use one or more
@@ -54,7 +54,7 @@ allow ^::1$
 # Example:
 #
 cidr_allow 127.0.0.1/32
-cidr_allow 192.168.1.4/32
+cidr_allow {{ munin_server_ip }}/32
 #cidr_allow 192.0.2.0/24
 #cidr_deny  192.0.2.42/32
 
