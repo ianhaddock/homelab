@@ -62,6 +62,7 @@
       - iotop
       - tree
       - tcpdump
+      - telnet
       - tiptop
     state: latest  # noqa package-latest
   when: ansible_os_family == 'Debian'
