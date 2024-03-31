@@ -1,0 +1,40 @@
+# piglow main.yml
+---
+
+- name: install python3 piglow
+  ansible.builtin.package:
+    name:
+      - python3-piglow
+    state: latest
+
+- name: enable i2c on boot config.txt
+  ansible.builtin.lineinfile:
+    path: /boot/config.txt
+    regex: '^#dtparam=i2c_arm=on$'
+    line: 'dtparam=i2c_arm=on'
+  notify: restart system
+
+- name: check if i2c is enabled in user space
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    regex: '^i2c_dev$'
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: i2c_user_space_check
+
+- name: enable i2c in user space if not already
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    line: 'i2c_dev'
+    state: present
+  when: i2c_user_space_check.found == 0
+  notify: restart system
+
+- name: add pyglow_demo.py script
+  ansible.builtin.template:
+    src: piglow_demo.py.j2
+    dest: /usr/local/sbin/piglow_demo.py
+    owner: root
+    group: root
+    mode: '0755'
