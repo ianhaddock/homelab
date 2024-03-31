@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 #
-# Demo app to test PiGlow
-# https://github.com/pimoroni/piglow/blob/master/examples/bar.py
-#
+### Demo app to test PiGlow
+# ref: https://github.com/pimoroni/piglow/blob/master/examples/bar.py
+# modifed . 
+# ansible installed on {{ ansible_date_time.date }}
 
 import time
 
 import piglow
 
+i = 0
 
-while True:
+while i <= 1:
     for x in range(100):
         piglow.leg_bar(0, x / 100.0)
         piglow.leg_bar(1, x / 100.0)
@@ -24,4 +26,4 @@ while True:
         piglow.white(0)
         piglow.show()
         time.sleep(0.03)
-
+    i += 1

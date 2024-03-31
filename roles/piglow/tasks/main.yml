@@ -38,3 +38,12 @@
     owner: root
     group: root
     mode: '0755'
+
+- name: add demo script to root cron
+  ansible.builtin.cron:
+    name: PiGlow Motivation Demo
+    user: root
+    job: /usr/local/sbin/piglow_demo.py
+    hour: "12"
+    minute: "0"
+    weekday: "1,3,5"
