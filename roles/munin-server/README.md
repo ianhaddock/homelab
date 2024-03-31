@@ -1,4 +1,4 @@
-## Munin
+## Munin server
 
 "[Munin][1] is a networked resource monitoring tool... that can help analyze resource trends"
 

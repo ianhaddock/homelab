@@ -1,0 +1,5 @@
+#!/bin/bash -e
+# update loaded munin plugins
+# added by ansible {{ ansible_date_time.date }}
+
+munin-node-configure --shell --remove-also | sh -x

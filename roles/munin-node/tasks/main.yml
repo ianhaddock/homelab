@@ -1,11 +1,13 @@
-# munin install main.yml
+# munin-client main.yml
 ---
-
-- name: set domain pages
-  ansible.builtin.include_role:
-    name: base-nginx
-    tasks_from: domain_pages.yml
-    public: true
+- name: open port
+  ansible.builtin.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items:
+    - "{{ app_port }}/tcp"
 
 - name: install munin on centos stream 9
   ansible.builtin.include_tasks: centos_munin_install.yml
