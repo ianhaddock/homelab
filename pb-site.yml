@@ -55,13 +55,16 @@
     - hd-idle
     - irssi
     - wakeonwin
-    - munin
+    - piglow
+    - munin-server
     - pihole
     - plex
     - timecap
 
-
   handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
     - name: reload nginx
       ansible.builtin.systemd:
         name: nginx
@@ -81,6 +84,7 @@
       ansible.builtin.systemd:
         daemon_reload: true
 
+
 ### devbox ###
 - hosts: devbox
   become: true
@@ -91,7 +95,7 @@
     - base-nginx
     - ac_backup
     - gitea
-    - munin
+    - munin-node
     - jenkins
     - jenkins-agent
     - pihole-clone

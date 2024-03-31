@@ -21,7 +21,7 @@ Build out for my systems.
 
 Utilities:
 * common: base packages, users, configs
-* sshd: ssh config
+* sshd: ssh config,  with random banner quote
 * zram: ram compression before disk swap
 * base-nginx: reverse proxy & ssl certificates
 * timecap: timecapsule service
@@ -29,12 +29,15 @@ Utilities:
 * file_store: simple https file server
 * wakeonwin: bash alias file to wake my PC
 * rpi2b_setup: rpi2b specific tweaks
+* munin-node: resource monitor
+* piglow: support for PiGlow hardware on Raspberry Pi
 
 Apps: 
 * blog: Flask app for [my blog][1]
 * gitea: git repo
 * pihole: DNS with ad-guard
-* munin: simple resource monitoring
+* munin-server: resource monitor gui
+* munin-node: resource monitoring
 * plex: personal media streaming service
 * transmission: bittorrent client
 * jenkins: automation server
