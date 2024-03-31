@@ -1,9 +1,20 @@
 # base webserver
 ---
-- name: install nginx
+- name: install nginx on Debian
   ansible.builtin.package:
-    name: nginx
+    name:
+      - nginx
+      - apache2-utils  # for htpasswd
     state: present
+  when: ansible_os_family == 'Debian'
+
+- name: install nginx on RedHat
+  ansible.builtin.package:
+    name:
+      - nginx
+      - httpd-tools  # for htpasswd
+    state: present
+  when: ansible_os_family == 'RedHat'
 
 - name: create sites-available directory
   ansible.builtin.file:
@@ -21,7 +32,7 @@
     dest: "{{ nginx_path }}/robots.txt"
     owner: root
     group: root
-    mode: '0644' 
+    mode: '0644'
 
 - name: open web ports
   ansible.builtin.firewalld:
