@@ -1,19 +1,29 @@
 # configure sshd
 # >>> /etc/update-motd.d/10-uname
 ---
+- name: install support packages
+  ansible.builtin.package:
+    name:
+      - figlet
+    state: latest
+
 - name: disable root login via ssh
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^PermitRootLogin yes'
     line: 'PermitRootLogin no'
-  register: sshd_reload
 
 - name: disable password authentication
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^PasswordAuthentication yes'
     line: 'PasswordAuthentication no'
-  register: sshd_reload
+
+- name: enable banner file
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#Banner none'
+    line: 'Banner /etc/banner.txt'
 
 - name: install banner file
   ansible.builtin.template:
@@ -25,44 +35,56 @@
   with_random_choice:
     - “All we have to decide is what to do with the time that is given us.”
     - "End of line."
-    - "life is not a problem to be solved; it is a reality to be experienced"
+    - "life is not a problem to be solved; it is a reality to be experienced."
     - "Come on, you scuzzy data, be in there."
     - "Never tell me the odds!"
     - "I never asked for this. They say they saved me, but I'm not sure saved is the right word."
 
-- name: install motd file
+- name: enable motd
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PrintMotd no'
+    line: 'PrintMotd yes'
+
+- name: install motd figlet script
+  ansible.builtin.template:
+    src: figlet_motd.sh.j2
+    dest: /usr/local/sbin/figlet_motd.sh
+    owner: root
+    group: root
+    mode: '0740'
+
+- name: install motd file on Debian
   ansible.builtin.template:
     src: motd.j2
     dest: /etc/motd
     owner: root
     group: root
     mode: '0640'
+  when: ansible_os_family == "Debian"
 
-- name: debug
-  ansible.builtin.debug:
-    msg: messge {{ sshd_reload }}
-  when: verbose
+- name: install motd in motd.d on RedHat
+  ansible.builtin.template:
+    src: motd.j2
+    dest: /etc/motd.d/ansible
+    owner: root
+    group: root
+    mode: '0640'
+  when: ansible_os_family == "RedHat"
 
-    # - name: create motd file with hostname
-    #   become: true
-    #   ansible.builtin.command:
-    #     cmd: /usr/bin/figlet "{{ hostname }}" >> /etc/motd
+- name: update motd with figlet doodle
+  become: true
+  ansible.builtin.command:
+    cmd: /usr/local/sbin/figlet_motd.sh
 
-- name: enable banner file
-  ansible.builtin.lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#Banner none'
-    line: 'Banner /etc/banner.txt'
-  register: sshd_reload
-
-- name: reload sshd if changed - RedHat
+- name: reload sshd if RedHat
   ansible.builtin.service:
     name: sshd
     state: reloaded
-  when: sshd_reload.changed and ansible_os_family == 'RedHat'
+  when: ansible_os_family == 'RedHat'
 
-- name: reload ssh if changed - Debian
+- name: reload ssh if Debian
   ansible.builtin.service:
     name: ssh
     state: reloaded
-  when: sshd_reload.changed and ansible_os_family == 'Debian'
+  when: ansible_os_family == 'Debian'
