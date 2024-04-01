@@ -10,7 +10,7 @@ Build out for my systems.
 * Vagrant
 * Terraform
 * Podman
-* Qemu KVM
+* KVM Qemu
 * ZFS
 * RedHat via the [developer subscription][2]
 * CentOS Stream
@@ -21,7 +21,7 @@ Build out for my systems.
 
 Utilities:
 * common: base packages, users, configs
-* sshd: ssh config,  with random banner quote
+* sshd: ssh config, with figlet & random quote
 * zram: ram compression before disk swap
 * base-nginx: reverse proxy & ssl certificates
 * timecap: timecapsule service
@@ -37,7 +37,6 @@ Apps:
 * gitea: git repo
 * pihole: DNS with ad-guard
 * munin-server: resource monitor gui
-* munin-node: resource monitoring
 * plex: personal media streaming service
 * transmission: bittorrent client
 * jenkins: automation server
