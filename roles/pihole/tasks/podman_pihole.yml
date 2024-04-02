@@ -78,7 +78,7 @@
     ports:
       - "5353:53/tcp"
       - "5353:53/udp"
-      - "6767:67/udp"
+      - "6767:67/tcp"
       - "{{ app_port }}:80/tcp"
     volumes:
       - "{{ containers_path }}/{{ app_name }}/etc-dnsmasq.d:/etc/dnsmasq.d"

@@ -1,6 +1,20 @@
 # PiHole Update Playbook
 ---
 
+### blog vps ###
+- hosts: blog
+  become: true
+
+  roles:
+    - pihole
+
+  handlers:
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+
+
 ### RPi2B ###
 - hosts: rpi2b
   become: true
