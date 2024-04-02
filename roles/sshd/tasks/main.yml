@@ -12,18 +12,21 @@
     path: /etc/ssh/sshd_config
     regexp: '^PermitRootLogin yes'
     line: 'PermitRootLogin no'
+  notify: reload sshd
 
 - name: disable password authentication
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^PasswordAuthentication yes'
     line: 'PasswordAuthentication no'
+  notify: reload sshd
 
 - name: enable banner file
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^#Banner none'
     line: 'Banner /etc/banner.txt'
+  notify: reload sshd
 
 - name: install banner file
   ansible.builtin.template:
@@ -38,13 +41,26 @@
     - "life is not a problem to be solved; it is a reality to be experienced."
     - "Come on, you scuzzy data, be in there."
     - "Never tell me the odds!"
-    - "I never asked for this. They say they saved me, but I'm not sure saved is the right word."
+    - "I never asked for this... they saved me, but I'm not sure saved is the right word."
+    - "No. I'm, I'm simply saying that life, uh... finds a way."
+    - "The power of the force has stopped you, you hosers."
 
-- name: enable motd
+- name: enable motd on RedHat
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^PrintMotd no'
-    line: 'PrintMotd yes'
+    line: '#PrintMotd yes'
+  when: ansible_os_family == "RedHat"
+  notify: reload sshd
+
+# ref: https://askubuntu.com/questions/649138/motd-printing-twice-with-printmotd-no
+- name: disable sshd motd as pam.d will show motd, on Debian
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PrintMotd yes'
+    line: 'PrintMotd no'
+  when: ansible_os_family == "Debian"
+  notify: reload sshd
 
 - name: install motd figlet script
   ansible.builtin.template:
@@ -66,15 +82,3 @@
   become: true
   ansible.builtin.command:
     cmd: /usr/local/sbin/figlet_motd.sh
-
-- name: reload sshd if RedHat
-  ansible.builtin.service:
-    name: sshd
-    state: reloaded
-  when: ansible_os_family == 'RedHat'
-
-- name: reload ssh if Debian
-  ansible.builtin.service:
-    name: ssh
-    state: reloaded
-  when: ansible_os_family == 'Debian'

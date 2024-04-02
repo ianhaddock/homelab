@@ -25,6 +25,11 @@
         name: networking
         state: restarted
 
+    - name: reload sshd
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
+
 
 ### blog vps ###
 - hosts: blog
@@ -62,9 +67,6 @@
     - timecap
 
   handlers:
-    - name: restart system
-      ansible.builtin.reboot:
-
     - name: reload nginx
       ansible.builtin.systemd:
         name: nginx
@@ -79,10 +81,6 @@
       ansible.builtin.systemd:
         name: networking
         state: restarted
-
-    - name: reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: true
 
 
 ### devbox ###
