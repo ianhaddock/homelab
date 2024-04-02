@@ -25,12 +25,7 @@
         name: networking
         state: restarted
 
-    - name: reload sshd redhat
+    - name: reload sshd
       ansible.builtin.service:
         name: sshd
-        state: reloaded
-
-    - name: reload ssh debian
-      ansible.builtin.service:
-        name: ssh
         state: reloaded
