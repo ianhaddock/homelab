@@ -59,3 +59,11 @@
     key: "{{ item }}"
   with_file:
     - "public_keys/{{ public_key }}"
+
+- name: add screenrc
+  ansible.builtin.template:
+    src: screenrc.j2
+    dest: "/home/{{ admin_user }}/.screenrc"
+    owner: "{{ admin_user }}"
+    group: "{{ admin_group }}"
+    mode: '0640'
