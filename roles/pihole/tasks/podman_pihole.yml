@@ -120,7 +120,6 @@
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
   when: container_state.changed
   register: files_systemctl_debug
-  notify: reload nginx
 
 - name: debug
   ansible.builtin.debug:

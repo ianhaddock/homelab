@@ -1,0 +1,30 @@
+# PiHole Update Playbook
+---
+
+### RPi2B ###
+- hosts: rpi2b
+  become: true
+
+  roles:
+    - pihole
+
+  handlers:
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+
+
+### devbox ###
+
+- hosts: devbox
+  become: true
+
+  roles:
+    - pihole-clone
+
+  handlers:
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
