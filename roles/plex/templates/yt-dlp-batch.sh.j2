@@ -91,7 +91,7 @@ echo "[info] Target: $DIRECTORY";
 # Download a youtube-DL compatible h264 (avc) video file, subtitles, metadata
 /usr/local/sbin/yt-dlp \
     $quiet_or_verbose \
-    --abort-on-error \
+    --no-abort-on-error \
     --abort-on-unavailable-fragments \
     --limit-rate $RATE_LIMIT \
     --max-sleep-interval $SLEEP_MAX \
