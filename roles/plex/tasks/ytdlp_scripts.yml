@@ -22,10 +22,11 @@
     group: "{{ app_group }}"
     mode: '0740'
 
-- name: create log file
-  ansible.builtin.file:
-    state: touch
-    path: /var/log/yt-dlp-batch.log
+- name: create yt-dlp-batch log file
+  ansible.builtin.copy:
+    content: ""
+    dest: /var/log/yt-dlp-batch.log
+    force: false
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
     mode: '0644'
