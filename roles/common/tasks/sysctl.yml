@@ -1,6 +1,6 @@
 # sysctl.yml
 ---
-- name: add sysctl local.conf
+- name: add sysctl local.conf to set vmswappiness
   ansible.builtin.template:
     src: 00-local.conf.j2
     dest: /etc/sysctl.d/00-local.conf
@@ -8,7 +8,7 @@
     group: root
     mode: '0640'
 
-- name: add sysctl network.conf
+- name: add sysctl network.conf to adjust ipv4 filtering
   ansible.builtin.template:
     src: 00-network.conf.j2
     dest: /etc/sysctl.d/00-network.conf
