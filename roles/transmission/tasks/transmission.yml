@@ -47,6 +47,7 @@
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
     image: lscr.io/linuxserver/transmission:latest
+    ip: "{{ container_ip }}"
     ports:
       - "{{ app_port }}:9091/tcp"
       - "{{ app_data_port }}:51412/udp"

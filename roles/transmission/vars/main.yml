@@ -10,5 +10,7 @@ app_port: 9091
 app_data_port: 51412
 app_media: "/mnt/transmission"
 
+container_ip: '10.88.0.23'
+
 blocklist_enabled: 'true'
 blocklist: 'https://github.com/Naunter/BT_BlockLists/releases/download/v.1/bt_blocklists.gz'
