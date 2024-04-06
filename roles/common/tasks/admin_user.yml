@@ -60,10 +60,16 @@
   with_file:
     - "public_keys/{{ public_key }}"
 
-- name: add screenrc
+- name: .add screenrc
   ansible.builtin.template:
     src: screenrc.j2
     dest: "/home/{{ admin_user }}/.screenrc"
     owner: "{{ admin_user }}"
     group: "{{ admin_group }}"
     mode: '0640'
+
+- name: add w to .bashrc
+  ansible.builtin.lineinfile:
+    path: "/home/{{ admin_user }}/.bashrc"
+    regexp: '^w$'
+    line: 'w  # show w on login'
