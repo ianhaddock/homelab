@@ -1,0 +1,82 @@
+# See smb.conf.example for a more detailed config file or
+# read the smb.conf manpage.
+# Run 'testparm' to verify the config is correct after
+# you modified it.
+#
+# Note:
+# SMB1 is disabled by default. This means clients without support for SMB2 or
+# SMB3 are no longer able to connect to smbd (by default).
+
+[global]
+        workgroup = SAMBA
+        security = user
+
+        passdb backend = tdbsam
+
+;       ref: wiki.samba.org/index.php/Configure_Samba_to_Work_Better_with_Mac_OS_X
+        vfs objects = fruit streams_xattr  
+        fruit:metadata = stream
+        fruit:model = MacSamba
+        fruit:posix_rename = yes 
+        fruit:zero_file_id = yes
+        fruit:veto_appledouble = no
+        fruit:nfs_aces = no
+        fruit:wipe_intentionally_left_blank_rfork = yes 
+        fruit:delete_empty_adfiles = yes 
+
+;        printing = cups
+;        printcap name = cups
+;        load printers = yes
+;        cups options = raw
+
+;[homes]
+;        comment = Home Directories
+;        valid users = %S, %D%w%S
+;        browseable = No
+;        read only = No
+;        inherit acls = Yes
+
+;[printers]
+;        comment = All Printers
+;        path = /var/tmp
+;        printable = Yes
+;        create mask = 0600
+;        browseable = No
+
+;[print$]
+;        comment = Printer Drivers
+;        path = /var/lib/samba/drivers
+;        write list = @printadmin root
+;        force group = @printadmin
+;        create mask = 0664
+;        directory mask = 0775
+
+[{{ app_name }}]
+    comment = Timecapsule
+    path = {{ app_path }}/{{ app_name }}/backups
+    valid users = {{ app_user }}
+    write list = {{ app_user }}
+    guest ok = no
+    read only = no
+    vfs objects = catia fruit streams_xattr
+    fruit:time machine = yes
+    fruit:time machine max size = 650G
+
+[media]
+    comment = Media Files
+    path = /mnt/media
+    guest ok = yes
+    read list = guest
+    write list = plex
+    valid users = plex
+    mangled names = no
+    spotlight backend = elasticsearch
+
+[archives]
+    comment = Archives
+    path = /tank/storage
+    guest ok = no
+    write list = ian
+    valid users = ian
+    mangled names = no
+    spotlight backend = elasticsearch

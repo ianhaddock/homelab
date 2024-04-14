@@ -28,6 +28,19 @@
 # Change this to the workgroup/NT-domain name your Samba server will part of
    workgroup = WORKGROUP
 
+
+# add MacOS support
+;       ref: wiki.samba.org/index.php/Configure_Samba_to_Work_Better_with_Mac_OS_X
+        vfs objects = fruit streams_xattr  
+        fruit:metadata = stream
+        fruit:model = MacSamba
+        fruit:posix_rename = yes 
+        fruit:zero_file_id = yes
+        fruit:veto_appledouble = no
+        fruit:nfs_aces = no
+        fruit:wipe_intentionally_left_blank_rfork = yes 
+        fruit:delete_empty_adfiles = yes 
+
 #### Networking ####
 
 # The specific set of interfaces / networks to bind to
@@ -236,7 +249,7 @@
 
 [{{ app_name }}]
     comment = Timecapsule
-    path = /mnt/hdd/{{ app_name }}/backups
+    path = {{ app_path }}/{{ app_name }}/backups
     valid users = {{ app_user }}
     write list = {{ app_user }}
     guest ok = no
@@ -253,6 +266,7 @@
     write list = plex
     valid users = plex
     mangled names = no
+    spotlight backend = elasticsearch
 
 [archives]
     comment = Archives
@@ -261,3 +275,4 @@
     write list = ian
     valid users = ian
     mangled names = no
+    spotlight backend = elasticsearch

@@ -7,7 +7,7 @@ Using references from [ovechkin.xyz][303] and [stackoverflow][304].
 ### As implemented
 * enabled on restart
 * set to 1Tb max storage space
-* disable ipv6_rpfilter on rpi2b
+* disables ipv6_rpfilter
 
 ### Why disable ipv6 in firewalld
 Log spam, a repeating kernel message 'ipv6 route cache full' ([bug reference][301]) ([serverfault reference][302])

@@ -6,6 +6,6 @@ app_uid: 1209
 app_group: timecap
 app_gid: 1209
 
-app_name: timecapsule
+app_name: 'timecapsule'
 
-
+app_path: '/mnt'
