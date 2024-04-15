@@ -32,7 +32,10 @@
       - bonnie++  # disk benchmarking
       - samba
       - cifs-utils
+      - nvme-cli
     state: present
+  tags:
+    - packages
 
 - name: lock kernel versions to zfs supported ones
   ansible.builtin.template:
