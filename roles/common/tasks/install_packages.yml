@@ -4,12 +4,16 @@
   ansible.builtin.package:
     name: '*'
     state: latest  # noqa package-latest
+  tags:
+    - packages
 
 - name: install epel-release
   ansible.builtin.package:  # noqa package-latest
     name: epel-release
     state: latest
   when: ansible_os_family == 'RedHat'
+  tags:
+    - packages
 
 - name: add rpm fusion free key
   ansible.builtin.rpm_key:
@@ -17,6 +21,8 @@
     fingerprint: "EDC0 0FE7 418C 9DF7 EF49  91A4 7403 EA33 2964 58F3"
     state: present
   when: ansible_os_family == 'RedHat'
+  tags:
+    - packages
 
 - name: add rpm fusion nonfree key
   ansible.builtin.rpm_key:
@@ -24,18 +30,24 @@
     fingerprint: "BB24 128A 4BB3 C335 2C0B  75A2 E417 4E6B AAB2 12EA"
     state: present
   when: ansible_os_family == 'RedHat'
+  tags:
+    - packages
 
 - name: add rpm fusion free repo
   ansible.builtin.dnf:
     name: "https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-{{ ansible_facts.distribution_major_version }}.noarch.rpm"
     state: present
   when: ansible_os_family == 'RedHat'
+  tags:
+    - packages
 
 - name: add rpm fusion nonfree repo
   ansible.builtin.dnf:
     name: "https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-{{ ansible_facts.distribution_major_version }}.noarch.rpm"
     state: present
   when: ansible_os_family == 'RedHat'
+  tags:
+    - packages
 
 - name: install utility packages general
   ansible.builtin.package:
@@ -51,8 +63,11 @@
       - lsof
       - iotop
       - cpuid
+      - speedtest-cli
     state: latest  # noqa package-latest
   when: ansible_os_family == 'RedHat'
+  tags:
+    - packages
 
 - name: install utility packages rpi2b
   ansible.builtin.package:
@@ -64,8 +79,11 @@
       - tcpdump
       - telnet
       - tiptop
+      - speedtest-cli
     state: latest  # noqa package-latest
   when: ansible_os_family == 'Debian'
+  tags:
+    - packages
 
 - name: install container tools
   ansible.builtin.package:
@@ -73,6 +91,8 @@
       - podman
     state: latest  # noqa package-latest
   when: containers
+  tags:
+    - packages
 
 - name: set rootless storage path
   ansible.builtin.lineinfile:
