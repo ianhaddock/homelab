@@ -14,10 +14,14 @@
 - name: install transmission
   ansible.builtin.import_tasks: transmission.yml
   when: containers and not ansible_facts.machine == "armv7l"
+  tags:
+    - transmission
 
 - name: install transmission rpi2b
   ansible.builtin.import_tasks: rpi2b_transmission.yml
   when: ansible_facts.machine == "armv7l"
+  tags:
+    - transmission
 
 - name: open app data port on firewall
   ansible.builtin.firewalld:
