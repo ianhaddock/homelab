@@ -20,14 +20,14 @@
     permanent: true
     state: enabled
   with_items:
-    - 'rule family=ipv4 forward-port port=53 protocol=tcp to-port=5353'
-    - 'rule family=ipv4 forward-port port=53 protocol=udp to-port=5353'
-    - 'rule family=ipv4 forward-port port=67 protocol=tcp to-port=6767'
+    - 'rule family=ipv4 forward-port port=53 protocol=tcp to-port=5335'
+    - 'rule family=ipv4 forward-port port=53 protocol=udp to-port=5335'
+    - 'rule family=ipv4 forward-port port=67 protocol=tcp to-port=6776'
   when: not pihole_limit
 
 - name: limit firewall port 53/tcp to pihole users
   ansible.builtin.firewalld:
-    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=53 protocol=tcp to-port=5353'
+    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=53 protocol=tcp to-port=5335'
     immediate: true
     permanent: true
     state: enabled
@@ -37,7 +37,7 @@
 
 - name: limit firewall port 53/udp to pihole users
   ansible.builtin.firewalld:
-    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=53 protocol=udp to-port=5353'
+    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=53 protocol=udp to-port=5335'
     immediate: true
     permanent: true
     state: enabled
@@ -47,7 +47,7 @@
 
 - name: limit firewall port 67/tcp to pihole users
   ansible.builtin.firewalld:
-    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=67 protocol=tcp to-port=6767'
+    rich_rule: 'rule family=ipv4 source address={{ item }} forward-port port=67 protocol=tcp to-port=6776'
     immediate: true
     permanent: true
     state: enabled
@@ -76,9 +76,9 @@
     image: docker.io/pihole/pihole:latest
     image_strict: true
     ports:
-      - "5353:53/tcp"
-      - "5353:53/udp"
-      - "6767:67/tcp"
+      - "5335:53/tcp"
+      - "5335:53/udp"
+      - "6776:67/tcp"
       - "{{ app_port }}:80/tcp"
     volumes:
       - "{{ containers_path }}/{{ app_name }}/etc-dnsmasq.d:/etc/dnsmasq.d"
