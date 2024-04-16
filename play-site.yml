@@ -75,6 +75,13 @@
     - name: restart smb
       ansible.builtin.systemd:
         name: smb
+        enabled: true
+        state: restarted
+
+    - name: restart avahi
+      ansible.builtin.systemd:
+        name: avahi-daemon
+        enabled: true
         state: restarted
 
     - name: reload network Debian
@@ -82,6 +89,10 @@
         name: networking
         state: restarted
 
+    - name: reload firewall
+      ansible.builtin.systemd:
+        name: firewalld
+        state: restarted
 
 ### devbox ###
 - hosts: devbox
@@ -112,4 +123,11 @@
     - name: restart smb
       ansible.builtin.systemd:
         name: smb
+        enabled: true
+        state: restarted
+
+    - name: restart avahi
+      ansible.builtin.systemd:
+        name: avahi-daemon
+        enabled: true
         state: restarted
