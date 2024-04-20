@@ -43,7 +43,9 @@
     msg: "{{ image_pull }}"
   when: verbose
 
+  # ref: https://hub.docker.com/r/plexinc/pms-docker/
   # image does not support keep-id, s6's abc user perms error s6-setuidgid
+  # to update: restart container, script should pull latest version
 - name: start plex container:plexpass
   become_user: "{{ app_user }}"
   containers.podman.podman_container:
