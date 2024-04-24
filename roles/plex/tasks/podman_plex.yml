@@ -9,7 +9,6 @@
     state: directory
   with_items:
     - "{{ containers_path }}/{{ app_name }}/config"
-    - "{{ containers_path }}/{{ app_name }}/transcode"
     - "{{ media_path }}/audiobooks"
     - "{{ media_path }}/lemans"
     - "{{ media_path }}/movies"
@@ -20,7 +19,6 @@
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
     - "{{ media_path }}/yt_tunes"
-
 
 - name: create links in /mnt
   ansible.builtin.file:
@@ -45,7 +43,6 @@
 
   # ref: https://hub.docker.com/r/plexinc/pms-docker/
   # image does not support keep-id, s6's abc user perms error s6-setuidgid
-  # to update: restart container, script should pull latest version
 - name: start plex container:plexpass
   become_user: "{{ app_user }}"
   containers.podman.podman_container:
@@ -118,3 +115,12 @@
   until: result.status == 200
   retries: 720  # 720 * 5 = 1 hour
   delay: 5
+
+- name: user crontab: restart plex container weekly to autoupdate
+  become_user: "{{ app_user }}"
+  ansible.builtin.cron:
+    name: restart container to force updates
+    minute: "5"
+    hour: "4"
+    weekday: "5"
+    job: "/usr/bin/podman restart plex"
