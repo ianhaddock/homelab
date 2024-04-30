@@ -116,7 +116,7 @@
   retries: 720  # 720 * 5 = 1 hour
   delay: 5
 
-- name: user crontab: restart plex container weekly to autoupdate
+- name: user crontab restart plex container weekly to autoupdate
   become_user: "{{ app_user }}"
   ansible.builtin.cron:
     name: restart container to force updates
