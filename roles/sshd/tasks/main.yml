@@ -41,9 +41,12 @@
     - "life is not a problem to be solved; it is a reality to be experienced."
     - "Come on, you scuzzy data, be in there."
     - "Never tell me the odds!"
-    - "I never asked for this... they saved me, but I'm not sure saved is the right word."
+    - "I never asked for this..."
     - "No. I'm, I'm simply saying that life, uh... finds a way."
     - "The power of the force has stopped you, you hosers."
+    - "All that is gold does not glitter, not all those who wander are lost."
+    - "Spared no expense."
+    - "The old that is strong does not wither, deep roots are not reached by the frost."
 
 - name: enable motd on RedHat
   ansible.builtin.lineinfile:
