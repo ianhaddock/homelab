@@ -7,4 +7,5 @@ app_port: 4948
 app_user: 'munin'
 app_group: 'munin'
 
-munin_path: '/var/cache/munin/www/'
+#munin_path: '/var/cache/munin/www/'  # path on the rpi2b
+munin_path: '/var/www/html/munin/'  # path on centos
