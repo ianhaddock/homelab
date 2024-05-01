@@ -41,7 +41,7 @@
     - file_store
     - gitea
     - blog
-    - pihole
+    #    - pihole
 
   handlers:
     - name: reload nginx
@@ -61,10 +61,10 @@
     - irssi
     - wakeonwin
     - piglow
-    - munin-server
+    - munin-node
     - pihole
-    - plex
-    - timecap
+    #    - plex
+    #    - timecap
 
   handlers:
     - name: reload nginx
@@ -104,7 +104,7 @@
     - base-nginx
     - ac_backup
     - gitea
-    - munin-node
+    - munin-server
     - jenkins
     - jenkins-agent
     - pihole-clone
