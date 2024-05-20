@@ -60,7 +60,6 @@ cidr_allow {{ munin_server_ip }}/32
 
 # Which address to bind to;
 host *
-#host 127.0.0.1
 
 # And which port
-port 4949
+port {{ app_port }} 

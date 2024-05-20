@@ -9,10 +9,94 @@
   with_items:
     - "{{ app_port }}/tcp"
 
-- name: install munin on centos stream 9
-  ansible.builtin.include_tasks: centos_munin_install.yml
+- name: install RedHat munin packages
+  ansible.builtin.package:
+    enablerepo: crb
+    name:
+      - perl(Net::CIDR)
+      - perl(DBD::mysql)
+      - munin-node
+      - munin-common
+    state: latest
   when: ansible_os_family == "RedHat"
 
-- name: install munin on rpi2b
-  ansible.builtin.include_tasks: rpi2b_munin_install.yml
+- name: install Debian munin-node packages
+  ansible.builtin.package:
+    name:
+      - munin-node
+      - lm-sensors
+      - liblwp-protocol-https-perl
+      - libauthen-ntlm-perl
+    state: latest
   when: ansible_os_family == "Debian"
+
+- name: create log folder for munin-node
+  ansible.builtin.file:
+    path: /var/log/munin-node
+    owner: root
+    group: root
+    mode: '755'
+    state: directory
+
+- name: add munin-node.conf template
+  ansible.builtin.template:
+    src: 'munin-node.conf.j2'
+    dest: '/etc/munin/munin-node.conf'
+    owner: munin
+    group: munin
+    mode: '0640'
+
+- name: set hostname in munin.conf
+  ansible.builtin.lineinfile:
+    path: '/etc/munin/munin.conf'
+    regexp: '^\[localhost.localdomain\]'
+    line: '[{{ hostname }}]'
+
+- name: add munin local.conf template
+  ansible.builtin.template:
+    src: 'munin_local_conf.j2'
+    dest: '/etc/munin/munin-conf.d/local.conf'
+    owner: munin
+    group: munin
+    mode: '0640'
+
+- name: add munin plugins-conf template
+  ansible.builtin.template:
+    src: '10-plugins.j2'
+    dest: '/etc/munin/plugin-conf.d/10-plugins'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: setup nginx status page for munin to pull from
+  ansible.builtin.template:
+    src: 'nginx_status.conf.j2'
+    dest: '/etc/nginx/conf.d/nginx_status.conf'
+    owner: root
+    group: root
+    mode: '0640'
+
+- name: add plugin update script
+  ansible.builtin.template:
+    src: 'plugin_update.sh.j2'
+    dest: '/etc/munin/plugin_update.sh'
+    owner: munin
+    group: munin
+    mode: '0740'
+  register: plugin_update_stat
+
+- name: update enabled plugins
+  ansible.builtin.command:
+    cmd: /etc/munin/plugin_update.sh
+  when: plugin_update_stat.changed
+
+- name: plugin update debug
+  ansible.builtin.debug:
+    msg: "{{ plugin_update_stat }}"
+  when: verbose and plugin_update_stat.changed
+
+- name: enable and start munin-node
+  ansible.builtin.systemd:
+    name: munin-node
+    enabled: true
+    state: started

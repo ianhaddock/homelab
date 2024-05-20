@@ -2,4 +2,4 @@
 # update loaded munin plugins
 # added by ansible {{ ansible_date_time.date }}
 
-munin-node-configure --shell --remove-also | sh -x
+munin-node-configure --suggest --shell --remove-also 2>/dev/null | sh -x
