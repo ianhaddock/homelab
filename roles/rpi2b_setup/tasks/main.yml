@@ -9,26 +9,6 @@
     mode: '0640'
   notify: reload network Debian
 
-- name: create folder structure in /mnt
-  ansible.builtin.file:
-    path: "{{ item.path }}/{{ item.dir }}"
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-  loop:
-    - {path: /mnt, dir: hdd}
-
-- name: create links in /mnt
-  ansible.builtin.file:
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
-    owner: root
-    group: root
-    state: link
-  loop:
-    - {src: /mnt/hdd/media, dest: /mnt/media}
-
   #   # disable bright red led
   #   # ref: https://forums.raspberrypi.com/viewtopic.php?t=338980
   #   dtparam=pwr_led_trigger=none
