@@ -4,7 +4,14 @@ server {
   server_name {{ app_name }}.{{ site_fqdn }};
   client_max_body_size 256m;
 
-  root /var/www/html/munin;
+
+  # limit access by source IP
+  {% for source_ip in limit_source_ips %}
+  allow {{ source_ip }};
+  {% endfor %}
+  deny all;
+
+   root {{ munin_path }};
 
   index index.html;
 

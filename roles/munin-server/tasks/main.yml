@@ -1,10 +1,5 @@
 # munin install main.yml
 ---
-- name: set domain pages
-  ansible.builtin.include_role:
-    name: base-nginx
-    tasks_from: domain_pages.yml
-    public: true
 
 - name: install munin on centos stream 9
   ansible.builtin.include_tasks: centos_munin_install.yml
@@ -13,3 +8,34 @@
 - name: install munin on rpi2b
   ansible.builtin.include_tasks: rpi2b_munin_install.yml
   when: ansible_os_family == "Debian"
+
+- name: set domain pages
+  ansible.builtin.include_role:
+    name: base-nginx
+    tasks_from: domain_pages.yml
+    public: true
+
+- name: set htpassword file
+  become_user: root
+  ansible.builtin.command:
+    cmd: 'htpasswd -bc {{ nginx_path }}/htpasswd {{ munin_username }} {{ munin_password }}'
+
+- name: setup https nginx munin subdomain
+  ansible.builtin.template:
+    src: 'nginx_munin_conf_https.j2'
+    dest: '{{ nginx_path }}conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
+    owner: root
+    group: root
+    mode: '0640'
+  when: cert_enabled
+  notify: reload nginx
+
+- name: setup http nginx munin subdomain
+  ansible.builtin.template:
+    src: 'nginx_munin_conf_http.j2'
+    dest: '{{ nginx_path }}/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
+    owner: root
+    group: root
+    mode: '0640'
+  when: not cert_enabled
+  notify: reload nginx

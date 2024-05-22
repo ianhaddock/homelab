@@ -1,11 +1,9 @@
 # munin vars main.yml
 ---
-
 app_name: 'munin'
-app_port: 4948
+app_port: 4949
 
 app_user: 'munin'
 app_group: 'munin'
 
-#munin_path: '/var/cache/munin/www/'  # path on the rpi2b
-munin_path: '/var/www/html/munin/'  # path on centos
+nginx_path: '/etc/nginx'

@@ -1,7 +1,6 @@
 # centos steam 9 munin install
 # https://raymii.org/s/tutorials/Munin_optimalization_on_Debian.html
 ---
-
 - name: install munin packages
   ansible.builtin.package:
     enablerepo: crb
@@ -14,33 +13,6 @@
       - munin-nginx
       - munin-cgi
     state: latest
-
-- name: edit munin-node.conf
-  ansible.builtin.lineinfile:
-    path: '/etc/munin/munin-node.conf'
-    regexp: '^#cidr_allow 127.0.0.1/32'
-    line: 'cidr_allow 127.0.0.1/32'
-
-- name: add munin local.conf template
-  ansible.builtin.template:
-    src: 'munin_local_conf.j2'
-    dest: '/etc/munin/munin-conf.d/local.conf'
-    owner: munin
-    group: munin
-    mode: '0640'
-
-- name: add munin plugins-conf template
-  ansible.builtin.template:
-    src: '10-plugins.j2'
-    dest: '/etc/munin/plugin-conf.d/10-plugins'
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: set htpassword file
-  become_user: root
-  ansible.builtin.command:
-    cmd: 'htpasswd -bc /etc/nginx/htpasswd {{ munin_username }} {{ munin_password }}'
 
 - name: add munin-graph script
   ansible.builtin.template:
@@ -79,31 +51,6 @@
     state: restarted
   when: rrdcached_systemd_status.changed
 
-- name: add plugin update script
-  ansible.builtin.template:
-    src: 'plugin_update.sh.j2'
-    dest: '/etc/munin/plugin_update.sh'
-    owner: munin
-    group: munin
-    mode: '0740'
-
-  # should run on change to config
-- name: update enabled plugins
-  ansible.builtin.command:
-    cmd: /etc/munin/plugin_update.sh
-  register: plugin_update_stat
-
-- name: plugin update debug
-  ansible.builtin.debug:
-    msg: "{{ plugin_update_stat }}"
-  when: verbose
-
-- name: enable and start munin-node
-  ansible.builtin.systemd:
-    name: munin-node
-    enabled: true
-    state: restarted
-
 - name: enable and start munin-cgi-graph socket
   ansible.builtin.systemd:
     name: munin-cgi-graph.socket
@@ -135,30 +82,3 @@
     name: munin munin-graph job
     minute: "7"
     job: "if [ -x /usr/bin/munin-graph ]; then /bin/ionice -c 3 /bin/nice -n 19 /usr/bin/munin-graph; fi"
-
-- name: setup nginx status page for munin
-  ansible.builtin.template:
-    src: 'nginx_status.conf.j2'
-    dest: '/etc/nginx/conf.d/nginx_status.conf'
-    owner: nginx
-    group: nginx
-    mode: '0640'
-
-- name: setup nginx https munin subdomain
-  ansible.builtin.template:
-    src: 'nginx_munin_conf_https.j2'
-    dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
-    owner: nginx
-    group: nginx
-    mode: '0640'
-  when: cert_enabled
-
-- name: setup nginx http munin subdomain
-  ansible.builtin.template:
-    src: 'nginx_munin_conf_http.j2'
-    dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
-    owner: nginx
-    group: nginx
-    mode: '0640'
-  when: not cert_enabled
-

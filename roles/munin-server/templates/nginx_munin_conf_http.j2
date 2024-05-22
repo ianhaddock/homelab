@@ -5,7 +5,9 @@ server {
   client_max_body_size 256m;
 
   # limit access by source IP
-  allow 192.168.1.0/24;
+  {% for source_ip in limit_source_ips %}
+  allow {{ source_ip }};
+  {% endfor %}
   deny all;
 
   root {{ munin_path }};

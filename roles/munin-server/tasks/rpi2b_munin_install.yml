@@ -13,38 +13,6 @@
       - libauthen-ntlm-perl
     state: latest
 
-- name: add cidr_allow localhost in munin-node.conf
-  ansible.builtin.lineinfile:
-    path: '/etc/munin/munin-node.conf'
-    regexp: '^# cidr_allow 127.0.0.1/32'
-    line: 'cidr_allow 127.0.0.1/32'
-
-- name: comment out wildcard bind address in munin-node.conf
-  ansible.builtin.lineinfile:
-    path: '/etc/munin/munin-node.conf'
-    regexp: '^host *'
-    line: '# host *'
-
-- name: add 127.0.0.1 bind address in munin-node.conf
-  ansible.builtin.lineinfile:
-    path: '/etc/munin/munin-node.conf'
-    regexp: '^# host 127.0.0.1$'
-    line: 'host 127.0.0.1'
-
-- name: set hostname in munin.conf
-  ansible.builtin.lineinfile:
-    path: '/etc/munin/munin.conf'
-    regexp: '^\[localhost.localdomain\]'
-    line: '[{{ hostname }}]'
-
-- name: add munin local.conf template
-  ansible.builtin.template:
-    src: 'munin_local_conf.j2'
-    dest: '/etc/munin/munin-conf.d/local.conf'
-    owner: munin
-    group: munin
-    mode: '0640'
-
 - name: add munin devbox.conf template
   ansible.builtin.template:
     src: 'munin-conf.d-devbox.conf.j2'
@@ -52,19 +20,6 @@
     owner: munin
     group: munin
     mode: '0640'
-
-- name: add munin plugins-conf template
-  ansible.builtin.template:
-    src: '10-plugins.j2'
-    dest: '/etc/munin/plugin-conf.d/10-plugins'
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: set htpassword file
-  become_user: root
-  ansible.builtin.command:
-    cmd: 'htpasswd -bc /etc/nginx/htpasswd {{ munin_username }} {{ munin_password }}'
 
 - name: add munin-graph script for munin user crontab
   ansible.builtin.template:
@@ -132,31 +87,6 @@
     group: root
     mode: '0640'
 
-- name: add plugin update script
-  ansible.builtin.template:
-    src: 'plugin_update.sh.j2'
-    dest: '/etc/munin/plugin_update.sh'
-    owner: munin
-    group: munin
-    mode: '0740'
-
-  # should run on change to config
-- name: update enabled plugins
-  ansible.builtin.command:
-    cmd: /etc/munin/plugin_update.sh
-  register: plugin_update_stat
-
-- name: plugin update debug
-  ansible.builtin.debug:
-    msg: "{{ plugin_update_stat }}"
-  when: verbose
-
-- name: enable and start munin-node
-  ansible.builtin.systemd:
-    name: munin-node
-    enabled: true
-    state: restarted
-
 - name: enable and start munin-cgi-graph socket
   ansible.builtin.systemd:
     name: munin-cgi-graph.socket
@@ -205,23 +135,3 @@
     name: munin munin-graph job
     minute: "7"
     job: "if [ -x /usr/bin/munin-graph ]; then /bin/ionice -c 3 /bin/nice -n 19 /usr/bin/munin-graph; fi"
-
-- name: setup https nginx munin subdomain
-  ansible.builtin.template:
-    src: 'nginx_munin_conf_https.j2'
-    dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
-    owner: root
-    group: root
-    mode: '0640'
-  when: cert_enabled
-  notify: reload nginx
-
-- name: setup http nginx munin subdomain
-  ansible.builtin.template:
-    src: 'nginx_munin_conf_http.j2'
-    dest: '/etc/nginx/conf.d/{{ app_name }}.{{ site_fqdn }}.conf'
-    owner: root
-    group: root
-    mode: '0640'
-  when: not cert_enabled
-  notify: reload nginx
