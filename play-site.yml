@@ -63,8 +63,6 @@
     - piglow
     - munin-node
     - pihole
-    #    - plex
-    #    - timecap
 
   handlers:
     - name: reload nginx
@@ -104,6 +102,7 @@
     - base-nginx
     - ac_backup
     - gitea
+    - munin-node
     - munin-server
     - jenkins
     - jenkins-agent
