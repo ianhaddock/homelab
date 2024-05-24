@@ -20,7 +20,7 @@
     - "{{ app_media }}/complete"
     - "{{ app_media }}/incomplete"
 
-- name: create watch_folder with open permissions 
+- name: create watch_folder with open permissions
   ansible.builtin.file:
     path: "{{ item }}"
     owner: "{{ app_user }}"
