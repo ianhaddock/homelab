@@ -19,6 +19,15 @@
     - "{{ containers_path }}/{{ app_user }}/conf"
     - "{{ app_media }}/complete"
     - "{{ app_media }}/incomplete"
+
+- name: create watch_folder with open permissions 
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0777'
+    state: directory
+  with_items:
     - "{{ app_media }}/watch_folder"
 
 - name: install transmission.json file
