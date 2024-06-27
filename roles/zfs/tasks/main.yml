@@ -31,13 +31,14 @@
       - fio  # disk benchmarking
       - bonnie++  # disk benchmarking
       - samba
+      - samba-client
       - cifs-utils
       - nvme-cli
     state: present
   tags:
     - packages
 
-- name: lock kernel versions to zfs supported ones
+- name: don't uninstall zfs when a new kernel version is installed
   ansible.builtin.template:
     src: dnf_protected_zfs.j2
     dest: /etc/dnf/protected.d/zfs.conf
