@@ -1,6 +1,6 @@
 # Plex Update Playbook
 ---
-- hosts: rpi2b, devbox
+- hosts: devbox
   become: true
 
   roles:

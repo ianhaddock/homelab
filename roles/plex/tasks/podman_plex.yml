@@ -15,7 +15,6 @@
     - "{{ media_path }}/music"
     - "{{ media_path }}/staging"
     - "{{ media_path }}/tvshows"
-    - "{{ media_path }}/wec"
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
     - "{{ media_path }}/yt_tunes"
@@ -33,7 +32,7 @@
 - name: pull latest plex image
   become_user: "{{ app_user }}"
   containers.podman.podman_image:
-    name: docker.io/plexinc/pms-docker:plexpass
+    name: "docker.io/plexinc/pms-docker:plexpass"
   register: image_pull
 
 - name: debug
@@ -76,17 +75,6 @@
 - name: debug plex podman
   ansible.builtin.debug:
     msg: "{{ container_state }}"
-  when: verbose
-
-- name: prune old images
-  become_user: "{{ app_user }}"
-  ansible.builtin.command:
-    cmd: 'podman image prune -f -a'
-  register: prune_debug
-
-- name: debug
-  ansible.builtin.debug:
-    msg: "{{ prune_debug }}"
   when: verbose
 
 - name: enable and start
