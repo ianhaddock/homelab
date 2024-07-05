@@ -30,6 +30,7 @@ Utilities:
 * wakeonwin: bash alias file to wake my PC
 * rpi2b_setup: rpi2b specific tweaks
 * munin-node: resource monitor
+* flexget: transmission automation
 * piglow: support for PiGlow hardware on Raspberry Pi
 
 Apps: 
