@@ -30,7 +30,7 @@
   with_items:
     - "{{ app_media }}/watch_folder"
 
-- name: install transmission.json file
+- name: install transmission settings.json file
   ansible.builtin.template:
     src: templates/transmission-settings.json.j2
     dest: "{{ containers_path }}/{{ app_user }}/conf/settings.json"
