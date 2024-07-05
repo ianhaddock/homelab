@@ -23,6 +23,11 @@
   tags:
     - transmission
 
+- name: install flexget
+  ansible.builtin.import_tasks: flexget.yml
+  tags:
+    - flexget
+
 - name: open app data port on firewall
   ansible.builtin.firewalld:
     port: "{{ item }}"

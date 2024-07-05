@@ -1,0 +1,37 @@
+# flexget config.yml
+---
+schedules:
+  - tasks: [raspberrypios]
+    interval:
+      days: 7
+      jitter: 60
+
+  - tasks: [formula1-task, wec-task]
+    interval:
+      minutes: 6
+      jitter: 60
+
+tasks:
+  raspberrypios:
+    rss:
+      url: "https://downloads.raspberrypi.org/rss.xml"
+    regexp:
+      accept:
+        - "{{ ansible_date_time.year }}"
+    download: "/watch_folder"
+
+  formula1-task:
+    rss:
+      url: "{{ rss_2024_f1 }}"
+    accept_all: true
+    download: "/watch_folder"
+
+  wec-task:
+    rss:
+      url: "{{ rss_2024_wec }}"
+    regexp:
+      accept:
+        - 'Race'
+        - 'FP'
+    download: "/watch_folder"
+
