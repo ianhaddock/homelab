@@ -7,9 +7,10 @@ schedules:
       jitter: 60
 
   - tasks: [formula1-task, wec-task]
-    interval:
-      minutes: 6
-      jitter: 60
+    schedule:
+      minute: "*/5"
+      day_of_week: thu,fri,sat,sun,mon
+      jitter: 30
 
 tasks:
   raspberrypios:
