@@ -25,7 +25,7 @@
     recreate: true
     name: flexget
     hostname: "{{ hostname }}"
-    image: docker.io/ianhaddock/flexget:latest
+    image: ghcr.io/ianhaddock/flexget:latest
     volumes:
       - "{{ containers_path }}/{{ app_user }}/flexget_conf:/config:Z"
       - "{{ app_media }}/watch_folder:/watch_folder:z"
