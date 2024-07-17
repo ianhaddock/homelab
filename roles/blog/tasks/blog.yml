@@ -12,13 +12,6 @@
     - "{{ containers_path }}/{{ app_name }}/instance"
     - "{{ containers_path }}/{{ app_name }}/custom"
 
-- name: get app from git
-  become_user: "{{ app_user }}"
-  ansible.builtin.git:
-    repo: "{{ app_git_repo }}"
-    dest: "{{ containers_path }}/{{ app_name }}/app"
-    force: true
-
 - name: unarchive custom files if available
   ansible.builtin.unarchive:
     src: "{{ file_server }}/blog.zip"
@@ -29,22 +22,6 @@
     remote_src: true
   ignore_errors: true
 
-- name: run dockerfile
-  become_user: "{{ app_user }}"
-  containers.podman.podman_image:
-    force: true
-    name: blog:v0.1
-    path: "{{ containers_path }}/{{ app_name }}/app"
-    build:
-      format: docker
-      cache: false
-  register: dockerfile_build_debug
-
-- name: debug dockerfile build
-  ansible.builtin.debug:
-    msg: "{{ dockerfile_build_debug }}"
-  when: verbose
-
 - name: pull blog container
   become_user: "{{ app_user }}"
   containers.podman.podman_container:
@@ -52,7 +29,7 @@
     force_restart: true
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
-    image: localhost/blog:v0.1
+    image: ghcr.io/ianhaddock/blog:latest
     ports:
       - "{{ app_port }}:5000/tcp"
     volumes:
@@ -63,7 +40,6 @@
 
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
-  when: dockerfile_build_debug.changed
   register: container_state
 
 - name: prune old images
