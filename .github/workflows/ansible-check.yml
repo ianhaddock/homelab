@@ -1,0 +1,28 @@
+name: Ansible Yaml Check
+run-name: Run Syntax Check on Ansible Playbook
+
+on:
+  push:
+    branches: [ $default-branch ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
+
+env:
+  #
+  PLAYBOOK: play-site.yml
+
+permissions:
+  contents: read
+
+jobs:
+  Run-Syntax-Check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: install ansible
+        run: sudo apt update && sudo apt install -y python3-pip && sudo pip3 install ansible
+
+      - name: Run ansible playbook syntax check
+        run: ansible-playbook ${{ env.PLAYBOOK }} -i development --syntax-check

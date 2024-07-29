@@ -1,3 +1,5 @@
+[![Ansible Yaml Check](https://github.com/ianhaddock/homelab/actions/workflows/ansible-check.yml/badge.svg)](https://github.com/ianhaddock/homelab/actions/workflows/ansible-check.yml)
+
 # Personal Infrastructure
 Build out for my systems.
 
