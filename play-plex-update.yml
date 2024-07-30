@@ -1,7 +1,0 @@
-# Plex Update Playbook
----
-- hosts: devbox
-  become: true
-
-  roles:
-    - plex

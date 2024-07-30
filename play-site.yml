@@ -98,7 +98,6 @@
 
   roles:
     - zfs
-    - kvm-host
     - base-nginx
     - ac_backup
     - gitea

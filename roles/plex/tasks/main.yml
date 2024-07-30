@@ -15,13 +15,19 @@
 - name: install plex container
   ansible.builtin.import_tasks: podman_plex.yml
   when: containers and ansible_os_family == "RedHat"
+  tags:
+    - plex
 
 - name: install plex on rpi2b
   ansible.builtin.import_tasks: rpi2b_plex.yml
   when: ansible_facts.machine == "armv7l"
+  tags:
+    - plex
 
 - name: install plex plugins
   ansible.builtin.import_tasks: plugins.yml
+  tags:
+    - plex
 
 - name: set plex container forward proxy and ports
   ansible.builtin.include_role:

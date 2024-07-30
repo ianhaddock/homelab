@@ -23,6 +23,8 @@
     app_name: "{{ clone_name }}"
     app_port: "{{ clone_port }}"
   when: containers and not ansible_facts.machine == "armv7l"
+  tags:
+    - pihole
 
 - name: check if pihole is installed on rpi2b
   ansible.builtin.stat:
@@ -40,11 +42,15 @@
     app_name: "{{ clone_name }}"
     app_port: "{{ clone_port }}"
   when: ansible_facts.machine == "armv7l" and not pihole_path_check.stat.exists
+  tags:
+    - pihole
 
 - name: update pihole if installed and running on rpi2b
   ansible.builtin.command:
     cmd: pihole -up
   when: ansible_facts.machine == "armv7l" and pihole_path_check.stat.exists
+  tags:
+    - pihole
 
 - name: set forward proxy and ports
   ansible.builtin.include_role:
