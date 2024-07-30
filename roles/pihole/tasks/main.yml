@@ -14,6 +14,8 @@
 - name: install pihole container
   ansible.builtin.import_tasks: podman_pihole.yml
   when: containers and not ansible_facts.machine == "armv7l"
+  tags:
+    - pihole
 
 - name: check if pihole is installed on rpi2b
   ansible.builtin.stat:
@@ -23,11 +25,15 @@
 - name: install pihole on rpi2b (armv7l)
   ansible.builtin.import_tasks: rpi2b_pihole.yml
   when: ansible_facts.machine == "armv7l" and not pihole_path_check.stat.exists
+  tags:
+    - pihole
 
 - name: update pihole if installed and running on rpi2b
   ansible.builtin.command:
     cmd: pihole -up
   when: ansible_facts.machine == "armv7l" and pihole_path_check.stat.exists
+  tags:
+    - pihole
 
 - name: set nginx forward proxy and access restriction
   ansible.builtin.include_role:

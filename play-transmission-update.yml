@@ -1,9 +1,0 @@
-# Transmission Playbook
----
-
-### devbox ###
-- hosts: devbox
-  become: true
-
-  roles:
-    - transmission
