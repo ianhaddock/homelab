@@ -7,6 +7,7 @@
 # https://openzfs.github.io/openzfs-docs/Getting%20Started/RHEL-based%20distro/index.html
 # https://docs.ansible.com/ansible/latest/collections/community/general/zfs_module.html
 # https://openzfs.github.io/openzfs-docs/man/master/8/zpool-create.8.html
+# https://man7.org/linux/man-pages/man5/dracut.conf.5.html  <-- kenel wont build without omitting zfs
 # # # # # #
 #
 ---
@@ -42,6 +43,14 @@
   ansible.builtin.template:
     src: dnf_protected_zfs.j2
     dest: /etc/dnf/protected.d/zfs.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: add zfs to dracut.conf omit to allow building kernels
+  ansible.builtin.template:
+    src: dracut_conf.j2
+    dest: /etc/dracut.conf.d/zfs.conf
     owner: root
     group: root
     mode: '0644'
