@@ -1,0 +1,28 @@
+# .gitignore
+
+.DS_Store
+
+*.License 
+
+*.tar.xz
+*.tar.gz
+*.tar
+*.zip 
+*.rpm 
+
+*.pub
+
+Downloads/**
+Source/**
+
+# temp files from editors
+*~
+
+# server ips
+production
+
+# server vars
+host_vars
+
+# hosted files 
+roles/file_store/files/*
