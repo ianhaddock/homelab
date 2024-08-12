@@ -11,10 +11,18 @@
     uid: "{{ app_uid }}"
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
-    comment: "grafana app account"
+    comment: "{{ app_name }} app account"
 
 - name: install grafana container
-  ansible.builtin.import_tasks: podman.yml
-  when: containers and ansible_os_family == "RedHat"
+  ansible.builtin.import_tasks: grafana.yml
   tags:
     - grafana
+
+- name: set grafana container forward proxy and ports
+  ansible.builtin.include_role:
+    name: base-nginx
+    tasks_from: forward_proxy.yml
+    public: true
+
+    #- name: add DNS entry
+

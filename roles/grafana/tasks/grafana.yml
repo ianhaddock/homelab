@@ -9,21 +9,23 @@
     state: directory
   with_items:
     - "{{ containers_path }}/{{ app_name }}/config"
-    - "{{ containers_path }}/{{ app_name }}/storage"
+    - "{{ containers_path }}/{{ app_name }}/data"
 
-- name: pull grafana container
+- name: set grafana container
   become_user: "{{ app_user }}"
   containers.podman.podman_container:
     recreate: true
     force_restart: true
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
-    image docker.io/grafana/grafana-oss:latest:
+    image: docker.io/grafana/grafana-oss:latest
     ports:
-      - "{{ app_port }}:{{ app_port }}/tcp"
+      - "{{ app_port }}:3000/tcp"
     volumes:
-      - "{{ containers_path }}/{{ app_name }}/storage:\
-         /var/lib/grafana:rw,Z"
+      - "{{ containers_path }}/{{ app_name }}/data:/var/lib/grafana:U"
+    env:
+      GF_SERVER_ROOT_URL: "http://{{ app_name }}.{{ site_fqdn }}"
+      GF_INSTALL_PLUGINS: "grafana-clock-panel"
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
   register: container_state
