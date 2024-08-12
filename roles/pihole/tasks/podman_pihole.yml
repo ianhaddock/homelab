@@ -84,10 +84,9 @@
       - "{{ containers_path }}/{{ app_name }}/etc-dnsmasq.d:/etc/dnsmasq.d"
       - "{{ containers_path }}/{{ app_name }}/etc-pihole:/etc/pihole"
       - "{{ containers_path }}/{{ app_name }}/var_log:/var/log"
-
     env:
       TZ: "{{ timezone }}"
-      WEBPASSWORD: "{{ pihole_pass }}"
+      WEBPASSWORD: "{{ pihole_webpass }}"
       PIHOLE_UID: "{{ app_uid }}"
       PIHOLE_GID: "{{ app_gid }}"
       WEB_UID: "{{ app_uid }}"
