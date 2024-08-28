@@ -1,0 +1,34 @@
+# minio install
+---
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "{{ app_name }} account"
+
+- name: install minio container
+  ansible.builtin.import_tasks: minio.yml
+  tags:
+    - minio
+
+- name: open port
+  ansible.builtin.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items:
+    - "{{ api_port }}/tcp"
+    - "{{ app_port }}/tcp"
+
+- name: set forward proxy and http port
+  ansible.builtin.include_role:
+    name: base-nginx
+    tasks_from: forward_proxy.yml
+    public: true
+  when: containers

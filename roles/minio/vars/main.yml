@@ -1,0 +1,10 @@
+# minio
+---
+app_user: minio
+app_uid: 1214
+app_group: minio
+app_gid: 1214
+
+app_name: minio
+api_port: 9000
+app_port: 9001
