@@ -41,7 +41,6 @@
     - file_store
     - gitea
     - blog
-    #    - pihole
 
   handlers:
     - name: reload nginx
