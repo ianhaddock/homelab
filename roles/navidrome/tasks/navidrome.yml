@@ -26,6 +26,8 @@
       ND_LOGLEVEL: info
       ND_LASTFM_APIKEY: "{{ lastfm_key }}"
       ND_LASTFM_SECRET: "{{ lastfm_secret }}"
+      ND_SPOTIFY_ID: "{{ spotify_clientid }}"
+      ND_SPOTIFY_SECRET: "{{ spotify_secret }}"
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
   register: container_state

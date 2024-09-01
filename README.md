@@ -44,6 +44,9 @@ Apps:
 * transmission: bittorrent client
 * jenkins: automation server
 * jenkins-agent: automation agent
+* grafana: metrix visualizer
+* minio: s3 compatible object storage
+* navidrome: music streaming service
 
 
 ## Setup:
