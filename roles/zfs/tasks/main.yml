@@ -74,6 +74,13 @@
     state: started
   when: setup_zfs_filesystems|default(false) == true
 
+- name: setup trim daily
+  ansible.builtin.cron:
+    name: 'zfs trim {{ zfs_tank_name }} daily at 4:08'
+    minute: '8'
+    hour: '4'
+    job: '/usr/local/sbin/zpool trim {{ zfs_tank_name }}'
+
 - name: setup zfs filesystems if defined
   ansible.builtin.import_tasks: zfs_filesystems.yml
   when: setup_zfs_filesystems|default(false) == true
