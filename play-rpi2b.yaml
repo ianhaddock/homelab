@@ -1,4 +1,4 @@
-# Master Playbook
+# play-rpi2b.yaml
 ---
 
 ### all hosts ###
@@ -28,24 +28,6 @@
     - name: reload sshd
       ansible.builtin.service:
         name: sshd
-        state: reloaded
-
-
-### blog vps ###
-- hosts: blog
-  become: true
-
-  roles:
-    - outbound_ip
-    - base-nginx
-    - file_store
-    - gitea
-    - blog
-
-  handlers:
-    - name: reload nginx
-      ansible.builtin.systemd:
-        name: nginx
         state: reloaded
 
 
@@ -89,42 +71,4 @@
     - name: reload firewall
       ansible.builtin.systemd:
         name: firewalld
-        state: restarted
-
-### devbox ###
-- hosts: devbox
-  become: true
-
-  roles:
-    - zfs
-    - base-nginx
-    - ac_backup
-    - gitea
-    - munin-node
-    - munin-server
-    - jenkins
-    - jenkins-agent
-    - pihole-clone
-    - plex
-    - transmission
-
-  handlers:
-    - name: restart system
-      ansible.builtin.reboot:
-
-    - name: reload nginx
-      ansible.builtin.systemd:
-        name: nginx
-        state: reloaded
-
-    - name: restart smb
-      ansible.builtin.systemd:
-        name: smb
-        enabled: true
-        state: restarted
-
-    - name: restart avahi
-      ansible.builtin.systemd:
-        name: avahi-daemon
-        enabled: true
         state: restarted
