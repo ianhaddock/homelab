@@ -2,7 +2,7 @@
 
 Vagrant.configure("2") do |config|
   config.vm.provision "ansible" do |ansible|  # provisioning
-    ansible.playbook = "vagrant.yml"
+    ansible.playbook = "initial-setup.yaml"
   end
 
   config.vm.define "blog" do |blog|
