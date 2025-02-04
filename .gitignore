@@ -1,6 +1,9 @@
 # .gitignore
 
 .DS_Store
+.vagrant
+
+
 
 *.License 
 
