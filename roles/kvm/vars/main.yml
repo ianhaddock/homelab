@@ -1,0 +1,12 @@
+# main.yml
+---
+app_name: 'KVM'
+
+app_user: 'kvm_user'
+app_uid: 1210
+app_group: 'kvm_user'
+app_gid: 1210
+
+virsh_pool: '/mnt/vms/pool-default'
+
+centos_image: 'https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2'
