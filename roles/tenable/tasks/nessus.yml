@@ -1,0 +1,46 @@
+# nessus container
+---
+
+- name: create nessus conf directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0775'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_user }}/nessus_conf"
+
+- name: install nessus_conf.yml template
+  ansible.builtin.template:
+    src: templates/nessus_config.yml.j2
+    dest: "{{ containers_path }}/{{ app_user }}/nessus_conf/config.yml"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0640'
+
+- name: build nessus container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    name: nessus
+    hostname: "{{ hostname }}"
+    image: docker.io/ianhaddock/nessus:latest
+    volumes:
+      - "{{ containers_path }}/{{ app_user }}/nessus_conf:/config:Z"
+      - "{{ app_media }}/watch_folder:/watch_folder:z"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  register: container_state
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-nessus"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
