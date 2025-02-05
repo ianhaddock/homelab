@@ -1,8 +1,0 @@
-# PiGlow Playbook
----
-### RPi2B ###
-- hosts: rpi2b
-  become: true
-
-  roles:
-    - piglow
