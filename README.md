@@ -52,6 +52,10 @@ Pull the latest version of the repo
 
 `$ git pull https://github.com/ianhaddock/homelab.git`
 
+Install the needed ansible collections.
+
+`$ ansible-galaxy install -r roles/requirements.yml`
+
 Edit the Vagrantfile if you want to use a different IP space, or are using a different VM host. 
 
 Copy the reference example `group_vars/all.yml` file into a new host_vars directory and name the file as the target system's IPv4 IP (xxx.xxx.xxx.xxx.yml).
