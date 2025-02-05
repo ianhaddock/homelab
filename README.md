@@ -7,7 +7,7 @@ An increasingly vintage yet generally energy efficient array of systems hosting 
   <img width="80%" height="auto" src="readme.png">
 </p>
 
-### How its built
+## How it's built
 * Vagrant development environments
 * Podman container management
 * KVM virtual machines
@@ -45,42 +45,44 @@ An increasingly vintage yet generally energy efficient array of systems hosting 
 * rpi2b_setup: rpi2b configuration tweaks
 * piglow: support for PiGlow hardware
 
-## Quick Start:
-
+## Quick Start
 As this is mostly Ansible based I'm assuming you have Python, Ansible and optionally Vagrant installed. If this is a machine you do other work on, I strongly suggest you [setup a Python virtual environment][112] before you do the following. 
 
+Pull the latest version of the repo
+`$ git pull https://github.com/ianhaddock/homelab.git`
+
+Edit the Vagrantfile if you want to use a different IP space, or are using a different VM host. 
+
+Copy the reference example `group_vars/all.yml` file into a new host_vars directory and name the file as the target system's IPv4 IP (xxx.xxx.xxx.xxx.yml).
+
 ```
-# pull the latest
-$ git pull https://github.com/ianhaddock/homelab.git
-
-# install requirements
-$ ansible-galaxy install -r roles/requirements.yml
-
-# edit the Vagrantfile if you need a different IP space or are using a different VM host.
-
-# copy the example group_vars/all.yml file into host_vars directory named as the target system's IPv4 IP (xxx.xxx.xxx.xxx.yml).
 $ mkdir host_vars
 $ cp group_vars/all.yml host_vars/[target.systems.ip.address].yml
-
-# edit the values in the new host_vars/target.systems.ip.address.yaml file to fit your Vagrantfile configuration
- 
-# as ssh password login is disabled in the sshd setup, generate a ssh key-pair for the ansible account
-$ ssh-keygen -f ~/.ssh/ansible
-
-# add the ansible public key to the common role files directory so we can install it for you on the first run
-$ mkdir -p roles/common/files/public_key
-$ cp ~/.ssh/ansible.pub roles/common/files/public_keys/
-
-# start a development VM in vagrant, this will run the first-start.yaml file to get things started
-$ vagrant up --provision
-
-# edit a playbook as you like, select the role(s) you are interested in and run:
-$ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development your-playbook.yml
- 
 ```
 
-## Contributing
+Edit the values in the new host_vars/target.systems.ip.address.yml file to fit your Vagrantfile configuration.
 
+As ssh password login is disabled in the sshd setup, generate a ssh key-pair for the ansible account.
+
+`$ ssh-keygen -f ~/.ssh/ansible`
+
+Add the ansible public key to the common role files directory which it will install for you on the first run
+
+```
+$ mkdir -p roles/common/files/public_key
+$ cp ~/.ssh/ansible.pub roles/common/files/public_keys/
+```
+
+Start the vagrant VM. Using `--provision` will run the `initial-setup.yaml` file and get things started.
+
+`$ vagrant up --provision`
+
+Edit a main playbook as you like, select the role(s) you are interested in running and fire away:
+
+`$ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development your-playbook.yml`
+ 
+
+## Contributing
 I'm always interested in learning and helping the community. If you have questions or know of a better way to do some of the things here feel free to drop a pull request.
 
 
