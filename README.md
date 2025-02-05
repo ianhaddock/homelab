@@ -1,87 +1,91 @@
 [![Ansible Yaml Check](https://github.com/ianhaddock/homelab/actions/workflows/ansible-check.yml/badge.svg)](https://github.com/ianhaddock/homelab/actions/workflows/ansible-check.yml)
 
-# Personal Infrastructure
-Build out for my systems.
+# Homelab
+An increasingly vintage yet generally energy efficient array of systems hosting my eclectic mix of entertainment and edu-tainment flavored services and software. Built publicly and with portability in mind, many of these ansible roles can be plucked out and setup in your environment with minimal changes if you so wish. 
 
 <p align="center">
-  <img width="60%" height="auto" src="readme.png">
+  <img width="80%" height="auto" src="readme.png">
 </p>
 
-## Uses
+### How its built
+* Vagrant development environments
+* Podman container management
+* KVM virtual machines
+* ZFS block storage
+* mostly CentOS Stream
+* sometmes Raspbian
 
-* Vagrant
-* Terraform
-* Podman
-* KVM Qemu
-* ZFS
-* RedHat via the [developer subscription][2]
-* CentOS Stream
-* Raspberry Pi OS (Debian 11)
-
-
-## Roles
-
-Utilities:
-* common: base packages, users, configs
-* sshd: ssh config, with figlet & random quote
-* zram: ram compression before disk swap
-* base-nginx: reverse proxy & ssl certificates
-* timecap: timecapsule service
-* ac_backup: rsync file backup
-* file_store: simple https file server
-* wakeonwin: bash alias file to wake my PC
-* rpi2b_setup: rpi2b specific tweaks
-* munin-node: resource monitor
-* flexget: transmission automation
-* piglow: support for PiGlow hardware on Raspberry Pi
-
-Apps: 
-* blog: Flask app for [my blog][1]
-* gitea: git repo
+### Role Descriptions
+* base-nginx: NGINX reverse proxy & letsencrypt TLS certificates
+* blog: my Flask app I built for [my blog][1]
+* gitea: public and private git repos
+* motorsort: my [custom racing video sorting and poster maker][111]
 * pihole: DNS with ad-guard
+* munin-node: resource monitoring
 * munin-server: resource monitor gui
-* plex: personal media streaming service
-* transmission: bittorrent client
-* jenkins: automation server
-* jenkins-agent: automation agent
-* grafana: metrix visualizer
+* grafana: pretty data visualizer
 * minio: s3 compatible object storage
+* plex: personal media streaming service
+* flexget: transmission automation
+* transmission: bittorrent client
+* jenkins: the classic automation server
+* jenkins-agent: automation agent
 * navidrome: music streaming service
+* timecap: Apple timecapsule service for multiple users
 
+### Utilities & Configurations
+* common: installs base packages, enables users, base OS configuration
+* sshd: ssh config and hardening (certs only, no user pw), figlet & random quote MOTDs
+* zram: enables ram compression as swap with a smaller fallback disk swap cache
+* ac_backup: my simple rsync file backup
+* file_store: my simple https file server
+* wakeonwin: bash alias file to wake my PC
 
-## Setup:
+### Raspberry Pi specific
+* rpi2b_setup: rpi2b configuration tweaks
+* piglow: support for PiGlow hardware
 
-Requires Ansible and Vagrant on your host.
+## Quick Start:
+
+As this is mostly Ansible based I'm assuming you have Python, Ansible and optionally Vagrant installed. If this is a machine you do other work on, I strongly suggest you [setup a Python virtual environment][112] before you do the following. 
 
 ```
 # pull the latest
-$ git pull http://git.ianhaddock.com/ian/ansible.git
+$ git pull https://github.com/ianhaddock/homelab.git
 
 # install requirements
 $ ansible-galaxy install -r roles/requirements.yml
 
-# update Vagrantfile to conform to your VM product and IP space
+# edit the Vagrantfile if you need a different IP space or are using a different VM host.
 
-# clone group_vars/all.yml file to create host_vars files
+# copy the example group_vars/all.yml file into host_vars directory named as the target system's IPv4 IP (xxx.xxx.xxx.xxx.yml).
 $ mkdir host_vars
-$ cp group_vars/all.yml host_vars/[ip.address].yml
+$ cp group_vars/all.yml host_vars/[target.systems.ip.address].yml
 
-# edit host_vars files to match Vagrantfile
+# edit the values in the new host_vars/target.systems.ip.address.yaml file to fit your Vagrantfile configuration
  
-# generate ansible admin account ssh-key
+# as ssh password login is disabled in the sshd setup, generate a ssh key-pair for the ansible account
 $ ssh-keygen -f ~/.ssh/ansible
 
-# add admin public key to common role files
+# add the ansible public key to the common role files directory so we can install it for you on the first run
 $ mkdir -p roles/common/files/public_key
 $ cp ~/.ssh/ansible.pub roles/common/files/public_keys/
 
-# provision development VM
+# start a development VM in vagrant, this will run the first-start.yaml file to get things started
 $ vagrant up --provision
 
-# run playbook 
-$ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development site.yml
+# edit a playbook as you like, select the role(s) you are interested in and run:
+$ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development your-playbook.yml
  
 ```
 
+## Contributing
+
+I'm always interested in learning and helping the community. If you have questions or know of a better way to do some of the things here feel free to drop a pull request.
+
+
+
 [1]: https://ianhaddock.com
 [2]: https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux
+[111]: https://github.com/ianhaddock/motorsort
+[112]: https://docs.python.org/3/library/venv.html
