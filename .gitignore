@@ -1,9 +1,7 @@
 # .gitignore
 
 .DS_Store
-.vagrant
-
-
+.vagrant/*
 
 *.License 
 

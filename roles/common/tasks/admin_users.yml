@@ -1,13 +1,35 @@
 # admin_user.yml
 # sets admin user, group with passwordless sudo
 ---
-- name: Add admin group
+- name: Add administrators group
+  ansible.builtin.group:
+    name: "{{ item[2] }}"
+    gid: "{{ item[3] }}"
+    state: present
+  with_list: "{{ administrators }}"
+
+- name: Add administrators user
+  ansible.builtin.user:
+    name: "{{ item[0] }}"
+    comment: "{{ item[0] }}'s administrator account"
+    uid: "{{ item[1] }}"
+    group: "{{ item[3] }}"
+    groups: wheel
+    append: true
+    generate_ssh_key: true
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    state: present
+  with_list: "{{ administrators }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: Add old administrator group
   ansible.builtin.group:
     name: "{{ admin_user }}"
     gid: "{{ admin_gid }}"
     state: present
 
-- name: Add Fedora admin user
+- name: Add old administrator user
   ansible.builtin.user:
     name: "{{ admin_user }}"
     comment: admin user

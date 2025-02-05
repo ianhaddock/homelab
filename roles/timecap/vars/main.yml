@@ -1,4 +1,4 @@
-# timemachine timecapsule vars
+# timecapsule vars
 ---
 
 app_user: timecap
@@ -6,6 +6,8 @@ app_uid: 1209
 app_group: timecap
 app_gid: 1209
 
+# root path and subdirectory
+app_path: '/mnt'
 app_name: 'timecapsule'
 
-app_path: '/mnt'
+# administrators list of list located in host vars. See defaults for example.

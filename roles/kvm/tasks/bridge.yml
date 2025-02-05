@@ -1,0 +1,56 @@
+# bridge.yml
+# kvm-host
+---
+- name: enable and start networkmanager
+  ansible.builtin.service:
+    name: NetworkManager
+    state: started
+    enabled: true
+
+- name: create bridge0
+  ansible.builtin.nmcli:
+    conn_name: bridge0
+    ifname: bridge0
+    type: bridge
+    ip4: {{ host_ip_address }}/24
+    method6: disabled
+    state: present
+
+- name: setup epn4s0 for bridge0
+  ansible.builtin.nmcli:
+    conn_name: enp4s0
+    method4: disabled
+    master: bridge0
+    autoconnect: true
+    state: present
+
+
+  # ### ref:
+  # https://www.redhat.com/sysadmin/build-lab-quickly
+  # https://www.redhat.com/sysadmin/build-VM-fast-ansible
+  #
+  # ### Add bridge0 network to host:
+  # nmcli device status
+  # nmcli connection
+  # nmcli connection add type bridge con-name bridge0 ifname bridge0
+  # ip link set down enp3s0
+  # nmcli device modify enp3s0 ipv4.method disabled
+  # nmcli connection modify enp3s0 master bridge0
+  # nmcli connection up enp3s0
+  # nmcli connection up bridge0
+  #
+  # ### remove bridge0 and port:
+  # ip link set down bridge0
+  # ip link set down enp3s0
+  # nmcli connection delete bridge0
+  # ip link set up enp3s0
+  # nmcli device modify enp3s0 ipv4.method auto
+  # nmcli connection modify enp3s0 connection.autoconnect yes
+  #
+  # ### hard reset bridge nic:
+  # ip link set down enp3s0
+  # nmcli connection delete enp3s0
+  # nmcli connection add type ethernet ifname enp3s0 con-name enp3s0
+  #
+  # ### reload nmcli files from disk:
+  # nmcli connection reload

@@ -1,0 +1,57 @@
+# virsh.yml
+---
+
+- name: list VMs
+  ansible.builtin.virt:
+    command: list_vms
+  register: list_vms_status
+
+- name: debug virst list vms
+  ansible.builtin.debug:
+    msg: "{{ list_vms_status }}"
+
+# $ virsh pool-edit default
+# set: <path>/mnt/vms/pool-default</path>
+- name: set pool-default pool path
+  ansible.builtin.virt_pool:
+    command: define
+    name: pool-default
+    xml: '{{ lookup("template", "pool-default.xml.j2") }}'
+
+- name: pull centos9 qcow2 image
+  ansible.builtin.get_url:
+    url: "{{ centos_image }}"
+    dest: "{{ virsh_pool }}/centos9.qcow2"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0640'
+
+# ### Expand storage to 25G:
+# cp CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2 vm01.qcow2
+# virt-filesystems -a vm01.qcow2 --all --long -h
+# truncate -r vm01.qcow2  vm01-new.qcow2
+# truncate -s 25G vm01-new.qcow2
+# virt-filesystems --partitions --long -a vm01.qcow2
+# virt-resize --expand /dev/sda1 vm01.qcow2  vm01-new.qcow2
+# qemu-img info vm01-new.qcow2
+
+# ### Customize:
+# virt-customize -a vm01-new.qcow2 --hostname vm01.lab --root-password password:root --ssh-inject 'root:file:/home/user/.ssh/id_rsa.pub' --uninstall cloud-init --selinux-relabel
+
+# ### Start:
+# virt-install --name vm01 --memory 1536 --vcpus 1 --network bridge=bridge0,mac.address='52:54:00:b4:f3:2c' --disk vm01-new.qcow2 --import --os-variant centos-stream9 --noautoconsole
+
+# virsh list --all
+# virsh domifaddr vm01  # wont show bridge0 ip
+
+# ### Add bridge if vm alreadt existed:
+# vrish stop vm01
+# virt-xml vm01 --edit --network bridge=bridge0
+# virsh start vm01
+# virsh console vm01
+
+# ### ref:
+# https://gist.github.com/joseluisq/2fcf26ff1b9c59fe998b4fbfcc388342 -- Resize qcow2
+# https://cloud.centos.org/centos/9-stream/x86_64/images/
+# https://www.redhat.com/sysadmin/build-lab-quickly
+# https://www.redhat.com/sysadmin/build-VM-fast-ansible
