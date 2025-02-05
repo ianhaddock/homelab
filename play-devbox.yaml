@@ -1,15 +1,23 @@
 # play-devbox.yaml
 ---
 
-### all hosts ###
-- hosts: all
-  gather_facts: true
+- hosts: devbox
   become: true
 
   roles:
     - common
     - sshd
     - zram
+    - zfs
+    - base-nginx
+    - ac_backup
+    - gitea
+    - munin-node
+    - munin-server
+    - jenkins
+    - jenkins-agent
+    - plex
+    - transmission
 
   handlers:
     - name: restart system
@@ -29,28 +37,6 @@
       ansible.builtin.service:
         name: sshd
         state: reloaded
-
-
-### devbox ###
-- hosts: devbox
-  become: true
-
-  roles:
-    #- zfs
-    - base-nginx
-    - ac_backup
-    - gitea
-    - munin-node
-    - munin-server
-    - jenkins
-    - jenkins-agent
-    #- pihole-clone
-    - plex
-    - transmission
-
-  handlers:
-    - name: restart system
-      ansible.builtin.reboot:
 
     - name: reload nginx
       ansible.builtin.systemd:

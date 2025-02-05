@@ -49,7 +49,7 @@
 
 - name: add zfs to dracut.conf omit to allow building kernels
   ansible.builtin.template:
-    src: dracut_conf.j2
+    src: dracut.conf.j2
     dest: /etc/dracut.conf.d/zfs.conf
     owner: root
     group: root
