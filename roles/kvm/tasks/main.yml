@@ -1,0 +1,46 @@
+# main.yml
+---
+- name: install kvm packages
+  ansible.builtin.package:
+    name:
+      - qemu-kvm
+      - libvirt
+      - libvirt-client
+      - virt-install
+      - virt-viewer
+      - virt-top
+      - libguestfs-tools
+      - guestfs-tools
+      - genisoimage
+      - bridge-utils
+      - python3-libvirt
+    state: latest
+  tags:
+    - packages
+
+# stackoverflow.com/questions/55844981/ansible-insert-word-in-grub-cmdline
+- name: set intel_iommu=on in GRUB
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX="((?:(?!intel_iommu=on).)*?)"$'
+    line: 'GRUB_CMDLINE_LINUX="\1 intel_iommu=on"'
+    backrefs: true
+    backup: true
+  notify: restart system
+
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "{{ app_name }} account"
+
+- name: enable bridge0
+  ansible.builtin.include_tasks: bridge.yml
+
+- name: setup virsh
+  ansible.builtin.include_tasks: virsh.yml

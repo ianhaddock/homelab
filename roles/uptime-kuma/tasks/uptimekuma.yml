@@ -1,0 +1,54 @@
+# uptime kuma install
+---
+- name: create container volume directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_name }}/app/data"
+
+- name: pull uptime kuma container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    force_restart: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: docker.io/louislam/uptime-kuma:1
+    ports:
+      - "{{ app_port }}:3001/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_name }}/app/data:\
+         /app/data:Z"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  register: container_state
+
+- name: prune old images
+  become_user: "{{ app_user }}"
+  ansible.builtin.command:
+    cmd: 'podman image prune -f -a'
+  when: container_state.changed
+  register: prune_debug
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ prune_debug }}"
+  when: verbose
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    no_block: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
+  register: files_systemctl_debug

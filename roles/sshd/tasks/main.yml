@@ -47,6 +47,7 @@
     - "All that is gold does not glitter, not all those who wander are lost."
     - "Spared no expense."
     - "The old that is strong does not wither, deep roots are not reached by the frost."
+    - "In the end the pawn and the king go in the same box."
 
 - name: enable motd on RedHat
   ansible.builtin.lineinfile:

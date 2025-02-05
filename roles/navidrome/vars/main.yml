@@ -1,0 +1,9 @@
+# navidrome
+---
+app_user: navidrome
+app_uid: 1215
+app_group: navidrome
+app_gid: 1215
+
+app_name: music
+app_port: 4533

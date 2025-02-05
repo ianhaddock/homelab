@@ -1,0 +1,11 @@
+# Uptime Kuma
+---
+app_user: uptimekuma
+app_uid: 1217
+app_group: uptimekuma
+app_gid: 1217
+
+app_name: status
+app_port: 3001
+
+limit_app: false

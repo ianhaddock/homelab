@@ -1,0 +1,46 @@
+# navidrome install
+---
+- name: create navidrome directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_user }}/config"
+
+- name: create navidrome container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: docker.io/deluan/navidrome:latest
+    ports:
+      - "{{ app_port }}:4533/tcp"
+    volumes:
+      - "{{ media_path }}/music:/music:ro"
+      - "{{ containers_path }}/{{ app_user }}/config:/data"
+    env:
+      ND_LOGLEVEL: info
+      ND_LASTFM_APIKEY: "{{ lastfm_key }}"
+      ND_LASTFM_SECRET: "{{ lastfm_secret }}"
+      ND_SPOTIFY_ID: "{{ spotify_clientid }}"
+      ND_SPOTIFY_SECRET: "{{ spotify_secret }}"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  register: container_state
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
+  register: files_systemctl_debug

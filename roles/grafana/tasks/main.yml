@@ -1,0 +1,28 @@
+# grafana main.yml
+# https://hub.docker.com/r/grafana/grafana
+---
+
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "{{ app_name }} app account"
+
+- name: install grafana container
+  ansible.builtin.import_tasks: grafana.yml
+  tags:
+    - grafana
+
+- name: set grafana container forward proxy and ports
+  ansible.builtin.include_role:
+    name: base-nginx
+    tasks_from: forward_proxy.yml
+    public: true
+
+    #- name: add DNS entry
+

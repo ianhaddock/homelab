@@ -1,0 +1,45 @@
+# minio install
+---
+- name: create minio directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ containers_path }}/{{ app_user }}/data"
+    - "{{ containers_path }}/{{ app_user }}/config"
+
+- name: create minio container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: true
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: quay.io/minio/minio:latest
+    command: server /data --console-address 127.0.0.1:9001
+    ports:
+      - "{{ api_port }}:9000/tcp"
+      - "{{ app_port }}:9001/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_user }}/data:/data"
+    env:
+      MINIO_ROOT_USER: "{{ minio_username }}"
+      MINIO_ROOT_PASSWORD: " {{ minio_password }}"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  register: container_state
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  when: container_state.changed
+  register: files_systemctl_debug

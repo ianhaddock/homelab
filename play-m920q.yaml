@@ -1,0 +1,71 @@
+# play-m920q.yaml
+---
+
+### all hosts ###
+- hosts: all
+  gather_facts: true
+  become: true
+
+  roles:
+    - common
+    - sshd
+    - zram
+
+  handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
+    - name: reload network
+      ansible.builtin.systemd:
+        name: network
+        state: reloaded
+
+    - name: reload network Debian
+      ansible.builtin.systemd:
+        name: networking
+        state: restarted
+
+    - name: reload sshd
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
+
+
+### m920q ###
+- hosts: m920q
+  become: true
+
+  roles:
+    #- zfs
+    #- base-nginx
+    #- ac_backup
+    #- gitea
+    #- munin-node
+    #- munin-server
+    #- jenkins
+    #- jenkins-agent
+    #- plex
+    #- uptime-kuma
+    - plausible
+    #- transmission
+
+  handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+
+    - name: restart smb
+      ansible.builtin.systemd:
+        name: smb
+        enabled: true
+        state: restarted
+
+    - name: restart avahi
+      ansible.builtin.systemd:
+        name: avahi-daemon
+        enabled: true
+        state: restarted

@@ -1,0 +1,17 @@
+# include files must be listed in smb.conf
+#
+
+
+[{{ app_name }}]
+    comment = Timecapsule
+    path = {{ app_path }}/{{ app_name }}/%U
+    valid users = %U
+    writable = yes
+    durable handles = yes
+    guest ok = no
+    read only = no 
+    browsable = yes 
+    vfs objects = catia fruit streams_xattr
+    fruit:time machine = yes
+    #fruit:time machine max size = 768G
+

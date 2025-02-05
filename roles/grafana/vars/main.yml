@@ -1,0 +1,9 @@
+# grafana var
+---
+app_user: grafana
+app_uid: 1212
+app_group: grafana
+app_gid: 1212
+
+app_port: 3000
+app_name: grafana

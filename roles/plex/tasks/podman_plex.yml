@@ -111,4 +111,4 @@
     minute: "5"
     hour: "4"
     weekday: "5"
-    job: "/usr/bin/podman restart plex"
+    job: "/usr/bin/podman stop plex && sleep 20 && /usr/bin/podman start plex"
