@@ -1,0 +1,30 @@
+# .gitignore
+
+.DS_Store
+.vagrant/*
+.vimrc
+
+*.License
+
+*.tar.xz
+*.tar.gz
+*.tar
+*.zip
+*.rpm
+
+*.pub
+
+Downloads/**
+Source/**
+
+# temp files from editors
+*~
+
+# server ips
+production
+
+# server vars
+host_vars
+
+# hosted files
+roles/file_store/files/*
