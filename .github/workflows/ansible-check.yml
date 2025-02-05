@@ -9,7 +9,7 @@ on:
 
 env:
   #
-  PLAYBOOK: play-site.yml
+  PLAYBOOK: play-update-all.yml
 
 permissions:
   contents: read
