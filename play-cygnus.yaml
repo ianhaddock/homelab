@@ -1,0 +1,46 @@
+# m920q playbook
+---
+
+- hosts: cygnus
+  become: true
+
+  roles:
+    - common
+    - zram
+    - timecap
+
+  handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
+    - name: reload network
+      ansible.builtin.systemd:
+        name: network
+        state: reloaded
+
+    - name: reload network Debian
+      ansible.builtin.systemd:
+        name: networking
+        state: restarted
+
+    - name: reload sshd
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
+
+    - name: reload firewall
+      ansible.builtin.systemd:
+        name: firewalld
+        state: restarted
+
+    - name: restart smb
+      ansible.builtin.systemd:
+        name: smb
+        enabled: true
+        state: restarted
+
+    - name: restart avahi
+      ansible.builtin.systemd:
+        name: avahi-daemon
+        enabled: true
+        state: restarted

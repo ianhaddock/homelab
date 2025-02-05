@@ -17,8 +17,8 @@
 - name: install utility packages
   ansible.builtin.import_tasks: install_packages.yml
 
-- name: add admin user
-  ansible.builtin.import_tasks: admin_user.yml
+- name: add admin users
+  ansible.builtin.import_tasks: admin_users.yml
 
 - name: set firewalld
   ansible.builtin.import_tasks: firewalld.yml

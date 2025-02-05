@@ -24,11 +24,10 @@
     state: directory
   with_items:
     - "{{ app_path }}/{{ app_name }}"
-    - "{{ app_path }}/{{ app_name }}/backups"
 
 - name: update smb.conf file
   ansible.builtin.template:
-    src: rpi2b_smb.conf.j2
+    src: raspbian_smb.conf.j2
     dest: /etc/samba/smb.conf
     owner: root
     group: root
@@ -37,7 +36,7 @@
 
 - name: install avahi service
   ansible.builtin.template:
-    src: rpi2b_samba.service.j2
+    src: raspbian_avahi_samba.service.j2
     dest: /etc/avahi/services/samba.service
     owner: root
     group: root

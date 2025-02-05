@@ -1,5 +1,6 @@
-# main.yml
-# apple timecapsule
+# timecap/tasks/main.yml
+# Apple Timecapsule
+#
 ---
 
 - name: create isolation user and group. Enable linger
@@ -12,18 +13,70 @@
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
     comment: "{{ app_name }} account"
+  tags:
+    - timecap
+
+- name: setup timecap directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0750'
+    state: directory
+  with_items:
+    - "{{ app_path }}/{{ app_name }}"
+  tags:
+    - timecap
+
+- name: setup user subdirectories
+  ansible.builtin.file:
+    path: "{{ app_path }}/{{ app_name }}/{{ item[0] }}"
+    owner: "{{ item[0] }}"
+    group: "{{ item[2] }}"
+    mode: '0750'
+    state: directory
+  with_items:
+    - "{{ administrators }}"
+  tags:
+    - timecap
+
+- name: add administrators to timecap group
+  ansible.builtin.user:
+    name: "{{ item[0] }}"
+    groups: "{{ app_group }}"
+    append: true
+  with_items:
+    - "{{ administrators }}"
+  tags:
+    - timecap
+
+- name: add per user quotas
+  ansible.builtin.template:
+    src: com.apple.TimeMachine.quota.plist.j2
+    dest: "{{ app_path }}/{{ app_name }}/{{ item[0] }}/.com.apple.TimeMachine.Quota.plist"
+    owner: "{{ item[0] }}"
+    group: "{{ item[2] }}"
+    mode: '0644'
+  with_items:
+    - "{{ administrators }}"
+  tags:
+    - timecap
 
 - name: open smb 445/tcp port
   ansible.builtin.firewalld:
     port: 445/tcp
     state: enabled
     permanent: true
+  tags:
+    - timecap
 
 - name: open mDNS 5353/udp port
   ansible.builtin.firewalld:
     port: 5353/udp
     state: enabled
     permanent: true
+  tags:
+    - timecap
 
 - name: tweak filewall PIv6 filtering for avahi
   ansible.builtin.lineinfile:
@@ -31,11 +84,23 @@
     regexp: '^IPv6_rpfilter='
     line: 'IPv6_rpfilter=no'
   notify: reload firewall
+  tags:
+    - timecap
 
-- name: install timecapsule on rpi2b
-  ansible.builtin.include_tasks: rpi2b.yml
-  when: ansible_facts.nodename == "raspberrypi"
+- name: install and configure samba and avahi on Raspbian
+  ansible.builtin.include_tasks: raspbian.yml
+  when: ansible_distribution == "Raspbian"
+  tags:
+    - timecap
 
-- name: install timecapsule on devbox
-  ansible.builtin.include_tasks: devbox.yml
-  when: ansible_facts.nodename == "devbox"
+- name: install and configure samba and avahi on CentOS
+  ansible.builtin.include_tasks: centos.yml
+  when: ansible_distribution == "CentOS"
+  tags:
+    - timecap
+
+- name: notify user passwords need to be set
+  ansible.builtin.debug:
+    msg: "*** NOTE: Set Samba passwords:sudo echo _password_ | smbpasswd -s -a _username_ ***"
+  tags:
+    - timecap
