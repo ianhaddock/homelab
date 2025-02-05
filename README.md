@@ -49,6 +49,7 @@ An increasingly vintage yet generally energy efficient array of systems hosting 
 As this is mostly Ansible based I'm assuming you have Python, Ansible and optionally Vagrant installed. If this is a machine you do other work on, I strongly suggest you [setup a Python virtual environment][112] before you do the following. 
 
 Pull the latest version of the repo
+
 `$ git pull https://github.com/ianhaddock/homelab.git`
 
 Edit the Vagrantfile if you want to use a different IP space, or are using a different VM host. 
@@ -79,11 +80,11 @@ Start the vagrant VM. Using `--provision` will run the `initial-setup.yaml` file
 
 Edit a main playbook as you like, select the role(s) you are interested in running and fire away:
 
-`$ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development your-playbook.yml`
+`$ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development your-new-playbook.yml`
  
 
 ## Contributing
-I'm always interested in learning and helping the community. If you have questions or know of a better way to do some of the things here feel free to drop a pull request.
+I'm always interested in learning from and helping the community. If you have questions or know of a better way to do some of the things done here feel free to drop a pull request.
 
 
 
