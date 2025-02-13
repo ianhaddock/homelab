@@ -1,13 +1,16 @@
-# m920q playbook
+# Cygnus playbook
+#
 ---
-
 - hosts: cygnus
   become: true
 
   roles:
     - common
+    - sshd
     - zram
     - timecap
+    - base-nginx
+    - plex
 
   handlers:
     - name: restart system
@@ -32,6 +35,11 @@
       ansible.builtin.systemd:
         name: firewalld
         state: restarted
+
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
 
     - name: restart smb
       ansible.builtin.systemd:

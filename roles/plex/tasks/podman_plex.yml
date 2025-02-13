@@ -28,7 +28,7 @@
 - name: setup plex container plexpass
   become_user: "{{ app_user }}"
   containers.podman.podman_container:
-    recreate: true
+    recreate: false
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
     image: docker.io/plexinc/pms-docker:plexpass
@@ -49,7 +49,7 @@
       PLEX_UID: "{{ app_uid }}"
       PLEX_GID: "{{ app_gid }}"
       TZ: "{{ timezone }}"
-    state: stopped
+    state: present
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
   register: container_state
 
@@ -93,3 +93,12 @@
     hour: "4"
     weekday: "5"
     job: "/usr/bin/sh -c '/usr/bin/podman stop plex && sleep 20 && /usr/bin/podman start plex'"
+
+- name: user crontab backup confg directory weekly
+  become_user: root
+  ansible.builtin.cron:
+    name: plex - backup config directory weekly
+    minute: "45"
+    hour: "7"
+    weekday: "3"
+    job: "/usr/bin/tar czvf /mnt/media/staging/plex-weekly-config-backup.tar.gz /mnt/containers/plex/config"
