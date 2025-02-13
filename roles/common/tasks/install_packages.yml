@@ -15,6 +15,14 @@
   tags:
     - packages
 
+    # ansible not finding this
+    # - name: enable codeready-linux-builder
+    #   community.general.dnf_config_manager:
+    #     name: crb
+    #     state: enabled
+    #   tags:
+    #     - packages
+
 - name: add rpm fusion free key
   ansible.builtin.rpm_key:
     key: "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-free-el-9"

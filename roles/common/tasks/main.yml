@@ -3,7 +3,9 @@
 ---
 - name: print facts
   ansible.builtin.debug:
-    var: ansible_facts.nodename
+    msg:
+      - "nodename: {{ansible_facts.nodename}}"
+      - "os_family: {{ansible_os_family}}"
   when: verbose
 
 - name: set hostname
@@ -13,6 +15,28 @@
   ansible.builtin.import_tasks: rhel8epel.yml
   when: ansible_distribution_major_version == "8" and
    (ansible_distribution == "CentOS" or ansible_distribution == 'RedHat')
+
+- name: add user@.service.d directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/user@.service.d
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+  when: containers
+
+- name: grant all users cpu, cpuset thottling in systemd
+  ansible.builtin.template:
+    src: systemd-delegate.conf.j2
+    dest: /etc/systemd/system/user@.service.d/delegate.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: containers
+
+- name: systemd-daemon reload
+  ansible.builtin.systemd_service:
+    daemon_reload: true
 
 - name: install utility packages
   ansible.builtin.import_tasks: install_packages.yml
