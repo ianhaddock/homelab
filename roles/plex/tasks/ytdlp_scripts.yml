@@ -1,10 +1,11 @@
 # ytdlp_scripts.yml
 ---
-- name: install utility packages
+  # crb needs to be enabled for ffmpeg to install 'sudo dnf config-manager --set-enabled crb'
+- name: install ffmpeg utility package
   ansible.builtin.package:
     name:
-      - ffmpeg  # requires rpmfusion nonfree repo on Centos Stream 9
-    state: latest  # noqa package-latest
+      - ffmpeg  # rpmfusion nonfree repo Centos Stream9
+    state: present
 
 - name: install yt-dlp latest
   ansible.builtin.get_url:

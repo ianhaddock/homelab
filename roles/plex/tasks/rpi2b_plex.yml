@@ -10,10 +10,6 @@
   with_items:
     - "{{ containers_path }}/{{ app_name }}/config/Library/Application Support"
     - "{{ containers_path }}/{{ app_name }}/transcode"
-    - "{{ media_path }}/audiobooks"
-    - "{{ media_path }}/movies"
-    - "{{ media_path }}/staging"
-    - "{{ media_path }}/tvshows"
 
 - name: check if plex is already installed
   ansible.builtin.stat:

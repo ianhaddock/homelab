@@ -1,6 +1,7 @@
 # configure plex
+#
 ---
-- name: create directories for plex
+- name: create container directories for plex
   ansible.builtin.file:
     path: "{{ item }}"
     owner: "{{ app_user }}"
@@ -9,45 +10,27 @@
     state: directory
   with_items:
     - "{{ containers_path }}/{{ app_name }}/config"
-    - "{{ media_path }}/audiobooks"
-    - "{{ media_path }}/lemans"
-    - "{{ media_path }}/movies"
-    - "{{ media_path }}/music"
-    - "{{ media_path }}/staging"
-    - "{{ media_path }}/tvshows"
-    - "{{ media_path }}/yoga"
-    - "{{ media_path }}/youtube"
-    - "{{ media_path }}/yt_tunes"
+    - "{{ containers_path }}/{{ app_name }}/transcode"
 
-- name: create links in /mnt
-  ansible.builtin.file:
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
-    owner: root
-    group: root
-    state: link
-  loop:
-    - {src: "{{ media_path }}/transmission", dest: /mnt/transmission}
-
-- name: pull latest plex image
+- name: stop container-plex if it exists
   become_user: "{{ app_user }}"
-  containers.podman.podman_image:
-    name: "docker.io/plexinc/pms-docker:plexpass"
-  register: image_pull
-
-- name: debug
-  ansible.builtin.debug:
-    msg: "{{ image_pull }}"
-  when: verbose
+  ansible.builtin.systemd:
+    name: "container-{{ app_name }}"
+    daemon-reload: true
+    enabled: true
+    state: stopped
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
 
   # ref: https://hub.docker.com/r/plexinc/pms-docker/
   # image does not support keep-id, s6's abc user perms error s6-setuidgid
-- name: start plex container:plexpass
+- name: setup plex container plexpass
   become_user: "{{ app_user }}"
   containers.podman.podman_container:
     recreate: true
     name: "{{ app_name }}"
-    hostname: "plex"
+    hostname: "{{ hostname }}"
     image: docker.io/plexinc/pms-docker:plexpass
     ports:
       - "{{ app_port }}:32400/tcp"
@@ -55,21 +38,19 @@
       - "{{ containers_path }}/{{ app_name }}/config:/config:Z"
       - "{{ containers_path }}/{{ app_name }}/transcode:/transcode:Z"
       - "{{ media_path }}:/mnt/media:ro"
-        ### Required for hardware acceleration
-        #    device:
-        #      - '/dev/dri:/dev/dri'
-        #    group_add:
-        #      - 'keep-groups'
-        ###
+    # hardware acceleration
+    device:
+      - '/dev/dri:/dev/dri'
+    cpus: "{{ cpu_core_limit }}"
+    memory: "{{ memory_limit }}"
     env:
       ADVERTISE_IP: "http://{{ host_ip_address }}:{{ app_port }}/"
       PLEX_CLAIM: "{{ plex_claim }}"
       PLEX_UID: "{{ app_uid }}"
       PLEX_GID: "{{ app_gid }}"
       TZ: "{{ timezone }}"
-    state: present
+    state: stopped
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
-  when: image_pull.changed
   register: container_state
 
 - name: debug plex podman
@@ -77,7 +58,7 @@
     msg: "{{ container_state }}"
   when: verbose
 
-- name: enable and start
+- name: enable and start plex
   become_user: "{{ app_user }}"
   ansible.builtin.systemd:
     daemon-reload: true
@@ -87,7 +68,7 @@
     scope: user
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
-  when: container_state.changed
+    #  when: container_state.changed
   register: app_systemctl_debug
 
 - name: debug plex podman

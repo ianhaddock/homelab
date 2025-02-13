@@ -1,5 +1,5 @@
 # main.yml
-# install plex
+#
 ---
 - name: create isolation user and group. Enable linger
   ansible.builtin.include_role:
@@ -10,7 +10,32 @@
     uid: "{{ app_uid }}"
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
-    comment: "plex app account"
+    comment: "{{ app_name }} account"
+
+- name: add user to groups
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+    groups: "{{ append_groups }}"
+    append: true
+
+- name: create media directories for plex
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ media_path }}/audiobooks"
+    - "{{ media_path }}/books"
+    - "{{ media_path }}/lemans"
+    - "{{ media_path }}/movies"
+    - "{{ media_path }}/music"
+    - "{{ media_path }}/staging"
+    - "{{ media_path }}/tvshows"
+    - "{{ media_path }}/yoga"
+    - "{{ media_path }}/youtube"
+    - "{{ media_path }}/yt_tunes"
 
 - name: install plex container
   ansible.builtin.import_tasks: podman_plex.yml
@@ -29,6 +54,10 @@
   tags:
     - plex
 
+- name: install yt-dlp scripts
+  ansible.builtin.import_tasks: ytdlp_scripts.yml
+  when: containers and ansible_os_family == "RedHat"
+
 - name: set plex container forward proxy and ports
   ansible.builtin.include_role:
     name: base-nginx
@@ -44,7 +73,3 @@
     app_port: 32400
     app_name: plex
   when: ansible_facts.machine == "armv7l"
-
-- name: install yt-dlp scripts
-  ansible.builtin.import_tasks: ytdlp_scripts.yml
-  when: containers and ansible_os_family == "RedHat"
