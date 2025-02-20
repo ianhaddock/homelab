@@ -22,6 +22,8 @@
     scope: user
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  register: app_stop_result
+  failed_when: "app_stop_result is failed and 'Could not find the requested service container-' not in app_stop_result.msg"
 
   # ref: https://hub.docker.com/r/plexinc/pms-docker/
   # image does not support keep-id, s6's abc user perms error s6-setuidgid

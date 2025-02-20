@@ -63,7 +63,6 @@
     name: base-nginx
     tasks_from: forward_proxy.yml
     public: true
-  notify: reload nginx
   when: containers and ansible_os_family == "RedHat"
 
 - name: set rpi2b forward proxy and ports
