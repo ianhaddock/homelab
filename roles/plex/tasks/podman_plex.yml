@@ -40,6 +40,7 @@
       - "{{ containers_path }}/{{ app_name }}/config:/config:Z"
       - "{{ containers_path }}/{{ app_name }}/transcode:/transcode:Z"
       - "{{ media_path }}:/mnt/media:ro"
+      - "{{ transmission_path }}:/mnt/transmission:ro"
     # hardware acceleration
     device:
       - '/dev/dri:/dev/dri'

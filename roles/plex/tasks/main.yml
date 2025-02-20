@@ -36,6 +36,7 @@
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
     - "{{ media_path }}/yt_tunes"
+    - "{{ transmission_path }}"
 
 - name: install plex container
   ansible.builtin.import_tasks: podman_plex.yml
