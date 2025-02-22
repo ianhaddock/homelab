@@ -97,6 +97,16 @@
     weekday: "5"
     job: "/usr/bin/sh -c '/usr/bin/podman stop plex && sleep 20 && /usr/bin/podman start plex'"
 
+- name: create archives path
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ archives_path }}/containers"
+
 - name: user crontab backup confg directory weekly
   become_user: root
   ansible.builtin.cron:
@@ -104,4 +114,4 @@
     minute: "45"
     hour: "7"
     weekday: "3"
-    job: "/usr/bin/tar czvf /mnt/media/staging/plex-weekly-config-backup.tar.gz /mnt/containers/plex/config"
+    job: "/usr/bin/tar czvf {{ archives_path }}/containers/plex-weekly-config-backup.tar.gz /mnt/containers/plex/config"
