@@ -22,6 +22,8 @@
     scope: user
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  register: app_stop_result
+  failed_when: "app_stop_result is failed and 'Could not find the requested service container-' not in app_stop_result.msg"
 
   # ref: https://hub.docker.com/r/plexinc/pms-docker/
   # image does not support keep-id, s6's abc user perms error s6-setuidgid
@@ -38,6 +40,7 @@
       - "{{ containers_path }}/{{ app_name }}/config:/config:Z"
       - "{{ containers_path }}/{{ app_name }}/transcode:/transcode:Z"
       - "{{ media_path }}:/mnt/media:ro"
+      - "{{ transmission_path }}:/mnt/transmission:ro"
     # hardware acceleration
     device:
       - '/dev/dri:/dev/dri'
@@ -94,6 +97,16 @@
     weekday: "5"
     job: "/usr/bin/sh -c '/usr/bin/podman stop plex && sleep 20 && /usr/bin/podman start plex'"
 
+- name: create archives path
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ archives_path }}/containers"
+
 - name: user crontab backup confg directory weekly
   become_user: root
   ansible.builtin.cron:
@@ -101,4 +114,4 @@
     minute: "45"
     hour: "7"
     weekday: "3"
-    job: "/usr/bin/tar czvf /mnt/media/staging/plex-weekly-config-backup.tar.gz /mnt/containers/plex/config"
+    job: "/usr/bin/tar czvf {{ archives_path }}/containers/plex-weekly-config-backup.tar.gz /mnt/containers/plex/config"

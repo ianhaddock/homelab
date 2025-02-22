@@ -40,6 +40,9 @@
     mode: '0640'
   when: not cert_enabled
   notify: reload nginx
+  tags:
+    - transmission
+    - plex
 
 - name: set nginx subdomain https forward proxy
   ansible.builtin.template:
@@ -50,3 +53,6 @@
     mode: '0640'
   when: cert_enabled
   notify: reload nginx
+  tags:
+    - transmission
+    - plex

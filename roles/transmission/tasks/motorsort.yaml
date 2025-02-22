@@ -1,0 +1,51 @@
+# motorsort container
+---
+
+- name: create motorsort conf directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0775'
+    state: directory
+  with_items:
+    - "{{ app_media }}/motorsort"
+    - "{{ app_media }}/motorsort/custom"
+
+- name: stop motorsort if exists
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    name: "container-motorsort"
+    state: stopped
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  register: app_stop_result
+  failed_when: "app_stop_result is failed and 'Could not find the requested service container-' not in app_stop_result.msg"
+
+- name: build motorsort container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: false
+    name: motorsort
+    hostname: "{{ hostname }}"
+    image: ghcr.io/ianhaddock/motorsort:0.5
+    env:
+      MEDIA_SOURCE_PATH="/mnt/media/complete"
+      MEDIA_DESTINATION_PATH="/mnt/media/motorsort"
+    volumes:
+      - "{{ app_media }}:/mnt/media:z"
+      - "{{ app_media }}/motorsort/custom:/custom:z"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-motorsort"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"

@@ -24,3 +24,4 @@ If target is Raspberry Pi2b (armv7b arch), plex is installed directly.
 ### Crontab entries:
 * weekly yt-dlp scripts, 3x
 * weekly PLEX auto-update container restart
+* weekly archive of config

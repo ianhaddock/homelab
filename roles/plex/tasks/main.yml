@@ -36,6 +36,7 @@
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
     - "{{ media_path }}/yt_tunes"
+    - "{{ transmission_path }}"
 
 - name: install plex container
   ansible.builtin.import_tasks: podman_plex.yml
@@ -63,7 +64,6 @@
     name: base-nginx
     tasks_from: forward_proxy.yml
     public: true
-  notify: reload nginx
   when: containers and ansible_os_family == "RedHat"
 
 - name: set rpi2b forward proxy and ports

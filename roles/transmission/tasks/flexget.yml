@@ -11,6 +11,17 @@
   with_items:
     - "{{ containers_path }}/{{ app_user }}/flexget_conf"
 
+- name: stop flexget container if exists
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    name: "container-flexget"
+    state: stopped
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  register: app_stop_result
+  failed_when: "app_stop_result is failed and 'Could not find the requested service container-' not in app_stop_result.msg"
+
 - name: install flexget_conf.yml template
   ansible.builtin.template:
     src: templates/flexget_config.yml.j2
@@ -25,13 +36,12 @@
     recreate: true
     name: flexget
     hostname: "{{ hostname }}"
-    image: ghcr.io/ianhaddock/flexget:latest
+    image: ghcr.io/ianhaddock/flexget:0.2
     volumes:
       - "{{ containers_path }}/{{ app_user }}/flexget_conf:/config:Z"
       - "{{ app_media }}/watch_folder:/watch_folder:z"
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
-  register: container_state
 
 - name: enable and start
   become_user: "{{ app_user }}"
@@ -43,4 +53,22 @@
     scope: user
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
-  when: container_state.changed
+
+- name: create archives path
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ archives_path }}/containers"
+
+- name: user crontab backup confg directory weekly
+  become_user: root
+  ansible.builtin.cron:
+    name: flexget - backup config directory weekly
+    minute: "45"
+    hour: "7"
+    weekday: "5"
+    job: "/usr/bin/tar czvf {{ archives_path }}/containers/flexget-weekly-config-backup.tar.gz /mnt/containers/{{ app_user }}/flexget_conf"

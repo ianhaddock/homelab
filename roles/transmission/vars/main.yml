@@ -1,16 +1,18 @@
 # transmission
 ---
-app_user: tr
+app_user: transm
 app_uid: 1204
-app_group: tr
+app_group: transm
 app_gid: 1204
 
-app_name: tr
+app_name: transmission
 app_port: 9091
 app_data_port: 51412
-app_media: "/mnt/transmission"
 
-container_ip: '10.88.0.23'
+cpu_core_limiti: 1
+memory_limit: "512M"
 
-blocklist_enabled: 'true'
-blocklist: 'https://github.com/Naunter/BT_BlockLists/releases/download/v.1/bt_blocklists.gz'
+app_media: "{{ transmission_path }}"
+
+transmission_blocklist_enabled: 'false'
+transmission_blocklist: ''
