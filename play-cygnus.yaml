@@ -11,6 +11,7 @@
     - timecap
     - base-nginx
     - plex
+    - transmission
 
   handlers:
     - name: restart system

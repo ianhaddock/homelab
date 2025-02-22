@@ -16,8 +16,6 @@
     - munin-server
     - jenkins
     - jenkins-agent
-    - plex
-    - transmission
 
   handlers:
     - name: restart system

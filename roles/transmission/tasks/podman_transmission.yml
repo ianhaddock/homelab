@@ -1,0 +1,74 @@
+# transmission rootful container
+---
+- name: stop container if exists
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: stopped
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  register: app_stop_result
+  failed_when: "app_stop_result is failed and 'Could not find the requested service container-' not in app_stop_result.msg"
+
+- name: install transmission container
+  become_user: "{{ app_user }}"
+  containers.podman.podman_container:
+    recreate: false
+    name: "{{ app_name }}"
+    hostname: "{{ hostname }}"
+    image: ghcr.io/ianhaddock/transmission-container:0.0
+    #ip: "{{ container_ip }}"
+    cpus: "{{ cpu_core_limit }}"
+    memory: "{{ memory_limit }}"
+    ports:
+      - "{{ app_port }}:9091/tcp"
+      - "{{ app_data_port }}:{{ app_data_port }}/udp"
+      - "{{ app_data_port }}:{{ app_data_port }}/tcp"
+    volumes:
+      - "{{ containers_path }}/{{ app_user }}/conf:/config:z"
+      - "{{ app_media }}/complete:/complete:z"
+      - "{{ app_media }}/incomplete:/incomplete:z"
+      - "{{ app_media }}/watch_folder:/watch_folder:z"
+    env:
+      TZ: "{{ timezone }}"
+      NETWORK_RANGE: "{{ transmission_whitelist }}"
+      USERNAME: "{{ transmission_username }}"
+      PASSWORD: "{{ transmission_password }}"
+      PORT: "{{ app_port }}"
+      PEERPORT: "{{ app_data_port }}"
+    generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
+    state: present
+  register: container_state
+
+- name: enable and start
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    daemon-reload: true
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+    #  when: container_state.changed
+
+- name: create archives path
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ archives_path }}/containers"
+
+- name: user crontab backup confg directory weekly
+  become_user: root
+  ansible.builtin.cron:
+    name: transmission - backup config directory weekly
+    minute: "45"
+    hour: "7"
+    weekday: "4"
+    job: "/usr/bin/tar czvf {{ archives_path }}/containers/transmission-weekly-config-backup.tar.gz /mnt/containers/{{ app_user }}/conf"

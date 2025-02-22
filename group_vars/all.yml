@@ -27,6 +27,9 @@ limit_source_ips: ['192.168.1.0/24']
 containers: true
 containers_path: '/mnt/containers'
 
+# archives
+archives_path: "/mnt/archives"
+
 # munin
 munin_username: 'example'
 munin_password: 'example'
