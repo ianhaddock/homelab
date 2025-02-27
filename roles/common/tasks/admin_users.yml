@@ -90,8 +90,13 @@
     group: "{{ admin_group }}"
     mode: '0640'
 
-- name: add w to .bashrc
-  ansible.builtin.lineinfile:
-    path: "/home/{{ admin_user }}/.bashrc"
-    regexp: '^w$'
-    line: 'w  # show w on login'
+    # This below is a hangup with scp. .bashrc needs to be smarter. Adding:
+    #  # if not interactive, return early
+    #  [[ $- == *i* ]] || return
+    #  ...at the start would fix it. But time to think whats best to do.
+
+    # - name: add w to .bashrc
+    #   ansible.builtin.lineinfile:
+    #     path: "/home/{{ admin_user }}/.bashrc"
+    #     regexp: '^w$'
+    #     line: 'w  # show w on login'
