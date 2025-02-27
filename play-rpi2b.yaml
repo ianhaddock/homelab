@@ -1,4 +1,4 @@
-# play-rpi2b.yaml
+# Raspberry Pi2b Playbook
 ---
 
 - hosts: rpi2b
@@ -20,11 +20,6 @@
   handlers:
     - name: restart system
       ansible.builtin.reboot:
-
-    - name: reload network
-      ansible.builtin.systemd:
-        name: network
-        state: reloaded
 
     - name: reload network Debian
       ansible.builtin.systemd:
@@ -51,11 +46,6 @@
       ansible.builtin.systemd:
         name: avahi-daemon
         enabled: true
-        state: restarted
-
-    - name: reload network Debian
-      ansible.builtin.systemd:
-        name: networking
         state: restarted
 
     - name: reload firewall

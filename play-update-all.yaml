@@ -1,7 +1,6 @@
-# Update Playbook
+# Update All Playbook
 ---
 
-### all hosts ###
 - hosts: all
   gather_facts: true
   become: true

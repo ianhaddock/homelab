@@ -1,4 +1,4 @@
-# play-blog.yaml
+# Blog Playbook
 ---
 
 - hosts: blog

@@ -1,4 +1,4 @@
-# play-devbox.yaml
+# Devbox Playbook
 ---
 
 - hosts: devbox
@@ -25,11 +25,6 @@
       ansible.builtin.systemd:
         name: network
         state: reloaded
-
-    - name: reload network Debian
-      ansible.builtin.systemd:
-        name: networking
-        state: restarted
 
     - name: reload sshd
       ansible.builtin.service:

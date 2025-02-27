@@ -1,6 +1,7 @@
-# vagrant.yml
+# initial setup
+# Used for Vagrant images as well as setting up a new box for ansible use
 ---
-- name: Vagrant provision play
+- name: provision play
   hosts: all
   become: true
   gather_facts: true
@@ -23,4 +24,3 @@
         daemon-reload: true
         name: networking
         state: restarted
-
