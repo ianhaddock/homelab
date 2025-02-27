@@ -1,15 +1,18 @@
 # play-blog.yaml
 ---
 
-### all hosts ###
-- hosts: all
-  gather_facts: true
+- hosts: blog
   become: true
 
   roles:
     - common
     - sshd
     - zram
+    - outbound_ip
+    - base-nginx
+    - file_store
+    - gitea
+    - blog
 
   handlers:
     - name: restart system
@@ -30,19 +33,6 @@
         name: sshd
         state: reloaded
 
-
-### blog vps ###
-- hosts: blog
-  become: true
-
-  roles:
-    - outbound_ip
-    - base-nginx
-    - file_store
-    - gitea
-    - blog
-
-  handlers:
     - name: reload nginx
       ansible.builtin.systemd:
         name: nginx

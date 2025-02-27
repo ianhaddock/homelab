@@ -1,15 +1,21 @@
 # play-rpi2b.yaml
 ---
 
-### all hosts ###
-- hosts: all
-  gather_facts: true
+- hosts: rpi2b
   become: true
 
   roles:
     - common
     - sshd
     - zram
+    - rpi2b_setup
+    - base-nginx
+    - hd-idle
+    - irssi
+    - wakeonwin
+    - piglow
+    - munin-node
+    - pihole
 
   handlers:
     - name: restart system
@@ -30,22 +36,6 @@
         name: sshd
         state: reloaded
 
-
-### RPi2B ###
-- hosts: rpi2b
-  become: true
-
-  roles:
-    - rpi2b_setup
-    - base-nginx
-    - hd-idle
-    - irssi
-    - wakeonwin
-    - piglow
-    - munin-node
-    - pihole
-
-  handlers:
     - name: reload nginx
       ansible.builtin.systemd:
         name: nginx
