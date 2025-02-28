@@ -1,4 +1,5 @@
 # flexget config.yml
+#
 ---
 schedules:
   - tasks: [raspberrypios]
@@ -6,11 +7,17 @@ schedules:
       days: 7
       jitter: 60
 
-  - tasks: [formula1-task]
+  - tasks: [libreoffice_mac, libreoffice_rpm]
+    schedule:
+      hour: 9
+      day_of_week: tue
+      jitter: 60
+
+  - tasks: [formula1-task, wec-task]
     schedule:
       minute: "*/5"
-      day_of_week: thu,fri,sat,sun,mon
-      jitter: 30
+      day_of_week: thu,fri,sat,sun
+      jitter: 15
 
 tasks:
   raspberrypios:
@@ -21,18 +28,42 @@ tasks:
         - "{{ ansible_date_time.year }}"
     download: "/watch_folder"
 
+  libreoffice_rpm:
+    html:
+      url: "https://www.libreoffice.org/download/download-libreoffice/?type=rpm-x86_64"
+    regexp:
+      accept:
+        - LibreOffice_25
+      reject:
+        - sdk
+        - src
+        - helppack
+    download: "/watch_folder"
+
+  libreoffice_mac:
+    html:
+      url: "https://www.libreoffice.org/download/download-libreoffice/?type=mac-aarch64"
+    regexp:
+      accept:
+        - LibreOffice_25
+      reject:
+        - sdk
+        - src
+        - helppack
+    download: "/watch_folder"
+
   formula1-task:
     rss:
       url: "{{ rss_2024_f1 }}"
     accept_all: true
     download: "/watch_folder"
 
-#  wec-task:
-#    rss:
-#      url: "{{ rss_2024_wec }}"
-#    regexp:
-#      accept:
-#        - 'Race'
-#        - 'FP'
-#    download: "/watch_folder"
-#
+  wec-task:
+    rss:
+      url: "{{ rss_2025_wec }}"
+    regexp:
+      accept:
+        - 'Race'
+      reject:
+        - 'Pack'
+    download: "/watch_folder"
