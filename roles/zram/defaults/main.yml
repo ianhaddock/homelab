@@ -1,0 +1,4 @@
+# zram defaults main
+---
+
+zram_swapfile_size: "512M"

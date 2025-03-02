@@ -47,7 +47,7 @@
 
 - name: create file for swap
   ansible.builtin.command:
-    cmd: fallocate -l 512M /var/swap
+    cmd: fallocate -l {{ zram_swapfile_size }} /var/swap
   when: not swapfile_check.stat.exists
 
 - name: set permissions on swapfile
