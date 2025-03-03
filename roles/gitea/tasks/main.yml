@@ -10,9 +10,13 @@
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
     comment: "gitea app account"
+  tags:
+    - gitea
 
 - name: install gitea container
   ansible.builtin.import_tasks: gitea.yml
+  tags:
+    - gitea
 
 - name: open git ssh port
   ansible.builtin.firewalld:
@@ -22,9 +26,13 @@
     state: enabled
   with_items:
     - "{{ app_ssh_port }}/tcp"
+  tags:
+    - gitea
 
 - name: set hosts files entries
   ansible.builtin.import_tasks: hosts_file.yml
+  tags:
+    - gitea
 
 - name: set forward proxy and http port
   ansible.builtin.include_role:
@@ -32,3 +40,5 @@
     tasks_from: forward_proxy.yml
     public: true
   when: containers
+  tags:
+    - gitea

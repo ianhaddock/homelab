@@ -13,6 +13,7 @@
     - plex
     - transmission
     - ac_backup
+    - gitea
 
   handlers:
     - name: restart system

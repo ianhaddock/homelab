@@ -43,6 +43,7 @@
   tags:
     - transmission
     - plex
+    - gitea
 
 - name: set nginx subdomain https forward proxy
   ansible.builtin.template:
@@ -56,3 +57,4 @@
   tags:
     - transmission
     - plex
+    - gitea

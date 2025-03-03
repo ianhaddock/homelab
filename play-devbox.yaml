@@ -10,7 +10,6 @@
     - zram
     - zfs
     - base-nginx
-    - gitea
     - munin-node
     - munin-server
     - jenkins

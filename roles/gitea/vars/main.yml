@@ -8,3 +8,6 @@ app_gid: 1208
 app_name: git
 app_port: 8082
 app_ssh_port: 2222
+
+cpu_core_limit: 2
+memory_limit: "1024M"
