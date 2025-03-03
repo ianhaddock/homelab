@@ -8,3 +8,6 @@ app_gid: 1214
 app_name: minio
 api_port: 9000
 app_port: 9001
+
+cpu_core_limit: 2
+memory_limit: "4096M"

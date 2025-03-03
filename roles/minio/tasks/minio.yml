@@ -8,17 +8,32 @@
     mode: '0755'
     state: directory
   with_items:
+    - "{{ containers_path }}/{{ app_user }}"
     - "{{ containers_path }}/{{ app_user }}/data"
     - "{{ containers_path }}/{{ app_user }}/config"
+
+- name: stop container if exists
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    name: "container-{{ app_name }}"
+    enabled: true
+    state: stopped
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  register: app_stop_result
+  failed_when: "app_stop_result is failed and 'Could not find the requested service container-' not in app_stop_result.msg"
 
 - name: create minio container
   become_user: "{{ app_user }}"
   containers.podman.podman_container:
-    recreate: true
+    recreate: false
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
-    image: quay.io/minio/minio:latest
+    image: quay.io/minio/minio:RELEASE.2025-02-28T09-55-16Z
     command: server /data --console-address 127.0.0.1:9001
+    cpus: "{{ cpu_core_limit }}"
+    memory: "{{ memory_limit }}"
     ports:
       - "{{ api_port }}:9000/tcp"
       - "{{ app_port }}:9001/tcp"
@@ -29,7 +44,6 @@
       MINIO_ROOT_PASSWORD: " {{ minio_password }}"
     generate_systemd: {"path": "/home/{{ app_user }}/.config/systemd/user"}
     state: present
-  register: container_state
 
 - name: enable and start
   become_user: "{{ app_user }}"
@@ -41,5 +55,3 @@
     scope: user
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
-  when: container_state.changed
-  register: files_systemctl_debug

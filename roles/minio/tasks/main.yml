@@ -10,6 +10,8 @@
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
     comment: "{{ app_name }} account"
+  tags:
+    - minio
 
 - name: install minio container
   ansible.builtin.import_tasks: minio.yml
@@ -25,6 +27,8 @@
   with_items:
     - "{{ api_port }}/tcp"
     - "{{ app_port }}/tcp"
+  tags:
+    - minio
 
 - name: set forward proxy and http port
   ansible.builtin.include_role:
@@ -32,3 +36,5 @@
     tasks_from: forward_proxy.yml
     public: true
   when: containers
+  tags:
+    - minio

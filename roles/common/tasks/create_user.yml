@@ -7,6 +7,7 @@
   tags:
     - ac_backup
     - gitea
+    - minio
 
 - name: create user
   ansible.builtin.user:
@@ -19,6 +20,7 @@
   tags:
     - ac_backup
     - gitea
+    - minio
 
 - name: check if linger is enabled
   ansible.builtin.stat:
@@ -27,6 +29,7 @@
   tags:
     - ac_backup
     - gitea
+    - minio
 
 - name: enable linger
   ansible.builtin.command:
@@ -35,6 +38,7 @@
   tags:
     - ac_backup
     - gitea
+    - minio
 
 - name: add XDG_RUNTIME_DIR to .bashrc as a workaround to systemd-nspawn
   ansible.builtin.lineinfile:
@@ -44,6 +48,7 @@
   tags:
     - ac_backup
     - gitea
+    - minio
 
     # - name: install systemd-container package for machinectl
     #  so this is the new way to switch users with a clean login environment

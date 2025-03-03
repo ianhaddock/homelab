@@ -44,6 +44,7 @@
     - transmission
     - plex
     - gitea
+    - minio
 
 - name: set nginx subdomain https forward proxy
   ansible.builtin.template:
@@ -58,3 +59,4 @@
     - transmission
     - plex
     - gitea
+    - minio
