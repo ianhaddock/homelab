@@ -1,10 +1,10 @@
 # ac backup
 ---
-app_user: ac_backup
+app_user: acbackup
 app_uid: 1206
-app_group: ac_backup
+app_group: acbackup
 app_gid: 1206
-app_comment: "AC Backups"
+app_comment: "sDrive Backups"
 
 app_script: '/usr/local/sbin/ac_backup_script.sh'
 app_log: '/var/log/ac_backup_script.log'

@@ -10,7 +10,6 @@
     - zram
     - zfs
     - base-nginx
-    - ac_backup
     - gitea
     - munin-node
     - munin-server

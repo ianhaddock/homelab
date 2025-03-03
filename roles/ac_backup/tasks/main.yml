@@ -10,16 +10,22 @@
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
     comment: "{{ app_comment }}"
+  tags:
+    - ac_backup
 
 - name: copy key
   ansible.builtin.shell:
     cmd: "cat /home/{{ app_user }}/.ssh/{{ app_user }}.pub"
   register: ssh_key
+  tags:
+    - ac_backup
 
 - name: debug keys
   ansible.builtin.debug:
     msg: "{{ ssh_key.stdout }}"
   when: verbose
+  tags:
+    - ac_backup
 
     ## requires update to ACSM admin user ##
     # - name: copy key to target
@@ -37,6 +43,8 @@
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
     mode: '0644'
+  tags:
+    - ac_backup
 
 - name: create local storage directory
   ansible.builtin.file:
@@ -45,6 +53,8 @@
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
     mode: '0755'
+  tags:
+    - ac_backup
 
 - name: install script
   ansible.builtin.template:
@@ -53,6 +63,8 @@
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
     mode: '0740'
+  tags:
+    - ac_backup
 
 - name: add cron job
   become_user: "{{ app_user }}"
@@ -61,3 +73,5 @@
     minute: "45"
     hour: "6"
     job: "{{ app_script }} >> {{ app_log }} 2>&1"
+  tags:
+    - ac_backup

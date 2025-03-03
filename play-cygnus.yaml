@@ -12,6 +12,7 @@
     - base-nginx
     - plex
     - transmission
+    - ac_backup
 
   handlers:
     - name: restart system

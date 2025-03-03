@@ -4,6 +4,8 @@
   ansible.builtin.group:
     name: "{{ group }}"
     gid: "{{ gid }}"
+  tags:
+    - ac_backup
 
 - name: create user
   ansible.builtin.user:
@@ -13,23 +15,31 @@
     comment: "{{ comment }}"
     generate_ssh_key: true
     ssh_key_file: ".ssh/{{ user }}"
+  tags:
+    - ac_backup
 
 - name: check if linger is enabled
   ansible.builtin.stat:
     path: "/var/lib/systemd/linger/{{ user }}"
   register: linger_status
   when: containers
+  tags:
+    - ac_backup
 
 - name: enable linger
   ansible.builtin.command:
     cmd: "loginctl enable-linger {{ user }}"
   when: containers and not linger_status.stat.exists
+  tags:
+    - ac_backup
 
 - name: add XDG_RUNTIME_DIR to .bashrc as a workaround to systemd-nspawn
   ansible.builtin.lineinfile:
     path: "/home/{{ user }}/.bashrc"
     line: 'export XDG_RUNTIME_DIR=/run/user/$UID'
     regexp: '^export XDG_RUNTIME_DIR'
+  tags:
+    - ac_backup
 
     # - name: install systemd-container package for machinectl
     #  so this is the new way to switch users with a clean login environment
