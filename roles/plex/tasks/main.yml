@@ -1,6 +1,13 @@
-# main.yml
+# plex/tasks/main.yml
 #
 ---
+- name: base setup samba and avahi
+  ansible.builtin.include_role:
+    name: samba
+    tasks_from: main.yaml
+  tags:
+    - plex
+
 - name: create isolation user and group. Enable linger
   ansible.builtin.include_role:
     name: common
@@ -11,12 +18,16 @@
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
     comment: "{{ app_name }} account"
+  tags:
+    - plex
 
 - name: add user to groups
   ansible.builtin.user:
     name: "{{ app_user }}"
     groups: "{{ append_groups }}"
     append: true
+  tags:
+    - plex
 
 - name: create media directories for plex
   ansible.builtin.file:
@@ -31,12 +42,25 @@
     - "{{ media_path }}/lemans"
     - "{{ media_path }}/movies"
     - "{{ media_path }}/music"
-    - "{{ media_path }}/staging"
     - "{{ media_path }}/tvshows"
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
     - "{{ media_path }}/yt_tunes"
     - "{{ transmission_path }}"
+  tags:
+    - plex
+
+- name: create staging directory with open permissions
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0777'
+    state: directory
+  with_items:
+    - "{{ media_path }}/staging"
+  tags:
+    - plex
 
 - name: install plex container
   ansible.builtin.import_tasks: podman_plex.yml
@@ -58,6 +82,28 @@
 - name: install yt-dlp scripts
   ansible.builtin.import_tasks: ytdlp_scripts.yml
   when: containers and ansible_os_family == "RedHat"
+  tags:
+    - plex
+
+- name: add include statement to smb.conf file
+  ansible.builtin.lineinfile:
+    path: /etc/samba/smb.conf
+    state: present
+    regexp: '^include =$'
+    line: 'include = /etc/samba/smb.d/{{ app_name }}.conf'
+  tags:
+    - plex
+
+- name: add plex.conf file to smb.d
+  ansible.builtin.template:
+    src: centos_smb.plex.conf.j2
+    dest: "/etc/samba/smb.d/{{ app_name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart smb
+  tags:
+    - plex
 
 - name: set plex container forward proxy and ports
   ansible.builtin.include_role:
@@ -65,6 +111,8 @@
     tasks_from: forward_proxy.yml
     public: true
   when: containers and ansible_os_family == "RedHat"
+  tags:
+    - plex
 
 - name: set rpi2b forward proxy and ports
   ansible.builtin.include_role:
@@ -74,3 +122,5 @@
     app_port: 32400
     app_name: plex
   when: ansible_facts.machine == "armv7l"
+  tags:
+    - plex

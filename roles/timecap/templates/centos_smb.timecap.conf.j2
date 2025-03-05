@@ -1,7 +1,6 @@
 # include files must be listed in smb.conf
 #
 
-
 [{{ app_name }}]
     comment = Timecapsule
     path = {{ app_path }}/{{ app_name }}/%U
@@ -11,7 +10,7 @@
     guest ok = no
     read only = no 
     browsable = yes 
-    vfs objects = catia fruit streams_xattr
-    fruit:time machine = yes
-    #fruit:time machine max size = 768G
 
+;   ref: https://wiki.samba.org/index.php/Configure_Samba_to_Work_Better_with_Mac_OS_X
+    fruit:time machine = yes
+    spotlight backend = elasticsearch

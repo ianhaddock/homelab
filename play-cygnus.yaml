@@ -9,6 +9,7 @@
     - sshd
     - zram
     - hd-idle
+    - samba
     - timecap
     - base-nginx
     - plex

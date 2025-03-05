@@ -1,0 +1,83 @@
+# samba/tasks/main.yaml
+---
+- name: install samba, avahi, and avahi-tools
+  ansible.builtin.package:
+    name:
+      - samba
+      - avahi
+      - avahi-tools
+    state: latest  # noqa package-latest
+  tags:
+    - timecap
+    - transmission
+    - plex
+    - samba
+
+- name: open smb 445/tcp port
+  ansible.builtin.firewalld:
+    port: 445/tcp
+    state: enabled
+    permanent: true
+  tags:
+    - timecap
+    - transmission
+    - plex
+    - samba
+
+- name: open mDNS 5353/udp port
+  ansible.builtin.firewalld:
+    port: 5353/udp
+    state: enabled
+    permanent: true
+  tags:
+    - timecap
+    - transmission
+    - plex
+    - samba
+
+- name: tweak filewall PIv6 filtering for avahi
+  ansible.builtin.lineinfile:
+    path: '/etc/firewalld/firewalld.conf'
+    regexp: '^IPv6_rpfilter='
+    line: 'IPv6_rpfilter=no'
+  notify: reload firewall
+  tags:
+    - timecap
+    - transmission
+    - plex
+    - samba
+
+- name: add smb.conf template
+  ansible.builtin.template:
+    src: centos_smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - timecap
+    - transmission
+    - plex
+    - samba
+
+- name: create smb.d folder for config files
+  ansible.builtin.file:
+    path: /etc/samba/smb.d
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+  tags:
+    - timecap
+    - transmission
+    - plex
+    - samba
+
+- name: notify user passwords need to be set
+  ansible.builtin.debug:
+    msg: "*** NOTE: Set Samba passwords:sudo echo _password_ | smbpasswd -s -a _username_ ***"
+  tags:
+    - timecap
+    - transmission
+    - plex
+    - samba
