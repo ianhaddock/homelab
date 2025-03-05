@@ -7,6 +7,8 @@
       - hdparm
       - hd-idle
     state: latest  # noqa package-latest
+  tags:
+    - hd-idle
 
 - name: update hd-idle defaults file
   ansible.builtin.template:
@@ -15,6 +17,8 @@
     owner: root
     group: root
     mode: '0644'
+  tags:
+    - hd-idle
 
 - name: enable and start hd-idle service
   ansible.builtin.systemd:
@@ -22,6 +26,8 @@
     name: hd-idle
     enabled: true
     state: started
+  tags:
+    - hd-idle
 
 - name: create log file
   ansible.builtin.file:
@@ -30,3 +36,5 @@
     group: root
     mode: '0644'
     state: touch
+  tags:
+    - hd-idle

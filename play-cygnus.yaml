@@ -8,6 +8,7 @@
     - common
     - sshd
     - zram
+    - hd-idle
     - timecap
     - base-nginx
     - plex

@@ -10,7 +10,7 @@
 # properly update HD_IDLE_OPTS in order to star hd-idle
 
 ## set no idle for all drives, set /dev/sda to 5 min idle time only, log events
-HD_IDLE_OPTS="-i 0 -a /dev/sda -i 300 -l /var/log/hd-idle.log"
+HD_IDLE_OPTS="-i 0 -a {{ hdd_device }} -i 300 -l /var/log/hd-idle.log"
 
 # hd-idle command line options
 # Options are:

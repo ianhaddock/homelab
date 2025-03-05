@@ -1,0 +1,3 @@
+# defaults
+---
+hdd_device: '/dev/sda'
