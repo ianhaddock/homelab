@@ -1,0 +1,3 @@
+# dnf vars main.yaml
+---
+dnf_max_parallel_downloads: 10

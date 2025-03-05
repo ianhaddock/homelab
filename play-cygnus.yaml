@@ -5,6 +5,7 @@
   become: true
 
   roles:
+    - dnf
     - common
     - sshd
     - zram

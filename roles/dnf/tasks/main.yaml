@@ -1,0 +1,17 @@
+#dnf main.yaml
+---
+- name: enable fastestmirror
+  ansible.builtin.lineinfile:
+    path: /etc/dnf/dnf.conf
+    line: 'fastestmorror=1'
+    state: present
+  tags:
+    - dnf
+
+- name: increase max_parallel_downloads
+  ansible.builtin.lineinfile:
+    path: /etc/dnf/dnf.conf
+    line: 'max_parallel_downloads={{ dnf_max_parallel_downloads }}'
+    state: present
+  tags:
+    - dnf  
