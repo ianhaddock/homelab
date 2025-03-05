@@ -1,0 +1,50 @@
+# install isos
+---
+- name: base setup samba and avahi
+  ansible.builtin.include_role:
+    name: samba
+    tasks_from: main.yaml
+  tags:
+    - isos
+
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "{{ app_name }} account"
+  tags:
+    - isos
+
+- name: check if app path is created
+  ansible.builtin.stat:
+    path: "{{ app_media }}"
+  register: app_media_stat
+  tags:
+    - isos
+
+- name: create directories
+  ansible.builtin.file:
+    path: "{{ app_media }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0775'
+    state: directory
+  when: not (app_media_stat.stat.isdir is defined and app_media_stat.stat.isdir)
+  tags:
+    - isos
+
+- name: add isos.conf file to smb.d
+  ansible.builtin.template:
+    src: centos_smb.isos.conf.j2
+    dest: "/etc/samba/smb.d/{{ app_name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart smb
+  tags:
+    - isos

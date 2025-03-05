@@ -1,0 +1,10 @@
+# isos
+---
+app_user: isos
+app_uid: 1211
+app_group: isos
+app_gid: 1211
+
+app_name: isos
+
+app_media: "/mnt/{{ app_name }}"

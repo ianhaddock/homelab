@@ -10,6 +10,7 @@
     - zram
     - hd-idle
     - samba
+    - isos
     - timecap
     - base-nginx
     - plex

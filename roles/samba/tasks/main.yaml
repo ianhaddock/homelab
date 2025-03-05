@@ -8,6 +8,7 @@
       - avahi-tools
     state: latest  # noqa package-latest
   tags:
+    - isos
     - timecap
     - transmission
     - plex
@@ -19,6 +20,7 @@
     state: enabled
     permanent: true
   tags:
+    - isos
     - timecap
     - transmission
     - plex
@@ -30,6 +32,7 @@
     state: enabled
     permanent: true
   tags:
+    - isos
     - timecap
     - transmission
     - plex
@@ -42,6 +45,7 @@
     line: 'IPv6_rpfilter=no'
   notify: reload firewall
   tags:
+    - isos
     - timecap
     - transmission
     - plex
@@ -55,6 +59,7 @@
     group: root
     mode: 0644
   tags:
+    - isos
     - timecap
     - transmission
     - plex
@@ -68,6 +73,7 @@
     mode: '0755'
     state: directory
   tags:
+    - isos
     - timecap
     - transmission
     - plex
@@ -77,6 +83,7 @@
   ansible.builtin.debug:
     msg: "*** NOTE: Set Samba passwords:sudo echo _password_ | smbpasswd -s -a _username_ ***"
   tags:
+    - isos
     - timecap
     - transmission
     - plex
