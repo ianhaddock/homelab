@@ -1,0 +1,65 @@
+# See smb.conf.example for a more detailed config file or
+# read the smb.conf manpage.
+# Run 'testparm' to verify the config is correct after
+# you modified it.
+#
+# Note:
+# SMB1 is disabled by default. This means clients without support for SMB2 or
+# SMB3 are no longer able to connect to smbd (by default).
+
+[global]
+        workgroup = SAMBA
+        security = user
+
+        passdb backend = tdbsam
+
+;       ref: wiki.samba.org/index.php/Configure_Samba_to_Work_Better_with_Mac_OS_X
+        min protocol = SMB2
+        ea support = yes
+        vfs objects = catia fruit streams_xattr
+        fruit:metadata = stream
+        fruit:model = MacSamba
+        fruit:veto_appledouble = no
+        fruit:nfs_aces = no
+        fruit:wipe_intentionally_left_blank_rfork = yes
+        fruit:delete_empty_adfiles = yes
+        fruit:posix_rename = yes
+        fruit:zero_file_id = yes
+
+;       ref: https://www.samba.org/samba/docs/current/man-html/vfs_catia.8.html
+;       ref: https://unix.stackexchange.com/questions/299130/samba-how-to-display-files-with-colon-in-their-names/381639#381639
+        mangled names = no
+        catia:mappings = 0x22:0xa8,0x2a:0xa4,0x2f:0xf8,0x3a:0xf7,0x3c:0xab,0x3e:0xbb,0x3f:0xbf,0x5c:0xff,0x7c:0xa6
+
+;        printing = cups
+;        printcap name = cups
+;        load printers = yes
+;        cups options = raw
+
+[homes]
+        comment = Home Directories
+        valid users = %S, %D%w%S
+        browseable = No
+        read only = No
+        inherit acls = Yes
+
+;[printers]
+;        comment = All Printers
+;        path = /var/tmp
+;        printable = Yes
+;        create mask = 0600
+;        browseable = No
+
+;[print$]
+;        comment = Printer Drivers
+;        path = /var/lib/samba/drivers
+;        write list = @printadmin root
+;        force group = @printadmin
+;        create mask = 0664
+;        directory mask = 0775
+
+
+;       includes
+include = /etc/samba/smb.d/plex.conf
+include = /etc/samba/smb.d/timecapsule.conf
+include = /etc/samba/smb.d/transmission.conf

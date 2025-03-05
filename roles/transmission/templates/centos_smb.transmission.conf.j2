@@ -1,0 +1,13 @@
+# include files must be listed in smb.conf
+#
+
+[{{ app_name }}]
+    comment = {{ app_name }} Files 
+    path = {{ app_media }}
+    valid users = {{ app_user }}{% for admin in administrators %}, {{ admin[0] }}{% endfor %} 
+    writable = yes
+    durable handles = yes
+    guest ok = no
+    read only = no 
+    browsable = yes 
+    spotlight backend = elasticsearch

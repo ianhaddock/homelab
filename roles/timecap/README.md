@@ -4,15 +4,11 @@
 
 Apple's networked time machine service using samba and avahi-daemon.
 
-### Firewall
-* `445/tcp` smb
-* `5353/udp` mDNS/Avahi
-* `ipv6_rpfilter=no` firewalld
-
 ### Samba
-* Configuration uses an `include=` in the main smb.conf file to point to the /etc/samba/smb.d/timecap.conf file.
-* User directories created at `/app_path/app_name/username`
-* A notification message is shown at the end that a Samba password must be set per user.
+* uses samba role for base setup
+* Config uses `include=` in smb.conf to point to /etc/samba/smb.d/timecap.conf
+* User directories at `/app_path/app_name/username`
+* Per user quotas
 
 ### Avahi
 * uses the `Xserve1,1` model type icon

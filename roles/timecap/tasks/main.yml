@@ -2,6 +2,12 @@
 # Apple Timecapsule
 #
 ---
+- name: base setup samba and avahi
+  ansible.builtin.include_role:
+    name: samba
+    tasks_from: main.yaml
+  tags:
+    - timecap
 
 - name: create isolation user and group. Enable linger
   ansible.builtin.include_role:
@@ -28,6 +34,16 @@
   tags:
     - timecap
 
+- name: add administrators to timecap group
+  ansible.builtin.user:
+    name: "{{ item[0] }}"
+    groups: "{{ app_group }}"
+    append: true
+  with_items:
+    - "{{ administrators }}"
+  tags:
+    - timecap
+
 - name: setup user subdirectories
   ansible.builtin.file:
     path: "{{ app_path }}/{{ app_name }}/{{ item[0] }}"
@@ -35,16 +51,6 @@
     group: "{{ item[2] }}"
     mode: '0750'
     state: directory
-  with_items:
-    - "{{ administrators }}"
-  tags:
-    - timecap
-
-- name: add administrators to timecap group
-  ansible.builtin.user:
-    name: "{{ item[0] }}"
-    groups: "{{ app_group }}"
-    append: true
   with_items:
     - "{{ administrators }}"
   tags:
@@ -62,45 +68,33 @@
   tags:
     - timecap
 
-- name: open smb 445/tcp port
-  ansible.builtin.firewalld:
-    port: 445/tcp
-    state: enabled
-    permanent: true
-  tags:
-    - timecap
-
-- name: open mDNS 5353/udp port
-  ansible.builtin.firewalld:
-    port: 5353/udp
-    state: enabled
-    permanent: true
-  tags:
-    - timecap
-
-- name: tweak filewall PIv6 filtering for avahi
+- name: add include statement to smb.conf file
   ansible.builtin.lineinfile:
-    path: '/etc/firewalld/firewalld.conf'
-    regexp: '^IPv6_rpfilter='
-    line: 'IPv6_rpfilter=no'
-  notify: reload firewall
+    path: /etc/samba/smb.conf
+    state: present
+    regexp: '^include =$'
+    line: 'include = /etc/samba/smb.d/{{ app_name }}.conf'
   tags:
     - timecap
 
-- name: install and configure samba and avahi on Raspbian
-  ansible.builtin.include_tasks: raspbian.yml
-  when: ansible_distribution == "Raspbian"
+- name: add timecap.conf file to smb.d
+  ansible.builtin.template:
+    src: centos_smb.timecap.conf.j2
+    dest: "/etc/samba/smb.d/{{ app_name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart smb
   tags:
     - timecap
 
-- name: install and configure samba and avahi on CentOS
-  ansible.builtin.include_tasks: centos.yml
-  when: ansible_distribution == "CentOS"
-  tags:
-    - timecap
-
-- name: notify user passwords need to be set
-  ansible.builtin.debug:
-    msg: "*** NOTE: Set Samba passwords:sudo echo _password_ | smbpasswd -s -a _username_ ***"
+- name: configure avahi samba service
+  ansible.builtin.template:
+    src: centos_avahi.samba.service.j2
+    dest: /etc/avahi/services/samba.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart avahi
   tags:
     - timecap

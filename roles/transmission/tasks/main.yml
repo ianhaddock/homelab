@@ -1,5 +1,12 @@
 # install transmission
 ---
+- name: base setup samba and avahi
+  ansible.builtin.include_role:
+    name: samba
+    tasks_from: main.yaml
+  tags:
+    - transmission
+
 - name: create isolation user and group. Enable linger
   ansible.builtin.include_role:
     name: common
@@ -71,6 +78,26 @@
   ansible.builtin.import_tasks: motorsort.yaml
   tags:
     - motorsort
+
+- name: add include statement to smb.conf file
+  ansible.builtin.lineinfile:
+    path: /etc/samba/smb.conf
+    state: present
+    regexp: '^include =$'
+    line: 'include = /etc/samba/smb.d/{{ app_name }}.conf'
+  tags:
+    - transmission
+
+- name: add transmission.conf file to smb.d
+  ansible.builtin.template:
+    src: centos_smb.transmission.conf.j2
+    dest: "/etc/samba/smb.d/{{ app_name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart smb
+  tags:
+    - transmission
 
 - name: open app data port on firewall
   ansible.builtin.firewalld:
