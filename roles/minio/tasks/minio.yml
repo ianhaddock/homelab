@@ -31,7 +31,7 @@
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
     image: quay.io/minio/minio:RELEASE.2025-02-28T09-55-16Z
-    command: server /data --console-address 127.0.0.1:9001
+    command: server /data --console-address :9001
     cpus: "{{ cpu_core_limit }}"
     memory: "{{ memory_limit }}"
     ports:
