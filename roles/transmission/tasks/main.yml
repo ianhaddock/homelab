@@ -20,6 +20,16 @@
   tags:
     - transmission
 
+- name: add administrators to transmission group
+  ansible.builtin.user:
+    name: "{{ item[0] }}"
+    groups: "{{ app_group }}"
+    append: true
+  with_items:
+    - "{{ administrators }}"
+  tags:
+    - transmission
+
 - name: add sysctl 00-transmission.conf
   ansible.builtin.template:
     src: 00-transmission.conf.j2
