@@ -20,6 +20,16 @@
   tags:
     - isos
 
+- name: add administrators to isos group
+  ansible.builtin.user:
+    name: "{{ item[0] }}"
+    groups: "{{ app_group }}"
+    append: true
+  with_items:
+    - "{{ administrators }}"
+  tags:
+    - isos
+
 - name: check if app path is created
   ansible.builtin.stat:
     path: "{{ app_media }}"
@@ -27,14 +37,14 @@
   tags:
     - isos
 
-- name: create directories
+- name: create iso directory if not already a link
   ansible.builtin.file:
     path: "{{ app_media }}"
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
     mode: '0775'
     state: directory
-  when: not (app_media_stat.stat.isdir is defined and app_media_stat.stat.isdir)
+  when: app_media_stat.stat.islnk is defined and app_media_stat.stat.islnk == False
   tags:
     - isos
 
