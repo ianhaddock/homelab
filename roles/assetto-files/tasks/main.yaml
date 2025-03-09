@@ -1,0 +1,60 @@
+# install assetto-files
+---
+- name: base setup samba and avahi
+  ansible.builtin.include_role:
+    name: samba
+    tasks_from: main.yaml
+  tags:
+    - assetto-files
+
+- name: create isolation user and group. Enable linger
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: create_user.yml
+  vars:
+    user: "{{ app_user }}"
+    uid: "{{ app_uid }}"
+    group: "{{ app_group }}"
+    gid: "{{ app_gid }}"
+    comment: "{{ app_name }} account"
+  tags:
+    - assetto-files
+
+- name: add administrators to assetto-files group
+  ansible.builtin.user:
+    name: "{{ item[0] }}"
+    groups: "{{ app_group }}"
+    append: true
+  with_items:
+    - "{{ administrators }}"
+  tags:
+    - assetto-files
+
+- name: check if app path is created
+  ansible.builtin.stat:
+    path: "{{ app_media }}"
+  register: app_media_stat
+  tags:
+    - assetto-files
+
+- name: create assetto files  directory if not already a link
+  ansible.builtin.file:
+    path: "{{ app_media }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0775'
+    state: directory
+  when: app_media_stat.stat.islnk is defined and app_media_stat.stat.islnk == False
+  tags:
+    - assetto-files
+
+- name: add assetto-files.conf file to smb.d
+  ansible.builtin.template:
+    src: "centos_smb.{{ app_name }}.conf.j2"
+    dest: "/etc/samba/smb.d/{{ app_name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart smb
+  tags:
+    - assetto-files

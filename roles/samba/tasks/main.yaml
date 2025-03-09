@@ -8,11 +8,11 @@
       - avahi-tools
     state: latest  # noqa package-latest
   tags:
+    - assetto-files
     - isos
     - timecap
     - transmission
     - plex
-    - samba
 
 - name: open smb 445/tcp port
   ansible.builtin.firewalld:
@@ -20,11 +20,12 @@
     state: enabled
     permanent: true
   tags:
+    - assetto-files
+    - isos
     - isos
     - timecap
     - transmission
     - plex
-    - samba
 
 - name: open mDNS 5353/udp port
   ansible.builtin.firewalld:
@@ -32,11 +33,12 @@
     state: enabled
     permanent: true
   tags:
+    - assetto-files
+    - isos
     - isos
     - timecap
     - transmission
     - plex
-    - samba
 
 - name: tweak filewall PIv6 filtering for avahi
   ansible.builtin.lineinfile:
@@ -45,11 +47,12 @@
     line: 'IPv6_rpfilter=no'
   notify: reload firewall
   tags:
+    - assetto-files
+    - isos
     - isos
     - timecap
     - transmission
     - plex
-    - samba
 
 - name: add smb.conf template
   ansible.builtin.template:
@@ -59,11 +62,12 @@
     group: root
     mode: 0644
   tags:
+    - assetto-files
+    - isos
     - isos
     - timecap
     - transmission
     - plex
-    - samba
 
 - name: create smb.d folder for config files
   ansible.builtin.file:
@@ -73,18 +77,20 @@
     mode: '0755'
     state: directory
   tags:
+    - assetto-files
+    - isos
     - isos
     - timecap
     - transmission
     - plex
-    - samba
 
 - name: notify user passwords need to be set
   ansible.builtin.debug:
     msg: "*** NOTE: Set Samba passwords:sudo echo _password_ | smbpasswd -s -a _username_ ***"
   tags:
+    - assetto-files
+    - isos
     - isos
     - timecap
     - transmission
     - plex
-    - samba

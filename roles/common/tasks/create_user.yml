@@ -6,6 +6,7 @@
     gid: "{{ gid }}"
   tags:
     - ac_backup
+    - assetto-files
     - gitea
     - isos
     - minio
@@ -20,6 +21,8 @@
     ssh_key_file: ".ssh/{{ user }}"
   tags:
     - ac_backup
+    - assetto-files
+    - gitea
     - gitea
     - isos
     - minio

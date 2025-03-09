@@ -1,0 +1,10 @@
+# assetto-files
+---
+app_user: assetto-files
+app_uid: 1216
+app_group: assetto-files
+app_gid: 1216
+
+app_name: assetto-files
+
+app_media: "/mnt/{{ app_name }}/"
