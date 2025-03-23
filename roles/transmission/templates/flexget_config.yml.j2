@@ -13,7 +13,7 @@ schedules:
       day_of_week: tue
       jitter: 60
 
-  - tasks: [formula1-task, wec-task]
+  - tasks: [formula1, wec-task]
     schedule:
       minute: "*/5"
       day_of_week: thu,fri,sat,sun
@@ -52,12 +52,6 @@ tasks:
         - helppack
     download: "/watch_folder"
 
-  formula1-task:
-    rss:
-      url: "{{ rss_2024_f1 }}"
-    accept_all: true
-    download: "/watch_folder"
-
   wec-task:
     rss:
       url: "{{ rss_2025_wec }}"
@@ -66,4 +60,20 @@ tasks:
         - 'Race'
       reject:
         - 'Pack'
+    download: "/watch_folder"
+
+  formula1:
+    rss:
+      url: "{{ rss_2025_f1 }}"
+    regexp:
+      accept:
+        - Race
+        - Qualifying
+        - Sprint
+        - English
+      reject:
+        - Pre
+        - Post
+        - F1TV
+        - Chequered.Flag
     download: "/watch_folder"
