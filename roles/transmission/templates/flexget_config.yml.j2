@@ -13,7 +13,7 @@ schedules:
       day_of_week: tue
       jitter: 60
 
-  - tasks: [formula1, wec-task]
+  - tasks: [f1, wec]
     schedule:
       minute: "*/5"
       day_of_week: thu,fri,sat,sun
@@ -52,17 +52,21 @@ tasks:
         - helppack
     download: "/watch_folder"
 
-  wec-task:
+  wec:
     rss:
       url: "{{ rss_2025_wec }}"
     regexp:
       accept:
         - 'Race'
+        - 'English'
       reject:
         - 'Pack'
+        - 'Hilights'
+        - 'Review'
+        - '.ts'
     download: "/watch_folder"
 
-  formula1:
+  f1:
     rss:
       url: "{{ rss_2025_f1 }}"
     regexp:
