@@ -7,7 +7,7 @@ schedules:
       days: 7
       jitter: 60
 
-  - tasks: [libreoffice_mac, libreoffice_rpm]
+  - tasks: [libreoffice_mac_aarch, libreoffice_mac_x86, libreoffice_rpm]
     schedule:
       hour: 9
       day_of_week: tue
@@ -40,9 +40,21 @@ tasks:
         - helppack
     download: "/watch_folder"
 
-  libreoffice_mac:
+  libreoffice_mac_aarch:
     html:
       url: "https://www.libreoffice.org/download/download-libreoffice/?type=mac-aarch64"
+    regexp:
+      accept:
+        - LibreOffice_25
+      reject:
+        - sdk
+        - src
+        - helppack
+    download: "/watch_folder"
+
+  libreoffice_mac_x86:
+    html:
+      url: "https://www.libreoffice.org/download/download-libreoffice/?type=mac-x86_64"
     regexp:
       accept:
         - LibreOffice_25
