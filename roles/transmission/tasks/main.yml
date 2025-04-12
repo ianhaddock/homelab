@@ -66,6 +66,20 @@
     - "{{ app_media }}/watch_folder"
   tags:
     - transmission
+    - flexget
+
+- name: update ownership of any files already in watch_folder
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ app_media }}/watch_folder"
+  tags:
+    - transmission
+    - flexget
 
 - name: install in container
   ansible.builtin.import_tasks: podman_transmission.yml

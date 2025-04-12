@@ -13,7 +13,7 @@ schedules:
       day_of_week: tue
       jitter: 60
 
-  - tasks: [f1, wec]
+  - tasks: [f1, f1_720p, wec]
     schedule:
       minute: "*/5"
       day_of_week: thu,fri,sat,sun
@@ -88,6 +88,25 @@ tasks:
         - Sprint
         - English
       reject:
+        - Pre
+        - Post
+        - F1TV
+        - Chequered
+    download: "/watch_folder"
+
+  f1_720p:
+    rss:
+      url: "{{ rss_2025_f1_enzo }}"
+    regexp:
+      accept:
+        - Race
+        - Quali
+        - Sprint
+        - English
+      reject:
+        - FP1
+        - FP2
+        - FP3
         - Pre
         - Post
         - F1TV
