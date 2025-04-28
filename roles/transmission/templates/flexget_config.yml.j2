@@ -13,7 +13,7 @@ schedules:
       day_of_week: tue
       jitter: 60
 
-  - tasks: [f1, f1_720p, wec]
+  - tasks: [f1_hot, wec]
     schedule:
       minute: "*/5"
       day_of_week: thu,fri,sat,sun
@@ -76,6 +76,27 @@ tasks:
         - 'Hilights'
         - 'Review'
         - '.ts'
+    download: "/watch_folder"
+
+  f1_hot:
+    rss:
+      url: "{{ rss_2025_f1 }}"
+    regexp:
+      accept:
+        - Race
+        - Sprint
+        - Quali
+        - SKY
+        - F1TV
+        - 1080p
+        - English
+      reject:
+        - Pre
+        - Post
+        - FP1
+        - FP2
+        - FP3
+        - Chequered
     download: "/watch_folder"
 
   f1:
