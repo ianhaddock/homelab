@@ -80,41 +80,20 @@ tasks:
 
   f1_hot:
     rss:
-      url: "{{ rss_2025_f1 }}"
+      url: "{{ rss_2025_f1_layer }}"
     regexp:
-      accept:
-        - Race
-        - Sprint
-        - Quali
-        - SKY
-        - F1TV
-        - 1080p
-        - English
       reject:
         - Pre
         - Post
+        - Show
+        - Conference
+        - Free
         - FP1
         - FP2
         - FP3
         - F1LIVE
         - Palmer
         - Warm
-        - Chequered
-    download: "/watch_folder"
-
-  f1:
-    rss:
-      url: "{{ rss_2025_f1 }}"
-    regexp:
-      accept:
-        - Race
-        - Qualifying
-        - Sprint
-        - English
-      reject:
-        - Pre
-        - Post
-        - F1TV
         - Chequered
     download: "/watch_folder"
 
