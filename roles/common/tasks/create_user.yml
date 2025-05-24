@@ -7,6 +7,7 @@
   tags:
     - ac_backup
     - assetto-files
+    - blog
     - gitea
     - isos
     - minio
@@ -22,7 +23,7 @@
   tags:
     - ac_backup
     - assetto-files
-    - gitea
+    - blog
     - gitea
     - isos
     - minio
@@ -33,6 +34,7 @@
   when: containers
   tags:
     - ac_backup
+    - blog
     - gitea
     - minio
 
@@ -42,6 +44,7 @@
   when: containers
   tags:
     - ac_backup
+    - blog
     - gitea
     - minio
 
@@ -52,6 +55,7 @@
     regexp: '^export XDG_RUNTIME_DIR'
   tags:
     - ac_backup
+    - blog
     - gitea
     - minio
 
