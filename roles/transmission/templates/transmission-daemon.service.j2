@@ -3,11 +3,11 @@ Description = Torrent Daemon
 Wants = network-online.target
 
 [Service]
-ExecStart = /usr/local/bin/transmission-daemon -f --log-level=debug --logfile=/var/log/transmission-daemon.log --config-dir /mnt/containers/tr/conf
-User = tr
-Group = tr
+ExecStart = /usr/local/bin/transmission-daemon -f --log-level=debug --logfile=/var/log/transmission-daemon.log --config-dir {{ containers_path }}/{{ app_user }}/conf
+User = {{ app_user }}
+Group = {{ app_user }}
 Restart = no 
-Nice = 10
+Nice = 0
 
 [Install]
 WantedBy = multi-user.target
