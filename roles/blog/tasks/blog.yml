@@ -12,6 +12,17 @@
     - "{{ containers_path }}/{{ app_name }}/instance"
     - "{{ containers_path }}/{{ app_name }}/custom"
 
+- name: stop container if exists
+  become_user: "{{ app_user }}"
+  ansible.builtin.systemd:
+    name: "{{ app_name }}"
+    state: stopped
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
+  register: app_stop_result
+  failed_when: "app_stop_result is failed and 'Could not find the requested service container-' not in app_stop_result.msg"
+
 - name: unarchive custom files if available
   ansible.builtin.unarchive:
     src: "{{ file_server }}/blog.zip"
@@ -66,4 +77,3 @@
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ app_uid }}"
   when: container_state.changed
-  register: files_systemctl_debug

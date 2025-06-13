@@ -5,32 +5,12 @@
   become: true
 
   roles:
-    - common
-    - sshd
-    - zram
-    - outbound_ip
-    - base-nginx
-    - file_store
-    - gitea
     - blog
 
   handlers:
-    - name: restart system
-      ansible.builtin.reboot:
-
     - name: reload network
       ansible.builtin.systemd:
         name: network
-        state: reloaded
-
-    - name: reload network Debian
-      ansible.builtin.systemd:
-        name: networking
-        state: restarted
-
-    - name: reload sshd
-      ansible.builtin.service:
-        name: sshd
         state: reloaded
 
     - name: reload nginx

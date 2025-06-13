@@ -30,6 +30,8 @@
     mode: '0640'
   when: cert_enabled and app_name in domain_app
   notify: reload nginx
+  tags:
+    - blog
 
 - name: set nginx subdomain http forward proxy
   ansible.builtin.template:
