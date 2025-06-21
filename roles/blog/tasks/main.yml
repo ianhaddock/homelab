@@ -11,9 +11,13 @@
     group: "{{ app_group }}"
     gid: "{{ app_gid }}"
     comment: "blog app account"
+  tags:
+    - blog
 
 - name: install container-blog
   ansible.builtin.import_tasks: blog.yml
+  tags:
+    - blog
 
 - name: set forward proxy and ports
   ansible.builtin.include_role:
@@ -21,3 +25,5 @@
     tasks_from: forward_proxy.yml
     public: true
   when: containers
+  tags:
+    - blog

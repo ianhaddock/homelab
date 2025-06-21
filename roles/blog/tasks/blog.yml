@@ -15,7 +15,7 @@
 - name: stop container if exists
   become_user: "{{ app_user }}"
   ansible.builtin.systemd:
-    name: "{{ app_name }}"
+    name: "container-{{ app_name }}"
     state: stopped
     scope: user
   environment:
@@ -40,7 +40,7 @@
     force_restart: true
     name: "{{ app_name }}"
     hostname: "{{ hostname }}"
-    image: ghcr.io/ianhaddock/blog:0.1.3
+    image: "ghcr.io/ianhaddock/blog:{{ blog_version }}"
     ports:
       - "{{ app_port }}:5000/tcp"
     volumes:
