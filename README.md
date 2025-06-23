@@ -1,17 +1,17 @@
 [![Ansible Yaml Check](https://github.com/ianhaddock/homelab/actions/workflows/ansible-check.yml/badge.svg)](https://github.com/ianhaddock/homelab/actions/workflows/ansible-check.yml)
 
 # Homelab
-Recently I reduced my homelab environment to the minimums as I refocus on power efficiency, quiet running, and maximized utilization per system. 
+Recently I reduced my homelab environment to the minimum to focus on power efficiency, quiet running, and maximized utilization per system. 
 
 <p align="center">
   <img width="80%" height="auto" src="readme.png">
 </p>
 
-### Roles
+## Roles
 * base-nginx: NGINX reverse proxy & letsencrypt TLS certificates
 * blog: my Flask app I built for [my blog][1]
 * gitea: public and private git repos
-* motorsort: my [custom racing video sorting and poster maker][111]
+* motorsort: my custom racing [video sorting and poster maker][111]
 * pihole: DNS with ad-guard
 * munin-node: resource monitoring
 * munin-server: resource monitor gui
@@ -36,7 +36,7 @@ Recently I reduced my homelab environment to the minimums as I refocus on power 
 * piglow: support for PiGlow hardware
 
 ## Quick Start
-As this Ansible so have Python, Ansible and Vagrant installed.
+As this is Ansible, have Python, Ansible, and Vagrant installed.
 ```
 # Pull the latest version of the repo.
 $ git pull https://github.com/ianhaddock/homelab.git
