@@ -1,21 +1,13 @@
 [![Ansible Yaml Check](https://github.com/ianhaddock/homelab/actions/workflows/ansible-check.yml/badge.svg)](https://github.com/ianhaddock/homelab/actions/workflows/ansible-check.yml)
 
 # Homelab
-An increasingly vintage yet generally energy efficient array of systems hosting my eclectic mix of entertainment and edu-tainment flavored services and software. Built publicly and with portability in mind, many of these Ansible roles can be plucked out and setup in your environment with minimal changes if you so wish.
+Recently I reduced my homelab environment to the minimums as I refocus on power efficiency, quiet running, and maximized utilization per system. 
 
 <p align="center">
   <img width="80%" height="auto" src="readme.png">
 </p>
 
-## How it's built
-* Vagrant development environments
-* Podman container management
-* KVM virtual machines
-* ZFS block storage
-* mostly CentOS Stream
-* sometimes Raspbian
-
-### Role Descriptions
+### Roles
 * base-nginx: NGINX reverse proxy & letsencrypt TLS certificates
 * blog: my Flask app I built for [my blog][1]
 * gitea: public and private git repos
@@ -33,66 +25,59 @@ An increasingly vintage yet generally energy efficient array of systems hosting 
 * navidrome: music streaming service
 * timecap: Apple timecapsule service for multiple users
 
-### Utilities & Configurations
+### Utility Roles
 * common: installs base packages, enables users, base OS configuration
 * sshd: ssh config and hardening (certs only, no user pw), figlet & random quote MOTDs
 * zram: enables ram compression as swap with a smaller fallback disk swap cache
 * ac_backup: my simple rsync file backup
 * file_store: my simple https file server
 * wakeonwin: bash alias file to wake my PC
-
-### Raspberry Pi specific
 * rpi2b_setup: rpi2b configuration tweaks
 * piglow: support for PiGlow hardware
 
 ## Quick Start
-As this is mostly Ansible based I'm assuming you have Python, Ansible and optionally Vagrant installed. If this is a machine you do other work on, I strongly suggest you [setup a Python virtual environment][112] before you do the following. 
-
-Pull the latest version of the repo.
-
-`$ git pull https://github.com/ianhaddock/homelab.git`
-
-Install the needed Ansible collections.
-
-`$ ansible-galaxy install -r roles/requirements.yml`
-
-Edit the Vagrantfile if you want to use a different IP space, or are using a different VM host. 
-
-Copy the reference example `group_vars/all.yml` file into a new host_vars directory and name the file as the target system's IPv4 IP (xxx.xxx.xxx.xxx.yml).
-
+As this Ansible so have Python, Ansible and Vagrant installed.
 ```
+# Pull the latest version of the repo.
+$ git pull https://github.com/ianhaddock/homelab.git
+
+# Install the needed Ansible collections.
+$ ansible-galaxy install -r roles/requirements.yml
+
+# Edit Vagrantfile for IP and/or VM provider. 
+$ vi Vagrantfile 
+
+# Copy the example to new a host_vars directory
 $ mkdir host_vars
 $ cp group_vars/all.yml host_vars/[target.systems.ip.address].yml
-```
 
-Edit the values in the new host_vars/target.systems.ip.address.yml file to fit your Vagrantfile configuration.
+# Edit the new host_vars file to fit your Vagrantfile config
+# Generate a ssh key-pair for the ansible account.
+$ ssh-keygen -f ~/.ssh/ansible
 
-As ssh password login is disabled in the sshd setup, generate a ssh key-pair for the ansible account.
-
-`$ ssh-keygen -f ~/.ssh/ansible`
-
-Add the Ansible public key to the common role files directory which it will install for you on the first run
-
-```
+# Add Ansible public key to the common role files directory
 $ mkdir -p roles/common/files/public_key
 $ cp ~/.ssh/ansible.pub roles/common/files/public_keys/
+
+# Start vagrant VM using --provision
+$ vagrant up --provision
+
+# Edit as you like, select roles and fire away:
+$ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development playbook.yml
 ```
-
-Start the vagrant VM. Using `--provision` will run the `initial-setup.yaml` file and get things started.
-
-`$ vagrant up --provision`
-
-Edit a main playbook as you like, select the role(s) you are interested in running and fire away:
-
-`$ ansible-playbook --private-key ~/.ssh/ansible -u ansible -i development your-new-playbook.yml`
- 
 
 ## Contributing
 I'm always interested in learning from and helping the community. If you have questions or know of a better way to do some of the things done here feel free to drop a pull request.
 
+## Donations
+If you found this useful and would like to support projects like this you can buy me a coffee:
 
+<p align="center">
+<a href="https://www.buymeacoffee.com/ianhaddock" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px; width: 174px;" ></a>
+</p>
 
 [1]: https://ianhaddock.com
 [2]: https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux
 [111]: https://github.com/ianhaddock/motorsort
 [112]: https://docs.python.org/3/library/venv.html
+
