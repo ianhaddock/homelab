@@ -10,5 +10,4 @@ app_port: 8888
 
 limit_app: false
 
-blog_version: 0.1.4
-
+blog_version: 0.1.5
