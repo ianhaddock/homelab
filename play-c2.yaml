@@ -1,0 +1,58 @@
+# C2 Playbook
+#
+---
+- hosts: c2
+  become: true
+
+  roles:
+    - dnf
+    - common
+    - sshd
+    - zram
+#    - hd-idle
+#    - samba
+#    - assetto-files
+#    - isos
+#    - timecap
+    - base-nginx
+    - plex
+    - transmission
+#    - ac_backup
+#    - gitea
+#    - minio
+
+  handlers:
+    - name: restart system
+      ansible.builtin.reboot:
+
+    - name: reload network
+      ansible.builtin.systemd:
+        name: network
+        state: reloaded
+
+    - name: reload sshd
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
+
+    - name: reload firewall
+      ansible.builtin.systemd:
+        name: firewalld
+        state: restarted
+
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+
+    - name: restart smb
+      ansible.builtin.systemd:
+        name: smb
+        enabled: true
+        state: restarted
+
+    - name: restart avahi
+      ansible.builtin.systemd:
+        name: avahi-daemon
+        enabled: true
+        state: restarted
