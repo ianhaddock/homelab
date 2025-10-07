@@ -1,5 +1,9 @@
 # ytdlp_scripts.yml
 ---
+- name: enable crb in dnf config-manager
+  ansible.builtin.command:
+    cmd: sudo dnf config-manager --set-enabled crb
+
   # crb needs to be enabled for ffmpeg to install 'sudo dnf config-manager --set-enabled crb'
 - name: install ffmpeg utility package
   ansible.builtin.package:
