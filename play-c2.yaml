@@ -17,8 +17,8 @@
     - base-nginx
     - plex
     - transmission
-#    - ac_backup
-#    - gitea
+    - ac_backup
+    - gitea
 #    - minio
 
   handlers:
