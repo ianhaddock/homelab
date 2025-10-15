@@ -9,7 +9,7 @@ app_name: transmission
 app_port: 9091
 app_data_port: 51412
 
-cpu_core_limiti: 1
+cpu_core_limit: 2
 memory_limit: "512M"
 
 app_media: "{{ transmission_path }}"
