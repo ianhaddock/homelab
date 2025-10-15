@@ -72,6 +72,7 @@
       - iotop
       - cpuid
       - speedtest-cli
+      - cifs-utils   # allows fqdn cifs mounts in fstab
     state: latest  # noqa package-latest
   when: ansible_os_family == 'RedHat'
   tags:
@@ -88,6 +89,7 @@
       - telnet
       - tiptop
       - speedtest-cli
+      - btop
     state: latest  # noqa package-latest
   when: ansible_os_family == 'Debian'
   tags:
