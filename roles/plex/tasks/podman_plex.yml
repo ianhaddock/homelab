@@ -9,6 +9,8 @@
     mode: '0755'
     state: directory
   with_items:
+    - "{{ plex_thumbnail_path }}"
+    - "{{ containers_path }}/{{ app_name }}"
     - "{{ containers_path }}/{{ app_name }}/config"
     - "{{ containers_path }}/{{ app_name }}/transcode"
 
@@ -37,8 +39,8 @@
     ports:
       - "{{ app_port }}:32400/tcp"
     volumes:
-      - "{{ containers_path }}/{{ app_name }}/config:/config:Z"
-      - "{{ containers_path }}/{{ app_name }}/transcode:/transcode:Z"
+      - "{{ containers_path }}/{{ app_name }}/config:/config"
+      - "{{ containers_path }}/{{ app_name }}/transcode:/transcode"
       - "{{ media_path }}:/mnt/media:ro"
       - "{{ transmission_path }}:/mnt/transmission:ro"
     # hardware acceleration

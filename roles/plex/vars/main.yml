@@ -7,7 +7,8 @@ app_group: plex
 app_gid: 1202
 
 plex_server_dir: "config/Library/Application Support/Plex Media Server"
-media_path: /mnt/media
+plex_thumbnail_path: "/mnt/plex-thumbnails"
+media_path: "/mnt/media"
 
 app_port: 32500
 app_name: plex

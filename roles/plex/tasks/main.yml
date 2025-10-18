@@ -37,6 +37,7 @@
     mode: '0755'
     state: directory
   with_items:
+    - "{{ media_path }}"
     - "{{ media_path }}/audiobooks"
     - "{{ media_path }}/books"
     - "{{ media_path }}/lemans"
