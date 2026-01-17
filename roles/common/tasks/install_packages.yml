@@ -73,6 +73,7 @@
       - cpuid
       - speedtest-cli
       - cifs-utils   # allows fqdn cifs mounts in fstab
+      - nfs_utils
     state: latest  # noqa package-latest
   when: ansible_os_family == 'RedHat'
   tags:
