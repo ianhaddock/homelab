@@ -47,7 +47,6 @@
     - "{{ media_path }}/yoga"
     - "{{ media_path }}/youtube"
     - "{{ media_path }}/yt_tunes"
-    - "{{ transmission_path }}"
   tags:
     - plex
 

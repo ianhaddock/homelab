@@ -9,7 +9,6 @@
     mode: '0755'
     state: directory
   with_items:
-    - "{{ plex_thumbnail_path }}"
     - "{{ containers_path }}/{{ app_name }}"
     - "{{ containers_path }}/{{ app_name }}/config"
     - "{{ containers_path }}/{{ app_name }}/transcode"
@@ -44,8 +43,7 @@
       - "{{ media_path }}:/mnt/media:ro"
       - "{{ transmission_path }}:/mnt/transmission:ro"
     # hardware acceleration
-    device:
-      - '/dev/dri:/dev/dri'
+    device: "/dev/dri:/dev/dri"
     cpus: "{{ cpu_core_limit }}"
     memory: "{{ memory_limit }}"
     env:

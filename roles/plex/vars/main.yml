@@ -1,5 +1,4 @@
-# plex var
-#
+# plex vars/main.yml
 ---
 app_user: plex
 app_uid: 1202
@@ -7,13 +6,12 @@ app_group: plex
 app_gid: 1202
 
 plex_server_dir: "config/Library/Application Support/Plex Media Server"
-plex_thumbnail_path: "/mnt/plex-thumbnails"
 media_path: "/mnt/media"
 
 app_port: 32500
 app_name: plex
 
-append_groups: "video,systemd-journal"
+append_groups: "video,render,systemd-journal"
 
-cpu_core_limit: 2
-memory_limit: "4G"
+cpu_core_limit: 4
+memory_limit: "6G"

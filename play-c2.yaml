@@ -9,17 +9,10 @@
     - common
     - sshd
     - zram
-#    - hd-idle
-#    - samba
-#    - assetto-files
-#    - isos
-#    - timecap
     - base-nginx
     - plex
     - transmission
     - ac_backup
-    - gitea
-#    - minio
 
   handlers:
     - name: restart system
