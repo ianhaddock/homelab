@@ -59,6 +59,14 @@ if [ $? != 0 ]; then
     exit 1;
 fi
 
+# prune local files
+echo "Removing local .gz older than 30 (+29) days old."
+find {{ ac_backup_destination }} -name *.log -atime +29 -exec rm -rvf '{}' \;
+if [ $? != 0 ]; then
+    echo "$(date +%Y%m%d:%H%M%S): local prune failed. Exiting"
+    exit 1;
+fi
+
 # copy remote files
 echo "Pulling backups from {{ ac_fqdn }}";
 
@@ -88,6 +96,15 @@ fi
 ssh -i /home/{{ app_user }}/.ssh/{{ app_user }} \
     {{ ac_user }}@{{ ac_fqdn }} "find {{ ac_backup_source }} \
         -name *.gz -ctime +1 -exec rm -rvf '{}' \;"
+
+if [ $? != 0 ]; then
+    echo "$(date +%Y%m%d:%H%M%S): prune failed. Exiting"
+    exit 1;
+fi
+
+ssh -i /home/{{ app_user }}/.ssh/{{ app_user }} \
+    {{ ac_user }}@{{ ac_fqdn }} "find {{ ac_backup_source }} \
+        -name *.log -ctime +1 -exec rm -rvf '{}' \;"
 
 if [ $? != 0 ]; then
     echo "$(date +%Y%m%d:%H%M%S): prune failed. Exiting"
